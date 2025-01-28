@@ -26,5 +26,6 @@ func RegisterProductRoutes(r chi.Router) {
 
 	r.Route("/products", func(r chi.Router) {
 		r.Get("/", hd.GetAll())
+		r.Get("/{id}", hd.GetById())
 	})
 }

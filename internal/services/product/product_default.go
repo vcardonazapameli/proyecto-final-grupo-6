@@ -2,6 +2,7 @@ package product
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
+	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -18,4 +19,13 @@ func (s *ProductDefault) GetAll() (map[int]models.ProductDoc, error) {
 	products, _ := s.rp.GetAll()
 	productsDoc := mappers.ProductsToProductsDoc(products)
 	return productsDoc, nil
+}
+
+func (s *ProductDefault) GetById(id int) (*models.ProductDoc, error) {
+	product, _ := s.rp.GetById(id)
+	if product == nil {
+		return nil, errorCustom.ErrorNotFound
+	}
+	productDoc := mappers.ProductToProductDoc(*product)
+	return &productDoc, nil
 }

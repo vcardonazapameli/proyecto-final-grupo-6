@@ -19,3 +19,11 @@ type ProductMap struct {
 func (r *ProductMap) GetAll() (map[int]models.Product, error) {
 	return r.db, nil
 }
+
+func (r *ProductMap) GetById(id int) (*models.Product, error) {
+	product, exist := r.db[id]
+	if !exist {
+		return nil, nil
+	}
+	return &product, nil
+}
