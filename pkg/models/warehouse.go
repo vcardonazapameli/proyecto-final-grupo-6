@@ -1,7 +1,7 @@
 package models
 
 type Warehouse struct {
-	Id uint64
+	Id int
 	WarehouseAttributes
 }
 
@@ -15,7 +15,7 @@ type WarehouseAttributes struct {
 }
 
 type WarehouseDoc struct {
-	ID                  uint64  `json:"id"`
+	ID                  int     `json:"id"`
 	Warehouse_code      string  `json:"warehouse_code"`
 	Address             string  `json:"addres"`
 	Telephone           string  `json:"telephone"`
