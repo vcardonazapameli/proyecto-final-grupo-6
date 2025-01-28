@@ -1,6 +1,7 @@
 package employee
 
 import (
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -20,6 +21,6 @@ type EmployeeMap struct {
 }
 
 // FindAll is a method that returns a map of all vehicles
-func (r *EmployeeMap) GetAll() (v map[int]models.Employee, err error) {
-	return
+func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
+	return nil, errors.ErrorConflict
 }
