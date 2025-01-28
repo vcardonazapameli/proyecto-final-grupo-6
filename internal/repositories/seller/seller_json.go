@@ -18,3 +18,7 @@ func NewSellerRepositoryJSON(db map[int]models.Seller, loader loader.SellerLoade
 	}
 	return &SellerRepositoryJSON{db: defaultDb, loader: loader}
 }
+
+func (r *SellerRepositoryJSON) GetAll() (s map[int]models.Seller, err error) {
+	return r.db, err
+}
