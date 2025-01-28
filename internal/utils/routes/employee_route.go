@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
-	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/loader/employee"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/employee"
+	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/employee"
 
 	"github.com/go-chi/chi/v5"
 )
