@@ -29,3 +29,12 @@ func (s *ProductDefault) GetById(id int) (*models.ProductDoc, error) {
 	productDoc := mappers.ProductToProductDoc(*product)
 	return &productDoc, nil
 }
+
+func (s *ProductDefault) Delete(id int) error {
+	product, _ := s.rp.GetById(id)
+	if product == nil {
+		return errorCustom.ErrorNotFound
+	}
+	s.rp.Delete(product.Id)
+	return nil
+}

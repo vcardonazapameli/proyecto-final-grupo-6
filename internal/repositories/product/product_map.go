@@ -27,3 +27,8 @@ func (r *ProductMap) GetById(id int) (*models.Product, error) {
 	}
 	return &product, nil
 }
+
+func (r *ProductMap) Delete(id int) error {
+	delete(r.db, id)
+	return nil
+}

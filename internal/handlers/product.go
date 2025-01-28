@@ -45,3 +45,17 @@ func (h *ProductHandler) GetById() http.HandlerFunc {
 		response.JSON(w, http.StatusOK, productDoc)
 	}
 }
+
+func (h *ProductHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+		err := h.sv.Delete(id)
+		if err != nil {
+			if errors.Is(err, errorCustom.ErrorNotFound) {
+				response.Error(w, http.StatusNotFound, err.Error())
+				return
+			}
+		}
+		response.JSON(w, http.StatusNoContent, "el registro se elimino correctamente")
+	}
+}
