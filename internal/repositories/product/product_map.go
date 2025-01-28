@@ -15,3 +15,7 @@ func NewProductMap(db map[int]models.Product) ProductRepository {
 type ProductMap struct {
 	db map[int]models.Product
 }
+
+func (r *ProductMap) GetAll() (map[int]models.Product, error) {
+	return nil, nil
+}

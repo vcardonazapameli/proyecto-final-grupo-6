@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/routes"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/routes"
 	"github.com/go-chi/chi/v5"
 )
 

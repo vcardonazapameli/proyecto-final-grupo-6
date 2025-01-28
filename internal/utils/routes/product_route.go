@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
-	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/loader/product"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/product"
+	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/product"
 )
 
 func RegisterProductRoutes(r chi.Router) {
@@ -25,6 +25,6 @@ func RegisterProductRoutes(r chi.Router) {
 	hd := handler.NewProductHandler(sv)
 
 	r.Route("/product", func(rt chi.Router) {
-		println(hd)
+		r.Get("/", hd.GetAll())
 	})
 }

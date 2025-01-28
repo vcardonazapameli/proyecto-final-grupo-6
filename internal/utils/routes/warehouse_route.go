@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
-	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/loader/warehouse"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
+	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/warehouse"
 )
 
 func RegisterWarehouseRoutes(r chi.Router) {
