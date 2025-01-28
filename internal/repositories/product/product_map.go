@@ -17,5 +17,5 @@ type ProductMap struct {
 }
 
 func (r *ProductMap) GetAll() (map[int]models.Product, error) {
-	return nil, nil
+	return r.db, nil
 }

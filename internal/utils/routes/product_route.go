@@ -24,7 +24,7 @@ func RegisterProductRoutes(r chi.Router) {
 	sv := service.NewProductDefault(rp)
 	hd := handler.NewProductHandler(sv)
 
-	r.Route("/product", func(rt chi.Router) {
+	r.Route("/products", func(r chi.Router) {
 		r.Get("/", hd.GetAll())
 	})
 }

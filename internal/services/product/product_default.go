@@ -2,6 +2,7 @@ package product
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -13,10 +14,8 @@ type ProductDefault struct {
 	rp repository.ProductRepository
 }
 
-func (s *ProductDefault) GetAll() (map[int]models.Product, error) {
-	products, err := s.rp.GetAll()
-	if products != nil {
-		return nil, err
-	}
-	return products, nil
+func (s *ProductDefault) GetAll() (map[int]models.ProductDoc, error) {
+	products, _ := s.rp.GetAll()
+	productsDoc := mappers.ProductsToProductsDoc(products)
+	return productsDoc, nil
 }
