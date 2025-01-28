@@ -1,7 +1,7 @@
 package models
 
 type Product struct {
-	Id uint64
+	Id int
 	ProductAttributes
 }
 
@@ -9,11 +9,11 @@ type ProductAttributes struct {
 	ProductCode                    string
 	Description                    string
 	ExpirationRate                 float64
-	recommendedFreezingTemperature float64
-	freezingRate                   float64
+	RecommendedFreezingTemperature float64
+	FreezingRate                   float64
 	Dimensions
-	ProductType uint64
-	Seller      uint64
+	ProductType int
+	Seller      int
 }
 
 type Dimensions struct {
@@ -24,16 +24,16 @@ type Dimensions struct {
 }
 
 type ProductDoc struct {
-	Id                             uint64  `json:"id"`
+	Id                             int     `json:"id"`
 	ProductCode                    string  `json:"product_code"`
 	Description                    string  `json:"description"`
 	ExpirationRate                 float64 `json:"expiration_rate"`
-	recommendedFreezingTemperature float64 `json:"recommended_freezing_temperature"`
-	freezingRate                   float64 `json:"freezing_rate"`
+	RecommendedFreezingTemperature float64 `json:"recommended_freezing_temperature"`
+	FreezingRate                   float64 `json:"freezing_rate"`
 	Width                          float64 `json:"width"`
 	Height                         float64 `json:"height"`
 	Length                         float64 `json:"length"`
 	NetWeight                      float64 `json:"net_weight"`
-	ProductType                    uint64  `json:"product_type_id"`
-	Seller                         uint64  `json:"seller_id"`
+	ProductType                    int     `json:"product_type_id"`
+	Seller                         int     `json:"seller_id"`
 }
