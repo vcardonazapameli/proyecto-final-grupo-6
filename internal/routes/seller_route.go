@@ -21,7 +21,7 @@ func RegisterSellerRoutes(r chi.Router) {
 	}
 
 	// //dependency injection
-	rp := repository.NewSellerRepositoryJSON(db, "docs/seller.json")
+	rp := repository.NewSellerRepositoryJSON(db, ld)
 	sv := service.NewSellerServiceDefault(rp)
 	hd := handler.NewSellerHandler(sv)
 

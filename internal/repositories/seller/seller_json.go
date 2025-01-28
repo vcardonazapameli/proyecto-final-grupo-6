@@ -1,17 +1,20 @@
 package seller
 
-import "github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+import (
+	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/loader/seller"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+)
 
 type SellerRepositoryJSON struct {
-	db       map[int]models.Seller
-	jsonPath string
+	db     map[int]models.Seller
+	loader loader.SellerLoader
 }
 
-func NewSellerRepositoryJSON(db map[int]models.Seller, path string) *SellerRepositoryJSON {
+func NewSellerRepositoryJSON(db map[int]models.Seller, loader loader.SellerLoader) *SellerRepositoryJSON {
 	// default db
 	defaultDb := make(map[int]models.Seller)
 	if db != nil {
 		defaultDb = db
 	}
-	return &SellerRepositoryJSON{db: defaultDb, jsonPath: path}
+	return &SellerRepositoryJSON{db: defaultDb, loader: loader}
 }
