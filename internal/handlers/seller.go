@@ -54,7 +54,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 				response.Error(w, http.StatusConflict, "Could not create Seller: Existing CID")
 				return
 			}
-			if errors.Is(err, service.ValidationError{}) {
+			if errors.As(err, &service.ValidationError{}) {
 				response.Error(w, http.StatusBadRequest, err.Error())
 				return
 			}
