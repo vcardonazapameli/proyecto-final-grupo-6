@@ -15,3 +15,7 @@ type SellerDoc struct {
 	Address     string `json:"address"`
 	Telephone   int    `json:"telephone"`
 }
+
+func NewSeller(id int, cid int, companyName string, address string, telephone int) *Seller {
+	return &Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+}

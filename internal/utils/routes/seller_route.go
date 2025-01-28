@@ -30,5 +30,6 @@ func RegisterSellerRoutes(r chi.Router) {
 	// - endpoints
 	r.Route("/seller", func(rt chi.Router) {
 		rt.Get("/", hd.GetAll())
+		rt.Post("/", hd.Create())
 	})
 }

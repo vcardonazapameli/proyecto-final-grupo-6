@@ -29,3 +29,19 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 	}
 	return s, nil
 }
+
+func (sv *SellerServiceDefault) Create(cid int, companyName string, address string, telephone int) (models.SellerDoc, error) {
+	// Validate Seller
+	if err := ValidateSeller(cid, companyName, address, telephone); err != nil {
+		return models.SellerDoc{}, err
+	}
+
+	new, err := sv.rp.Save(cid, companyName, address, telephone)
+	if err != nil {
+		return models.SellerDoc{}, err
+	}
+
+	newDoc := mappers.SellerToSellerDoc(new)
+	return newDoc, nil
+
+}
