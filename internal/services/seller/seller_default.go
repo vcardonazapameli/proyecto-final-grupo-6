@@ -45,3 +45,12 @@ func (sv *SellerServiceDefault) Create(cid int, companyName string, address stri
 	return newDoc, nil
 
 }
+
+func (sv *SellerServiceDefault) GetByID(id int) (models.SellerDoc, error) {
+	s, err := sv.rp.GetByID(id)
+	if err != nil {
+		return models.SellerDoc{}, err
+	}
+
+	return mappers.SellerToSellerDoc(s), nil
+}

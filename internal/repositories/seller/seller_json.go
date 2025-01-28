@@ -1,6 +1,7 @@
 package seller
 
 import (
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/seller"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -21,6 +22,14 @@ func NewSellerRepositoryJSON(db map[int]models.Seller, loader loader.SellerLoade
 
 func (r *SellerRepositoryJSON) GetAll() (s map[int]models.Seller, err error) {
 	return r.db, err
+}
+
+func (r *SellerRepositoryJSON) GetByID(id int) (models.Seller, error) {
+	if s, ok := r.db[id]; !ok {
+		return models.Seller{}, errors.ErrorNotFound
+	} else {
+		return s, nil
+	}
 }
 
 func (r *SellerRepositoryJSON) searchByCID(cid int) (models.Seller, bool) {

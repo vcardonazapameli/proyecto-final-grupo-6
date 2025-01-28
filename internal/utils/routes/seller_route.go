@@ -28,8 +28,9 @@ func RegisterSellerRoutes(r chi.Router) {
 	// // - middlewares
 
 	// - endpoints
-	r.Route("/seller", func(rt chi.Router) {
+	r.Route("/sellers", func(rt chi.Router) {
 		rt.Get("/", hd.GetAll())
+		rt.Get("/{id}", hd.GetByID())
 		rt.Post("/", hd.Create())
 	})
 }

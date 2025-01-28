@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	repositories "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
+	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/bootcamp-go/web/response"
+	"github.com/go-chi/chi/v5"
 )
 
 type SellerHandler struct {
@@ -65,6 +68,34 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 		response.JSON(w, http.StatusCreated, map[string]any{
 			"message": "success",
 			"data":    new,
+		})
+	}
+}
+
+func (h *SellerHandler) GetByID() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "ID format not correct. Must be int")
+			return
+		}
+
+		s, err := h.sv.GetByID(id)
+
+		// Error handling
+		if err != nil {
+			if errors.Is(err, defaultErrors.ErrorNotFound) {
+				response.Error(w, http.StatusNotFound, "Seller not found")
+				return
+			}
+			response.Error(w, http.StatusInternalServerError, "Unknown error ocurred")
+			return
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "success",
+			"data":    s,
 		})
 	}
 }
