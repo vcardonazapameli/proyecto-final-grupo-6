@@ -44,3 +44,25 @@ func (r *EmployeeMap) GetById(id int) (*models.Employee, error) {
 
 	return nil, nil
 }
+
+func createNewId(employees map[int]models.Employee) int {
+	maxId := 0
+	for _, value := range employees {
+		if value.Id > maxId {
+			maxId = value.Id
+		}
+	}
+	return maxId + 1
+}
+
+// Create implements EmployeeRepository.
+func (r *EmployeeMap) Create(newEmployee models.Employee) (models.Employee, error) {
+
+	newId := createNewId(r.db)
+	newEmployee.Id = newId
+
+	//save newEmployee
+	r.db[newId] = newEmployee
+
+	return newEmployee, nil
+}

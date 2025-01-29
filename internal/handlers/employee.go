@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -77,29 +78,27 @@ func (h *EmployeeHandler) GetById() http.HandlerFunc {
 	}
 }
 
-// func (h *EmployeeHandler) Create() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var newEmployee models.EmployeeDoc
+func (h *EmployeeHandler) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var newEmployee models.RequestEmployee
 
-// 		if err := json.NewDecoder(r.Body).Decode(&newEmployee); err != nil {
-// 			response.Error(w, http.StatusBadRequest, "Invalid JSON for employee")
-// 			return
-// 		}
+		if err := json.NewDecoder(r.Body).Decode(&newEmployee); err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid JSON for employee")
+			return
+		}
 
-// 		//map to employee model
-// 		newEmployeeMap := mappers.EmployeeDocToEmployee(newEmployee)
-// 		data, err := h.sv.Create(newEmployeeMap)
+		data, err := h.sv.Create(newEmployee)
 
-// 		if err != nil {
-// 			response.Error(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		//mapear
-// 		employeeDoc := mappers.EmployeeToEmployeeDoc(*data)
+		//mapear
+		employeeDoc := mappers.EmployeeToEmployeeDoc(*data)
 
-// 		response.JSON(w, http.StatusCreated, map[string]any{
-// 			"data": employeeDoc,
-// 		})
-// 	}
-// }
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"data": employeeDoc,
+		})
+	}
+}

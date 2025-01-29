@@ -14,6 +14,13 @@ func EmployeeDocToEmployee(EmployeeDoc models.EmployeeDoc) models.Employee {
 	}
 }
 
+func RequestEmployeeToEmployee(request models.RequestEmployee) models.Employee {
+	return models.Employee{
+		Id:                 0,
+		EmployeeAttributes: models.EmployeeAttributes(request),
+	}
+}
+
 func EmployeeToEmployeeDoc(Employee models.Employee) models.EmployeeDoc {
 	return models.EmployeeDoc{
 		Id:           Employee.Id,

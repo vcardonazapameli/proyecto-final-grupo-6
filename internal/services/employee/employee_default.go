@@ -3,6 +3,7 @@ package employee
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -40,7 +41,16 @@ func (e *EmployeeDefault) GetById(id int) (*models.Employee, error) {
 	return data, nil
 }
 
-// // Create implements EmployeeService.
-// func (e *EmployeeDefault) Create(models.Employee) (*models.Employee, error) {
+// Create implements EmployeeService.
+func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.Employee, error) {
 
-// }
+	//map request to model
+	newEmployeeMap := mappers.RequestEmployeeToEmployee(request)
+
+	data, err := e.rp.Create(newEmployeeMap)
+	if err != nil {
+		return nil, errors.ErrorInternalServerError
+	}
+
+	return &data, nil
+}
