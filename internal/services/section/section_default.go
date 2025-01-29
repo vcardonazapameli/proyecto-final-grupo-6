@@ -36,3 +36,19 @@ func (s *SectionDefault) Create(section models.Section) (st models.Section, err 
 	}
 	return section, nil
 }
+
+func (s *SectionDefault) Update(id int, section models.Section) (st models.Section, err error) {
+	section, err = s.rp.Update(id, section)
+	if err != nil {
+		return models.Section{}, err
+	}
+	return section, nil
+}
+
+func (s *SectionDefault) Delete(id int) error {
+	err := s.rp.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

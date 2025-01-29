@@ -47,3 +47,49 @@ func (s *SectionMap) Create(section models.Section) (st models.Section, err erro
 	s.db[newID] = section
 	return section, nil
 }
+
+// Update a section
+func (s *SectionMap) Update(id int, section models.Section) (st models.Section, err error) {
+	existSection, ok := s.db[id]
+	if !ok {
+		return models.Section{}, errors.ErrorNotFound
+	}
+	if section.SectionNumber != "" {
+		existSection.SectionNumber = section.SectionNumber
+	}
+	if section.CurrentCapacity != 0 {
+		existSection.CurrentCapacity = section.CurrentCapacity
+	}
+	if section.CurrentTemperature != 0 {
+		existSection.CurrentTemperature = section.CurrentTemperature
+	}
+	if section.MaximumCapacity != 0 {
+		existSection.MaximumCapacity = section.MaximumCapacity
+	}
+	if section.MinimumCapacity != 0 {
+		existSection.MinimumCapacity = section.MinimumCapacity
+	}
+	if section.MinimumTemperature != 0 {
+		existSection.MinimumTemperature = section.MinimumTemperature
+	}
+	if section.ProductTypeId != 0 {
+		existSection.ProductTypeId = section.ProductTypeId
+	}
+	if section.WarehouseId != 0 {
+		existSection.WarehouseId = section.WarehouseId
+	}
+	if len(section.ProductBatchId) != 0 {
+		existSection.ProductBatchId = section.ProductBatchId
+	}
+	s.db[id] = existSection
+	return existSection, nil
+}
+
+func (s *SectionMap) Delete(id int) error {
+	_, ok := s.db[id]
+	if !ok {
+		return errors.ErrorNotFound
+	}
+	delete(s.db, id)
+	return nil
+}

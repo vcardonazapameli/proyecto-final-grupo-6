@@ -98,3 +98,57 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 		})
 	}
 }
+
+func (h *SectionHandler) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			return
+		}
+		var s models.SectionDoc
+		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid request body")
+			return
+		}
+
+		section := mappers.SectionDocToSection(s)
+		updatedSection, err := h.sv.Update(idConv, section)
+		if err != nil {
+			if err == errors.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, err.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, "An error occurred while updating the section")
+			}
+			return
+		}
+		updateSectionDoc := mappers.SectionToSectionDoc(updatedSection)
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Section updated",
+			"data":    updateSectionDoc,
+		})
+	}
+}
+
+func (h *SectionHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			return
+		}
+
+		err = h.sv.Delete(idConv)
+		if err != nil {
+			if err == errors.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, err.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, "An error occurred while deleting the section")
+			}
+			return
+		}
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "Section deleted",
+		})
+	}
+}
