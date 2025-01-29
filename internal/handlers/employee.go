@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/employee"
-	"github.com/bootcamp-go/web/response"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 )
 
 func NewEmployeeHandler(sv service.EmployeeService) *EmployeeHandler {
@@ -24,10 +24,13 @@ func (h *EmployeeHandler) GetAll() http.HandlerFunc {
 
 		// process
 		// - get all
-		data, _ := h.sv.GetAll()
+		data, err := h.sv.GetAll()
 
-		println(data)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
 
-		response.JSON(w, http.StatusOK, "hola")
+		response.JSON(w, http.StatusOK, data)
 	}
 }
