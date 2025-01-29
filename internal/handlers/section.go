@@ -147,7 +147,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			}
 			return
 		}
-		response.JSON(w, http.StatusOK, map[string]any{
+		response.JSON(w, http.StatusNoContent, map[string]any{
 			"message": "Section deleted",
 		})
 	}
