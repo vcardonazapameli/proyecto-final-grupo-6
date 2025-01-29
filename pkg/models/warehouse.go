@@ -17,7 +17,7 @@ type WarehouseAttributes struct {
 type WarehouseDoc struct {
 	ID                  int     `json:"id"`
 	Warehouse_code      string  `json:"warehouse_code"`
-	Address             string  `json:"addres"`
+	Address             string  `json:"address"`
 	Telephone           string  `json:"telephone"`
 	Minimun_capacity    uint64  `json:"minimun_capacity"`
 	Minimun_temperature float64 `json:"minimun_temperature"`

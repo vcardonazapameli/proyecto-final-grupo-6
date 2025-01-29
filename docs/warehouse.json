@@ -1,1 +1,183 @@
-[{}]
+[
+    {
+      "id": 1,
+      "warehouse_code": "WH001",
+      "address": "123 Main Street",
+      "telephone": "555-1234",
+      "minimun_capacity": 500,
+      "minimun_temperature": -5.0,
+      "locality_id": 101
+    },
+    {
+      "id": 2,
+      "warehouse_code": "WH002",
+      "address": "456 Oak Avenue",
+      "telephone": "555-5678",
+      "minimun_capacity": 1000,
+      "minimun_temperature": -10.0,
+      "locality_id": 102
+    },
+    {
+      "id": 3,
+      "warehouse_code": "WH003",
+      "address": "789 Pine Road",
+      "telephone": "555-9876",
+      "minimun_capacity": 200,
+      "minimun_temperature": 2.0,
+      "locality_id": 103
+    },
+    {
+      "id": 4,
+      "warehouse_code": "WH004",
+      "address": "101 Elm Street",
+      "telephone": "555-4321",
+      "minimun_capacity": 750,
+      "minimun_temperature": -8.0,
+      "locality_id": 104
+    },
+    {
+      "id": 5,
+      "warehouse_code": "WH005",
+      "address": "202 Maple Lane",
+      "telephone": "555-8765",
+      "minimun_capacity": 300,
+      "minimun_temperature": 0.0,
+      "locality_id": 105
+    },
+    {
+        "id": 6,
+        "warehouse_code": "WH006",
+        "address": "307 Oak Avenue",
+        "telephone": "555-1175",
+        "minimun_capacity": 960,
+        "minimun_temperature": -11.2,
+        "locality_id": 106
+    },
+    {
+        "id": 7,
+        "warehouse_code": "WH007",
+        "address": "125 Oak Street",
+        "telephone": "555-2548",
+        "minimun_capacity": 976,
+        "minimun_temperature": -15.9,
+        "locality_id": 119
+    },
+    {
+        "id": 8,
+        "warehouse_code": "WH008",
+        "address": "448 Oak Lane",
+        "telephone": "555-7534",
+        "minimun_capacity": 1136,
+        "minimun_temperature": -14.5,
+        "locality_id": 118
+      },
+      {
+        "id": 9,
+        "warehouse_code": "WH009",
+        "address": "717 Elm Street",
+        "telephone": "555-6891",
+        "minimun_capacity": 1466,
+        "minimun_temperature": 2.9,
+        "locality_id": 111
+    },
+    {
+        "id": 10,
+        "warehouse_code": "WH010",
+        "address": "559 Oak Street",
+        "telephone": "555-6954",
+        "minimun_capacity": 642,
+        "minimun_temperature": -6.6,
+        "locality_id": 114
+    },
+    {
+        "id": 11,
+        "warehouse_code": "WH011",
+        "address": "792 Pine Road",
+        "telephone": "555-3085",
+        "minimun_capacity": 606,
+        "minimun_temperature": 1.3,
+        "locality_id": 105
+    },
+    {
+        "id": 12,
+        "warehouse_code": "WH012",
+        "address": "426 Oak Lane",
+        "telephone": "555-8670",
+        "minimun_capacity": 1449,
+        "minimun_temperature": -10.8,
+        "locality_id": 118
+    },
+    {
+        "id": 13,
+        "warehouse_code": "WH013",
+        "address": "161 Pine Avenue",
+        "telephone": "555-9815",
+        "minimun_capacity": 598,
+        "minimun_temperature": 1.7,
+        "locality_id": 113
+      },
+      {
+        "id": 14,
+        "warehouse_code": "WH014",
+        "address": "803 Pine Lane",
+        "telephone": "555-8882",
+        "minimun_capacity": 1854,
+        "minimun_temperature": -2.0,
+        "locality_id": 106
+    },
+    {
+        "id": 15,
+        "warehouse_code": "WH015",
+        "address": "326 Pine Street",
+        "telephone": "555-8773",
+        "minimun_capacity": 1492,
+        "minimun_temperature": -5.1,
+        "locality_id": 112
+    },
+    {
+        "id": 16,
+        "warehouse_code": "WH016",
+        "address": "405 Main Avenue",
+        "telephone": "555-9528",
+        "minimun_capacity": 224,
+        "minimun_temperature": -18.3,
+        "locality_id": 104
+    },
+    {
+        "id": 17,
+        "warehouse_code": "WH017",
+        "address": "328 Oak Avenue",
+        "telephone": "555-5922",
+        "minimun_capacity": 1886,
+        "minimun_temperature": -16.3,
+        "locality_id": 116
+    },
+    {
+        "id": 18,
+        "warehouse_code": "WH018",
+        "address": "326 Main Road",
+        "telephone": "555-1497",
+        "minimun_capacity": 443,
+        "minimun_temperature": -13.0,
+        "locality_id": 101
+    },
+    {
+        "id": 19,
+        "warehouse_code": "WH019",
+        "address": "395 Maple Road",
+        "telephone": "555-2651",
+        "minimun_capacity": 111,
+        "minimun_temperature": -9.6,
+        "locality_id": 106
+    },
+    {
+        "id": 20,
+        "warehouse_code": "WH020",
+        "address": "505 Main Lane",
+        "telephone": "555-8737",
+        "minimun_capacity": 953,
+        "minimun_temperature": -15.0,
+        "locality_id": 102
+    }
+]
+  
