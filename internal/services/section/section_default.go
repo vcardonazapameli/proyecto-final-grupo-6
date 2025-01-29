@@ -20,3 +20,11 @@ func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
 	}
 	return sections, nil
 }
+
+func (s *SectionDefault) GetByID(id int) (st models.Section, err error) {
+	section, err := s.rp.GetByID(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+	return section, nil
+}

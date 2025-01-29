@@ -26,7 +26,7 @@ func RegisterSectionRoutes(r chi.Router) {
 
 	r.Route("/section", func(rt chi.Router) {
 		rt.Get("/", hd.GetAll())
-		// rt.Get("/{id}", hd.GetByID())
+		rt.Get("/{id}", hd.GetByID())
 		// rt.Post("/", hd.Create())
 		// rt.Put("/{id}", hd.Update())
 		// rt.Delete("/{id}", hd.Delete())
