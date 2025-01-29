@@ -11,9 +11,10 @@ type SectionAttributes struct {
 	CurrentTemperature float64
 	MaximumCapacity    int
 	MinimumCapacity    int
-	MinimunTemperature float64
-	ProductType        int
+	MinimumTemperature float64
+	ProductTypeId      int
 	WarehouseId        int
+	ProductBatchId     []int
 }
 
 type SectionDoc struct {
@@ -23,7 +24,8 @@ type SectionDoc struct {
 	CurrentTemperature float64 `json:"current_temperature"`
 	MaximumCapacity    int     `json:"maximum_capacity"`
 	MinimumCapacity    int     `json:"minimum_capacity"`
-	MinimunTemperature float64 `json:"minimum_temperature"`
-	ProductType        int     `json:"product_type_id"`
+	MinimumTemperature float64 `json:"minimum_temperature"`
+	ProductTypeId      int     `json:"product_type_id"`
 	WarehouseId        int     `json:"warehouse_id"`
+	ProductBatchId     []int   `json:"product_batch_id"`
 }

@@ -16,6 +16,6 @@ type SectionMap struct {
 	db map[int]models.Section
 }
 
-func (r *SectionMap) GetAll() (v map[int]models.Section, err error) {
-	return
+func (s *SectionMap) GetAll() (map[int]models.Section, error) {
+	return s.db, nil
 }
