@@ -21,7 +21,7 @@ func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
 	return sections, nil
 }
 
-func (s *SectionDefault) GetByID(id int) (st models.Section, err error) {
+func (s *SectionDefault) GetByID(id int) (models.Section, error) {
 	section, err := s.rp.GetByID(id)
 	if err != nil {
 		return models.Section{}, err
@@ -29,16 +29,16 @@ func (s *SectionDefault) GetByID(id int) (st models.Section, err error) {
 	return section, nil
 }
 
-func (s *SectionDefault) Create(section models.Section) (st models.Section, err error) {
-	section, err = s.rp.Create(section)
+func (s *SectionDefault) Create(section models.Section) (models.Section, error) {
+	section, err := s.rp.Create(section)
 	if err != nil {
 		return models.Section{}, err
 	}
 	return section, nil
 }
 
-func (s *SectionDefault) Update(id int, section models.Section) (st models.Section, err error) {
-	section, err = s.rp.Update(id, section)
+func (s *SectionDefault) Update(id int, section models.Section) (models.Section, error) {
+	section, err := s.rp.Update(id, section)
 	if err != nil {
 		return models.Section{}, err
 	}

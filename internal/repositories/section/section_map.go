@@ -23,7 +23,7 @@ func (s *SectionMap) GetAll() (map[int]models.Section, error) {
 }
 
 // Get a section by ID
-func (s *SectionMap) GetByID(id int) (st models.Section, err error) {
+func (s *SectionMap) GetByID(id int) (models.Section, error) {
 	section, ok := s.db[id]
 	if !ok {
 		return models.Section{}, errors.ErrorNotFound
@@ -32,7 +32,7 @@ func (s *SectionMap) GetByID(id int) (st models.Section, err error) {
 }
 
 // Create a new section
-func (s *SectionMap) Create(section models.Section) (st models.Section, err error) {
+func (s *SectionMap) Create(section models.Section) (models.Section, error) {
 	if section.SectionNumber == "" {
 		return models.Section{}, errors.ErrorUnprocessableContent
 	}
@@ -49,7 +49,7 @@ func (s *SectionMap) Create(section models.Section) (st models.Section, err erro
 }
 
 // Update a section
-func (s *SectionMap) Update(id int, section models.Section) (st models.Section, err error) {
+func (s *SectionMap) Update(id int, section models.Section) (models.Section, error) {
 	existSection, ok := s.db[id]
 	if !ok {
 		return models.Section{}, errors.ErrorNotFound
