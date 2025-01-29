@@ -24,7 +24,7 @@ func RegisterSectionRoutes(r chi.Router) {
 	sv := service.NewSectionDefault(rp)
 	hd := handler.NewSectionHandler(sv)
 
-	r.Route("/section", func(rt chi.Router) {
+	r.Route("/sections", func(rt chi.Router) {
 		rt.Get("/", hd.GetAll())
 		rt.Get("/{id}", hd.GetByID())
 		// rt.Post("/", hd.Create())
