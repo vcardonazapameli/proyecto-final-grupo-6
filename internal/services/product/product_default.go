@@ -53,3 +53,17 @@ func (s *ProductDefault) Create(productDoc models.ProductDoc) (*models.ProductDo
 	productDoc = mappers.ProductToProductDoc(product)
 	return &productDoc, nil
 }
+
+func (s *ProductDefault) Update(id int, productDoc models.ProductDoc) (*models.ProductDoc, error) {
+	if product, _ := s.rp.GetById(id); product == nil {
+		return nil, errorCustom.ErrorNotFound
+	}
+	product := mappers.ProductDocToProduct(productDoc)
+	product.Id = id
+	err := s.rp.Update(id, product)
+	if err != nil {
+		return nil, nil
+	}
+	productDoc = mappers.ProductToProductDoc(product)
+	return &productDoc, nil
+}

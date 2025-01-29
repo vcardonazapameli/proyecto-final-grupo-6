@@ -7,4 +7,5 @@ type ProductService interface {
 	GetById(int) (*models.ProductDoc, error)
 	Delete(int) error
 	Create(models.ProductDoc) (*models.ProductDoc, error)
+	Update(int, models.ProductDoc) (*models.ProductDoc, error)
 }

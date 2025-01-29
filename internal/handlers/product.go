@@ -81,3 +81,24 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 		response.JSON(w, http.StatusCreated, product)
 	}
 }
+
+func (h *ProductHandler) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+		productDoc := models.ProductDoc{}
+		if err := json.NewDecoder(r.Body).Decode(&productDoc); err != nil {
+			response.Error(w, http.StatusUnprocessableEntity, "datos del registro mal formados o incompletos")
+			return
+		}
+		product, err := h.sv.Update(id, productDoc)
+		if err != nil {
+			if errors.Is(err, errorCustom.ErrorNotFound) {
+				response.Error(w, http.StatusNotFound, err.Error())
+				return
+			}
+			response.Error(w, http.StatusInternalServerError, errorCustom.ErrorInternalServerError.Error())
+			return
+		}
+		response.JSON(w, http.StatusOK, product)
+	}
+}

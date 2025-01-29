@@ -60,3 +60,8 @@ func (r *ProductMap) GenerateId() int {
 	}
 	return assignedId
 }
+
+func (r *ProductMap) Update(id int, product models.Product) error {
+	r.db[id] = product
+	return nil
+}

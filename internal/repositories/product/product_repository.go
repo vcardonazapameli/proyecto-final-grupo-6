@@ -9,4 +9,5 @@ type ProductRepository interface {
 	Create(models.Product) error
 	ExistInDb(string) bool
 	GenerateId() int
+	Update(int, models.Product) error
 }

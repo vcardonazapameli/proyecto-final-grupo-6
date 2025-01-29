@@ -29,5 +29,6 @@ func RegisterProductRoutes(r chi.Router) {
 		r.Get("/{id}", hd.GetById())
 		r.Delete("/{id}", hd.Delete())
 		r.Post("/", hd.Create())
+		r.Patch("/{id}", hd.Update())
 	})
 }
