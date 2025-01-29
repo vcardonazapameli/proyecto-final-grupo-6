@@ -6,4 +6,5 @@ type ProductService interface {
 	GetAll() (map[int]models.ProductDoc, error)
 	GetById(int) (*models.ProductDoc, error)
 	Delete(int) error
+	Create(models.ProductDoc) (*models.ProductDoc, error)
 }

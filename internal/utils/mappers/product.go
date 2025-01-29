@@ -21,7 +21,6 @@ func ProductToProductDoc(product models.Product) models.ProductDoc {
 
 func ProductDocToProduct(productDoc models.ProductDoc) models.Product {
 	return models.Product{
-		Id: productDoc.Id,
 		ProductAttributes: models.ProductAttributes{
 			ProductCode:                    productDoc.ProductCode,
 			Description:                    productDoc.Description,
@@ -63,9 +62,8 @@ func ProductsToProductsDoc(products map[int]models.Product) map[int]models.Produ
 
 func ProductsDocToProducts(productsDoc map[int]models.ProductDoc) map[int]models.Product {
 	products := map[int]models.Product{}
-	for _, product := range productsDoc {
-		products[product.Id] = models.Product{
-			Id: product.Id,
+	for key, product := range productsDoc {
+		products[key] = models.Product{
 			ProductAttributes: models.ProductAttributes{
 				ProductCode:                    product.ProductCode,
 				Description:                    product.Description,

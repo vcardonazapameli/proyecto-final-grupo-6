@@ -38,3 +38,18 @@ func (s *ProductDefault) Delete(id int) error {
 	s.rp.Delete(product.Id)
 	return nil
 }
+
+func (s *ProductDefault) Create(productDoc models.ProductDoc) (*models.ProductDoc, error) {
+	existInDb := s.rp.ExistInDb(productDoc.ProductCode)
+	if existInDb {
+		return nil, errorCustom.ErrorConflict
+	}
+	product := mappers.ProductDocToProduct(productDoc)
+	product.Id = s.rp.GenerateId()
+	err := s.rp.Create(product)
+	if err != nil {
+		return nil, nil
+	}
+	productDoc = mappers.ProductToProductDoc(product)
+	return &productDoc, nil
+}

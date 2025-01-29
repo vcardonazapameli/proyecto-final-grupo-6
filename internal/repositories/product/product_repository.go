@@ -6,4 +6,7 @@ type ProductRepository interface {
 	GetAll() (map[int]models.Product, error)
 	GetById(int) (*models.Product, error)
 	Delete(int) error
+	Create(models.Product) error
+	ExistInDb(string) bool
+	GenerateId() int
 }
