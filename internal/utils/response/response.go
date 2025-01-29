@@ -3,8 +3,9 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"net/http"
+
+	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 )
 
 type customResponse struct {

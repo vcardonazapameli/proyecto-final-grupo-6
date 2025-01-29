@@ -2,14 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
-	repositories "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
-	"github.com/bootcamp-go/web/response"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -26,7 +24,7 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 		s, err := h.sv.GetAll()
 
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, "There was an error when trying to fetch all sellers")
+			response.Error(w, err)
 			return
 		}
 
@@ -45,7 +43,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &SellerRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			response.Error(w, http.StatusBadRequest, "There was a problem decoding JSON")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
@@ -53,15 +51,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 
 		// Error handling
 		if err != nil {
-			if errors.Is(err, repositories.ExistingCIdError) {
-				response.Error(w, http.StatusConflict, "Could not create Seller: Existing CID")
-				return
-			}
-			if errors.As(err, &service.ValidationError{}) {
-				response.Error(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			response.Error(w, 0, err.Error())
+			response.Error(w, err)
 			return
 		}
 
@@ -77,7 +67,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "ID format not correct. Must be int")
+			response.Error(w, err) // BadRequest
 			return
 		}
 
@@ -85,11 +75,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 
 		// Error handling
 		if err != nil {
-			if errors.Is(err, defaultErrors.ErrorNotFound) {
-				response.Error(w, http.StatusNotFound, "Seller not found")
-				return
-			}
-			response.Error(w, http.StatusInternalServerError, "Unknown error ocurred")
+			response.Error(w, err)
 			return
 		}
 
@@ -105,17 +91,13 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Incorrect ID")
+			response.Error(w, defaultErrors.ErrorBadRequest) // BadRequest
 			return
 		}
 
 		// Error handling
 		if err := h.sv.Delete(id); err != nil {
-			if errors.Is(err, repositories.ErrorNotFound) {
-				response.Error(w, http.StatusNotFound, "Seller not found")
-				return
-			}
-			response.Error(w, http.StatusInternalServerError, "Internal error")
+			response.Error(w, err)
 			return
 		}
 
@@ -137,29 +119,22 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Incorrect ID")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		req := &UpdateSellerRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			response.Error(w, http.StatusBadRequest, "Error decoding JSON. Check if Body request is correct")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone)
 
 		// Error handling
+		// TODO: ValidationError
 		if err != nil {
-			if errors.Is(err, defaultErrors.ErrorNotFound) {
-				response.Error(w, http.StatusNotFound, "Could not find Seller to update")
-				return
-			}
-			if errors.As(err, &service.ValidationError{}) {
-				response.Error(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			response.Error(w, http.StatusInternalServerError, "internal error")
+			response.Error(w, err)
 			return
 		}
 

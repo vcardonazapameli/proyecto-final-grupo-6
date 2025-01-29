@@ -52,7 +52,7 @@ func (r *SellerRepositoryJSON) GetBiggestID() (max int) {
 
 func (r *SellerRepositoryJSON) Save(cid int, companyName string, address string, telephone int) (models.Seller, error) {
 	if _, exists := r.searchByCID(cid); exists {
-		return models.Seller{}, ExistingCIdError
+		return models.Seller{}, errors.ErrorConflict
 	}
 
 	// If does not exist, save.
@@ -64,7 +64,7 @@ func (r *SellerRepositoryJSON) Save(cid int, companyName string, address string,
 
 func (r *SellerRepositoryJSON) Delete(id int) error {
 	if _, exists := r.db[id]; !exists {
-		return ErrorNotFound
+		return errors.ErrorNotFound
 	}
 	delete(r.db, id)
 	return nil
