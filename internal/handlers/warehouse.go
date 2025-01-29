@@ -51,11 +51,11 @@ func (h *WarehouseHandler) GetById() http.HandlerFunc {
 		}
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
-			return
-		}
-		if warehouse.Id == 0 {
-			response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+			if err == errorsCustom.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			}
 			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouse)

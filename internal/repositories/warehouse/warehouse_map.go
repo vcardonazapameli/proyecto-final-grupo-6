@@ -29,16 +29,11 @@ func (r *WarehouseMap) GetAll() (v map[int]models.Warehouse, err error) {
 }
 
 func (r *WarehouseMap) GetById(idWarehouse int) (models.Warehouse, error) {
-	warehouses, err := r.GetAll()
-	if err != nil {
-		return models.Warehouse{}, err
+	warehouse, exists := r.db[idWarehouse]
+	if !exists {
+		return models.Warehouse{}, errorsCustom.ErrorNotFound
 	}
-	for _, warehouse := range warehouses {
-		if warehouse.Id == idWarehouse {
-			return warehouse, nil
-		}
-	}
-	return models.Warehouse{}, nil
+	return warehouse, nil
 }
 
 func (r *WarehouseMap) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {

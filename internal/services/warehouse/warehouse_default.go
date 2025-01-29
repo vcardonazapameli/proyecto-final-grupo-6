@@ -59,5 +59,5 @@ func (s *WarehouseDefault) UpdateWarehouse(id int, warehouse models.Warehouse) (
 	if warehouseData.Warehouse_code == warehouse.Warehouse_code {
 		return models.Warehouse{}, nil
 	}
-	return warehouseData, nil
+	return warehouse, nil
 }
