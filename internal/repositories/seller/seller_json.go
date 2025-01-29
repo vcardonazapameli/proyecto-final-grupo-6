@@ -61,3 +61,11 @@ func (r *SellerRepositoryJSON) Save(cid int, companyName string, address string,
 	r.db[id] = newSeller
 	return newSeller, nil
 }
+
+func (r *SellerRepositoryJSON) Delete(id int) error {
+	if _, exists := r.db[id]; !exists {
+		return ErrorNotFound
+	}
+	delete(r.db, id)
+	return nil
+}

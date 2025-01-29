@@ -54,3 +54,7 @@ func (sv *SellerServiceDefault) GetByID(id int) (models.SellerDoc, error) {
 
 	return mappers.SellerToSellerDoc(s), nil
 }
+
+func (sv *SellerServiceDefault) Delete(id int) error {
+	return sv.rp.Delete(id)
+}

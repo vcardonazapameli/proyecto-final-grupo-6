@@ -32,5 +32,6 @@ func RegisterSellerRoutes(r chi.Router) {
 		rt.Get("/", hd.GetAll())
 		rt.Get("/{id}", hd.GetByID())
 		rt.Post("/", hd.Create())
+		rt.Delete("/{id}", hd.Delete())
 	})
 }

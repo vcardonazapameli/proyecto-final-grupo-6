@@ -99,3 +99,28 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 		})
 	}
 }
+
+func (h *SellerHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Incorrect ID")
+			return
+		}
+
+		// Error handling
+		if err := h.sv.Delete(id); err != nil {
+			if errors.Is(err, repositories.ErrorNotFound) {
+				response.Error(w, http.StatusNotFound, "Seller not found")
+				return
+			}
+			response.Error(w, http.StatusInternalServerError, "Internal error")
+			return
+		}
+
+		// Deleted Successfully
+		response.JSON(w, http.StatusNoContent, nil)
+
+	}
+}
