@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -22,16 +23,19 @@ type SectionHandler struct {
 
 func (h *SectionHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s, err := h.sv.GetAll()
+		sections, err := h.sv.GetAll()
 		if err != nil {
 			response.Error(w, http.StatusInternalServerError, "An error occurred while getting sections")
 			return
 		}
 
-		data := mappers.SectionToSectionDoc(s)
+		sectionDocs := make(map[int]models.SectionDoc)
+		for id, section := range sections {
+			sectionDocs[id] = mappers.SectionToSectionDoc(section)
+		}
 
 		response.JSON(w, http.StatusOK, map[string]any{
-			"data": data,
+			"data": sectionDocs,
 		})
 
 	}
@@ -57,9 +61,40 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 			return
 		}
 
+		sectionDoc := mappers.SectionToSectionDoc(s)
 		response.JSON(w, http.StatusOK, map[string]any{
 			"message": "Section found",
-			"data":    mappers.SectionToSectionDoc(map[int]models.Section{idConv: s}),
+			"data":    sectionDoc,
+		})
+	}
+}
+
+func (h *SectionHandler) Create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var s models.SectionDoc
+		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid request body")
+			return
+		}
+
+		section := mappers.SectionDocToSection(s)
+		createdSection, err := h.sv.Create(section)
+		if err != nil {
+			switch err {
+			case errors.ErrorUnprocessableContent:
+				response.Error(w, http.StatusUnprocessableEntity, err.Error())
+			case errors.ErrorConflict:
+				response.Error(w, http.StatusConflict, err.Error())
+			default:
+				response.Error(w, http.StatusInternalServerError, "An error occurred while creating the section")
+			}
+			return
+		}
+
+		createdSectionDoc := mappers.SectionToSectionDoc(createdSection)
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "Section created",
+			"data":    createdSectionDoc,
 		})
 	}
 }

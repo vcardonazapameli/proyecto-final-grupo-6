@@ -28,3 +28,11 @@ func (s *SectionDefault) GetByID(id int) (st models.Section, err error) {
 	}
 	return section, nil
 }
+
+func (s *SectionDefault) Create(section models.Section) (st models.Section, err error) {
+	section, err = s.rp.Create(section)
+	if err != nil {
+		return models.Section{}, err
+	}
+	return section, nil
+}

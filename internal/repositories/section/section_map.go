@@ -30,3 +30,20 @@ func (s *SectionMap) GetByID(id int) (st models.Section, err error) {
 	}
 	return section, nil
 }
+
+// Create a new section
+func (s *SectionMap) Create(section models.Section) (st models.Section, err error) {
+	if section.SectionNumber == "" {
+		return models.Section{}, errors.ErrorUnprocessableContent
+	}
+
+	for _, sec := range s.db {
+		if sec.SectionNumber == section.SectionNumber {
+			return models.Section{}, errors.ErrorConflict
+		}
+	}
+	newID := len(s.db) + 1
+	section.Id = newID
+	s.db[newID] = section
+	return section, nil
+}
