@@ -110,3 +110,41 @@ func (h *WarehouseHandler) DeleteWarehouse() http.HandlerFunc {
 		response.JSON(w, http.StatusNoContent, "Warehouse deleted")
 	}
 }
+
+func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		strId := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(strId)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorBadRequest.Error())
+			return
+		}
+
+		var warehouseData models.Warehouse
+		err = json.NewDecoder(r.Body).Decode(&warehouseData)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorDataIncorrect.Error())
+			return
+		}
+
+		warehouseRepository, err := h.sv.UpdateWarehouse(id, warehouseData)
+		if warehouseRepository == (models.Warehouse{}) && err == nil {
+			response.Error(w, http.StatusConflict, errorsCustom.ErrorConflict.Error())
+			return
+		}
+		if err != nil {
+			response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			return
+		}
+		warehouseRepository.Warehouse_code = warehouseData.Warehouse_code
+		warehouseRepository.Address = warehouseData.Address
+		warehouseRepository.Telephone = warehouseData.Telephone
+		warehouseRepository.Minimun_capacity = warehouseData.Minimun_capacity
+		warehouseRepository.Minimun_temperature = warehouseData.Minimun_temperature
+		warehouseRepository.Locality_id = warehouseData.Locality_id
+
+		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouseRepository)
+
+		response.JSON(w, http.StatusOK, warehouseResponse)
+	}
+}

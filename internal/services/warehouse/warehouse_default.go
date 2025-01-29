@@ -50,3 +50,14 @@ func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
 	}
 	return s.rp.DeleteWarehouse(idWarehouse)
 }
+
+func (s *WarehouseDefault) UpdateWarehouse(id int, warehouse models.Warehouse) (models.Warehouse, error) {
+	warehouseData, err := s.rp.GetById(id)
+	if err != nil {
+		return models.Warehouse{}, err
+	}
+	if warehouseData.Warehouse_code == warehouse.Warehouse_code {
+		return models.Warehouse{}, nil
+	}
+	return warehouseData, nil
+}

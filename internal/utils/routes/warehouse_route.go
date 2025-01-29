@@ -29,5 +29,6 @@ func RegisterWarehouseRoutes(r chi.Router) {
 		r.Get("/{id}", hd.GetById())
 		r.Post("/", hd.CreateWarehouse())
 		r.Delete("/{id}", hd.DeleteWarehouse())
+		r.Patch("/{id}", hd.UpdateWarehouse())
 	})
 }
