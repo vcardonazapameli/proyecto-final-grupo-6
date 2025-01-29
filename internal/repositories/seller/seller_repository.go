@@ -7,4 +7,5 @@ type SellerRepository interface {
 	Save(cid int, companyName string, address string, telephone int) (models.Seller, error)
 	GetByID(id int) (models.Seller, error)
 	Delete(id int) error
+	Update(models.Seller)
 }

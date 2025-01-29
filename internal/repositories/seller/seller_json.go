@@ -69,3 +69,7 @@ func (r *SellerRepositoryJSON) Delete(id int) error {
 	delete(r.db, id)
 	return nil
 }
+
+func (r *SellerRepositoryJSON) Update(s models.Seller) {
+	r.db[s.Id] = s
+}

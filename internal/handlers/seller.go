@@ -124,3 +124,48 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 
 	}
 }
+
+type UpdateSellerRequest struct {
+	Cid         *int    `json:"cid"`
+	CompanyName *string `json:"company_name"`
+	Address     *string `json:"address"`
+	Telephone   *int    `json:"telephone"`
+}
+
+func (h *SellerHandler) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Incorrect ID")
+			return
+		}
+
+		req := &UpdateSellerRequest{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			response.Error(w, http.StatusBadRequest, "Error decoding JSON. Check if Body request is correct")
+			return
+		}
+
+		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone)
+
+		// Error handling
+		if err != nil {
+			if errors.Is(err, defaultErrors.ErrorNotFound) {
+				response.Error(w, http.StatusNotFound, "Could not find Seller to update")
+				return
+			}
+			if errors.As(err, &service.ValidationError{}) {
+				response.Error(w, http.StatusBadRequest, err.Error())
+				return
+			}
+			response.Error(w, http.StatusInternalServerError, "internal error")
+			return
+		}
+
+		response.JSON(w, http.StatusOK, map[string]any{
+			"message": "updated successfully",
+			"data":    sellerDoc,
+		})
+	}
+}
