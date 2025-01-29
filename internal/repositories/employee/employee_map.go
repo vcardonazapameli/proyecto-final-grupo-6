@@ -20,6 +20,27 @@ type EmployeeMap struct {
 }
 
 // FindAll is a method that returns a map of all vehicles
-func (r *EmployeeMap) GetAll() (v map[int]models.Employee, err error) {
-	return
+func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
+	e := make(map[int]models.Employee)
+
+	// copy db
+	for key, value := range r.db {
+		e[key] = value
+	}
+
+	return e, nil
+}
+
+// FindAll is a method that returns a map of all vehicles
+func (r *EmployeeMap) GetById(id int) (*models.Employee, error) {
+	var e models.Employee
+
+	for _, value := range r.db {
+		if value.Id == id {
+			e = value
+			return &e, nil
+		}
+	}
+
+	return nil, nil
 }

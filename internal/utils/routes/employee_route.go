@@ -32,5 +32,6 @@ func RegisterEmployeeRoutes(r chi.Router) {
 	r.Route("/employee", func(rt chi.Router) {
 		// - GET /vehicles
 		rt.Get("/", hd.GetAll())
+		rt.Get("/{id}", hd.GetById())
 	})
 }
