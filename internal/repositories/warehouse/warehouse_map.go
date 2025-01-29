@@ -55,3 +55,13 @@ func (r *WarehouseMap) CreateWarehouse(warehouse models.Warehouse) (models.Wareh
 	warehouses[warehouse.Id] = warehouse
 	return warehouse, nil
 }
+
+func (r *WarehouseMap) DeleteWarehouse(idWarehouse int) error {
+	warehouses, err := r.GetAll()
+	if err != nil {
+		return err
+	}
+	delete(warehouses, idWarehouse)
+	return nil
+
+}

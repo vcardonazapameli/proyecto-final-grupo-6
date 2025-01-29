@@ -89,3 +89,24 @@ func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 		})
 	}
 }
+
+func (h *WarehouseHandler) DeleteWarehouse() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		strId := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(strId)
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorBadRequest.Error())
+			return
+		}
+		err = h.sv.DeleteWarehouse(id)
+		if err != nil {
+			if err == errorsCustom.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			}
+			return
+		}
+		response.JSON(w, http.StatusNoContent, "Warehouse deleted")
+	}
+}

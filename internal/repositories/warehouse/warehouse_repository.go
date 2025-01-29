@@ -6,4 +6,5 @@ type WarehouseRepository interface {
 	GetAll() (map[int]models.Warehouse, error)
 	GetById(int) (models.Warehouse, error)
 	CreateWarehouse(models.Warehouse) (models.Warehouse, error)
+	DeleteWarehouse(int) error
 }

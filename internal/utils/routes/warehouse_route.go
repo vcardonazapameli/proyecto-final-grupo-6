@@ -13,7 +13,7 @@ import (
 
 func RegisterWarehouseRoutes(r chi.Router) {
 
-	ld := loader.NewWarehouseJSONFile("../docs/warehouse.json")
+	ld := loader.NewWarehouseJSONFile("docs/warehouse.json")
 	db, err := ld.Load()
 	if err != nil {
 		fmt.Print("Error: ", err.Error())
@@ -28,5 +28,6 @@ func RegisterWarehouseRoutes(r chi.Router) {
 		r.Get("/", hd.GetAll())
 		r.Get("/{id}", hd.GetById())
 		r.Post("/", hd.CreateWarehouse())
+		r.Delete("/{id}", hd.DeleteWarehouse())
 	})
 }
