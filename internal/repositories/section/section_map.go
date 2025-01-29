@@ -54,33 +54,6 @@ func (s *SectionMap) Update(id int, section models.Section) (models.Section, err
 	if !ok {
 		return models.Section{}, errors.ErrorNotFound
 	}
-	if section.SectionNumber != "" {
-		existSection.SectionNumber = section.SectionNumber
-	}
-	if section.CurrentCapacity != 0 {
-		existSection.CurrentCapacity = section.CurrentCapacity
-	}
-	if section.CurrentTemperature != 0 {
-		existSection.CurrentTemperature = section.CurrentTemperature
-	}
-	if section.MaximumCapacity != 0 {
-		existSection.MaximumCapacity = section.MaximumCapacity
-	}
-	if section.MinimumCapacity != 0 {
-		existSection.MinimumCapacity = section.MinimumCapacity
-	}
-	if section.MinimumTemperature != 0 {
-		existSection.MinimumTemperature = section.MinimumTemperature
-	}
-	if section.ProductTypeId != 0 {
-		existSection.ProductTypeId = section.ProductTypeId
-	}
-	if section.WarehouseId != 0 {
-		existSection.WarehouseId = section.WarehouseId
-	}
-	if len(section.ProductBatchId) != 0 {
-		existSection.ProductBatchId = section.ProductBatchId
-	}
 	s.db[id] = existSection
 	return existSection, nil
 }
