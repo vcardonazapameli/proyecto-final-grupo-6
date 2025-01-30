@@ -3,8 +3,9 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"net/http"
+
+	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 )
 
 type customResponse struct {
@@ -48,6 +49,10 @@ func Error(w http.ResponseWriter, err error) {
 
 	case errors.Is(err, e.ErrorBadRequest):
 		statusCode = http.StatusBadRequest
+		message = err.Error()
+
+	case errors.Is(err, e.ErrorUnprocessableContent):
+		statusCode = http.StatusUnprocessableEntity
 		message = err.Error()
 
 	case errors.As(err, &e.ValidationError{}):
