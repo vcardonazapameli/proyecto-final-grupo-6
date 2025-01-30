@@ -63,7 +63,7 @@ func (handler *BuyerHandler)CreateBuyer()http.HandlerFunc{
 			response.Error(w, err)
 			return
 		}
-		response.JSON(w,http.StatusOK,"")
+		response.JSON(w,http.StatusCreated,"Creado con exito")
 	}
 }
 func (handler *BuyerHandler)DeleteBuyer()http.HandlerFunc{
@@ -76,7 +76,7 @@ func (handler *BuyerHandler)DeleteBuyer()http.HandlerFunc{
 			response.Error(w, err)
 			return
 		}
-		response.JSON(w, http.StatusOK,"Deleted")
+		response.JSON(w, http.StatusNoContent,nil)
 	}
 }
 func (handler *BuyerHandler)UpdateBuyer()http.HandlerFunc{

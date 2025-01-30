@@ -1,8 +1,6 @@
 package buyer
 
 import (
-	"fmt"
-
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/buyer"
 	customErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
@@ -24,7 +22,9 @@ func (b *BuyerDefault) UpdateBuyer(id int , buyerDto models.UpdateBuyerDto) (mod
 		return models.Buyer{}, err
 	}
 	updatedBuyer := validators.UpdateEntity(buyerDto, buyerToUpdate)
-	fmt.Println("Updated buyer: ", *updatedBuyer)
+	if b.rp.ValidateCardNumberId(updatedBuyer.CardNumberId){
+		return models.Buyer{}, customErrors.ErrorConflict
+	}
 	b.rp.UpdateBuyer(id, *updatedBuyer)
 	return *updatedBuyer, nil
 }
@@ -42,10 +42,10 @@ func (b *BuyerDefault) DeleteBuyer(buyerId int) error {
 func (b *BuyerDefault) CreateBuyer(buyer models.Buyer) error {
 
 	if err := validators.ValidateNoEmptyFields(buyer); err != nil {
-		return customErrors.ErrorConflict
+		return customErrors.ErrorUnprocessableContent
 	}
 	if !validators.ValidateBuyer(buyer) {
-		return customErrors.ErrorBadRequest
+		return customErrors.ErrorUnprocessableContent
 	}
 	b.rp.CreateBuyer(buyer)
 	return nil
