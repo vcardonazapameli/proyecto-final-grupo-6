@@ -1,5 +1,7 @@
 package seller
 
+import e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+
 func ValidateSeller(cid int, companyName string, address string, telephone int) error {
 	messages := make([]string, 0)
 	if cid <= 0 {
@@ -16,7 +18,7 @@ func ValidateSeller(cid int, companyName string, address string, telephone int) 
 	}
 
 	if len(messages) > 0 {
-		return ValidationError{messages: messages}
+		return e.ValidationError{Messages: messages}
 	}
 	return nil
 }

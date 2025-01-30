@@ -3,6 +3,7 @@ package seller
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -95,7 +96,7 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 		}
 	}
 	if len(valError) > 0 {
-		return models.SellerDoc{}, ValidationError{valError}
+		return models.SellerDoc{}, e.ValidationError{Messages: valError}
 	}
 
 	sv.rp.Update(seller)
