@@ -32,7 +32,7 @@ func (r *SellerRepositoryJSON) GetByID(id int) (models.Seller, error) {
 	}
 }
 
-func (r *SellerRepositoryJSON) searchByCID(cid int) (models.Seller, bool) {
+func (r *SellerRepositoryJSON) SearchByCID(cid int) (models.Seller, bool) {
 	for _, s := range r.db {
 		if s.Cid == cid {
 			return s, true
@@ -51,7 +51,7 @@ func (r *SellerRepositoryJSON) GetBiggestID() (max int) {
 }
 
 func (r *SellerRepositoryJSON) Save(cid int, companyName string, address string, telephone int) (models.Seller, error) {
-	if _, exists := r.searchByCID(cid); exists {
+	if _, exists := r.SearchByCID(cid); exists {
 		return models.Seller{}, errors.ErrorConflict
 	}
 

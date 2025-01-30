@@ -71,6 +71,11 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 	}
 
 	if cid != nil {
+		// If exists a Seller with same CID that the one trying to update, raise conflcit.
+		if s, exists := sv.rp.SearchByCID(*cid); exists && s.Id != id {
+			return models.SellerDoc{}, errors.ErrorConflict
+		}
+
 		seller.Cid = *cid
 	}
 	if companyName != nil {
