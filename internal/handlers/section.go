@@ -85,18 +85,16 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 func (h *SectionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
+		var sectionDoc models.UpdateSectionDto
 		if err != nil {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
-		var s models.SectionDoc
-		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
-
-		section := mappers.SectionDocToSection(s)
-		updatedSection, err := h.sv.Update(idConv, section)
+		updatedSection, err := h.sv.Update(idConv, sectionDoc)
 		if err != nil {
 			response.Error(w, err)
 			return

@@ -37,8 +37,8 @@ func (s *SectionDefault) Create(section models.Section) (models.Section, error) 
 	return section, nil
 }
 
-func (s *SectionDefault) Update(id int, section models.Section) (models.Section, error) {
-	section, err := s.rp.Update(id, section)
+func (s *SectionDefault) Update(id int, sectionDTO models.UpdateSectionDto) (models.Section, error) {
+	section, err := s.rp.Update(id, sectionDTO)
 	if err != nil {
 		return models.Section{}, err
 	}

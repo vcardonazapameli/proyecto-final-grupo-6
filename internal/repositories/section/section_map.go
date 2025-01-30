@@ -53,14 +53,13 @@ func (s *SectionMap) Create(section models.Section) (models.Section, error) {
 	return section, nil
 }
 
-func (s *SectionMap) Update(id int, section models.Section) (models.Section, error) {
-	sectionDoc := mappers.SectionToSectionValidation(section)
+func (s *SectionMap) Update(id int, sectionDTO models.UpdateSectionDto) (models.Section, error) {
 	existSection, ok := s.db[id]
 	if !ok {
 		return models.Section{}, errors.ErrorNotFound
 	}
 
-	updatedSection := validators.UpdateEntity(sectionDoc, &existSection)
+	updatedSection := validators.UpdateEntity(sectionDTO, &existSection)
 	s.db[id] = *updatedSection
 	return *updatedSection, nil
 }
