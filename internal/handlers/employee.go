@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/employee"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -27,15 +26,12 @@ func (h *EmployeeHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		data, err := h.sv.GetAll()
-
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, err.Error())
+			response.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"data": data,
-		})
+		response.JSON(w, http.StatusOK, data)
 	}
 }
 
@@ -44,65 +40,53 @@ func (h *EmployeeHandler) GetById() http.HandlerFunc {
 
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
-
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
 		data, err := h.sv.GetById(id)
-
 		if err != nil {
-			if errors.Is(err, customErrors.ErrorNotFound) {
-				response.Error(w, http.StatusNotFound, err.Error())
-				return
-			}
-			response.Error(w, http.StatusBadRequest, err.Error())
+			response.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"data": data,
-		})
+		response.JSON(w, http.StatusOK, data)
 	}
 }
 
 func (h *EmployeeHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var newEmployee models.RequestEmployee
 
+		var newEmployee models.RequestEmployee
 		if err := json.NewDecoder(r.Body).Decode(&newEmployee); err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid JSON for employee")
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
 		data, err := h.sv.Create(newEmployee)
-
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, err.Error())
+			response.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"data": data,
-		})
+		response.JSON(w, http.StatusCreated, data)
 	}
 }
 
 func (h *EmployeeHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
-
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
 		err = h.sv.Delete(id)
-
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, err.Error())
+			response.Error(w, err)
 			return
 		}
 

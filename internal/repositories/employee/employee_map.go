@@ -6,6 +6,7 @@ import (
 )
 
 func NewEmployeeMap(db map[int]models.Employee) EmployeeRepository {
+
 	// default db
 	defaultDb := make(map[int]models.Employee)
 	if db != nil {
