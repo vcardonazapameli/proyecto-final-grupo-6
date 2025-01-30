@@ -3,8 +3,8 @@ package seller
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -33,7 +33,7 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 
 func (sv *SellerServiceDefault) Create(cid int, companyName string, address string, telephone int) (models.SellerDoc, error) {
 	// Validate Seller
-	if err := ValidateSeller(cid, companyName, address, telephone); err != nil {
+	if err := validators.ValidateSellerAttrs(cid, companyName, address, telephone); err != nil {
 		return models.SellerDoc{}, err
 	}
 
@@ -66,37 +66,23 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 		return models.SellerDoc{}, err
 	}
 
-	valError := make([]string, 0)
+	if err := validators.ValidateSellerAttrPointers(cid, companyName, address, telephone); err != nil {
+		return models.SellerDoc{}, err
+	}
+
 	if cid != nil {
-		if *cid <= 0 {
-			valError = append(valError, "CID must not be negative nor zero")
-		} else {
-			seller.Cid = *cid
-		}
+		seller.Cid = *cid
 	}
 	if companyName != nil {
-		if *companyName == "" {
-			valError = append(valError, "Company Name cannot be empty")
-		} else {
-			seller.CompanyName = *companyName
-		}
+		seller.CompanyName = *companyName
+
 	}
 	if address != nil {
-		if *address == "" {
-			valError = append(valError, "Company Address cannot be empty")
-		} else {
-			seller.Address = *address
-		}
+		seller.Address = *address
+
 	}
 	if telephone != nil {
-		if *telephone < 10000000 || *telephone > 99999999 {
-			valError = append(valError, "Wrong telephone format. Must have between 8 and 10 digits")
-		} else {
-			seller.Telephone = *telephone
-		}
-	}
-	if len(valError) > 0 {
-		return models.SellerDoc{}, e.ValidationError{Messages: valError}
+		seller.Telephone = *telephone
 	}
 
 	sv.rp.Update(seller)
