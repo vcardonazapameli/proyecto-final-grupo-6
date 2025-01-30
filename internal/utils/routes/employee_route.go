@@ -33,5 +33,8 @@ func RegisterEmployeeRoutes(r chi.Router) {
 		// - GET /vehicles
 		rt.Get("/", hd.GetAll())
 		rt.Get("/{id}", hd.GetById())
+		rt.Post("/", hd.Create())
+
+		rt.Delete("/{id}", hd.Delete())
 	})
 }

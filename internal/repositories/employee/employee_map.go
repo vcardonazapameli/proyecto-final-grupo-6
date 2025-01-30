@@ -1,6 +1,7 @@
 package employee
 
 import (
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -19,6 +20,16 @@ type EmployeeMap struct {
 	db map[int]models.Employee
 }
 
+// FindByCardNumberID implements EmployeeRepository.
+func (r *EmployeeMap) FindByCardNumberID(cardNumberID string) (*models.Employee, error) {
+	for _, employee := range r.db {
+		if employee.EmployeeAttributes.CardNumberID == cardNumberID {
+			return &employee, nil
+		}
+	}
+	return nil, customErrors.ErrorNotFound
+}
+
 // FindAll is a method that returns a map of all vehicles
 func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
 	e := make(map[int]models.Employee)
@@ -33,16 +44,13 @@ func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
 
 // FindAll is a method that returns a map of all vehicles
 func (r *EmployeeMap) GetById(id int) (*models.Employee, error) {
-	var e models.Employee
+	employee, exist := r.db[id]
 
-	for _, value := range r.db {
-		if value.Id == id {
-			e = value
-			return &e, nil
-		}
+	if !exist {
+		return nil, customErrors.ErrorNotFound
 	}
 
-	return nil, nil
+	return &employee, nil
 }
 
 func createNewId(employees map[int]models.Employee) int {
@@ -65,4 +73,16 @@ func (r *EmployeeMap) Create(newEmployee models.Employee) (models.Employee, erro
 	r.db[newId] = newEmployee
 
 	return newEmployee, nil
+}
+
+// Create implements EmployeeRepository.
+func (r *EmployeeMap) Delete(id int) error {
+	_, exist := r.db[id]
+	if !exist {
+		return customErrors.ErrorNotFound
+	}
+
+	delete(r.db, id)
+
+	return nil
 }

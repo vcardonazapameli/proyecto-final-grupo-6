@@ -6,4 +6,6 @@ type EmployeeRepository interface {
 	GetAll() (map[int]models.Employee, error)
 	GetById(id int) (*models.Employee, error)
 	Create(newEmployee models.Employee) (models.Employee, error)
+	Delete(id int) error
+	FindByCardNumberID(cardNumberID string) (*models.Employee, error)
 }

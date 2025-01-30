@@ -7,8 +7,7 @@ import (
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/employee"
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
@@ -34,15 +33,8 @@ func (h *EmployeeHandler) GetAll() http.HandlerFunc {
 			return
 		}
 
-		//mapear
-		var dataMap []models.EmployeeDoc
-		for _, value := range data {
-			employeeDoc := mappers.EmployeeToEmployeeDoc(value)
-			dataMap = append(dataMap, employeeDoc)
-		}
-
 		response.JSON(w, http.StatusOK, map[string]any{
-			"data": dataMap,
+			"data": data,
 		})
 	}
 }
@@ -61,7 +53,7 @@ func (h *EmployeeHandler) GetById() http.HandlerFunc {
 		data, err := h.sv.GetById(id)
 
 		if err != nil {
-			if errors.Is(err, e.ErrorNotFound) {
+			if errors.Is(err, customErrors.ErrorNotFound) {
 				response.Error(w, http.StatusNotFound, err.Error())
 				return
 			}
@@ -69,11 +61,8 @@ func (h *EmployeeHandler) GetById() http.HandlerFunc {
 			return
 		}
 
-		//mapear
-		employeeDoc := mappers.EmployeeToEmployeeDoc(*data)
-
 		response.JSON(w, http.StatusOK, map[string]any{
-			"data": employeeDoc,
+			"data": data,
 		})
 	}
 }
@@ -94,11 +83,29 @@ func (h *EmployeeHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		//mapear
-		employeeDoc := mappers.EmployeeToEmployeeDoc(*data)
-
 		response.JSON(w, http.StatusCreated, map[string]any{
-			"data": employeeDoc,
+			"data": data,
 		})
+	}
+}
+
+func (h *EmployeeHandler) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			return
+		}
+
+		err = h.sv.Delete(id)
+
+		if err != nil {
+			response.Error(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		response.JSON(w, http.StatusNoContent, nil)
 	}
 }

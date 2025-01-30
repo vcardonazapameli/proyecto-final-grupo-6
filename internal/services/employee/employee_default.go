@@ -2,7 +2,7 @@ package employee
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -18,39 +18,71 @@ type EmployeeDefault struct {
 }
 
 // GetAll implements EmployeeService.
-func (e *EmployeeDefault) GetAll() (map[int]models.Employee, error) {
+func (e *EmployeeDefault) GetAll() ([]models.EmployeeDoc, error) {
+
 	data, err := e.rp.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	//mapear
+	var dataMap []models.EmployeeDoc
+	for _, value := range data {
+		employeeMap := mappers.EmployeeToEmployeeDoc(value)
+		dataMap = append(dataMap, employeeMap)
+	}
+
+	return dataMap, nil
 }
 
 // GetById implements EmployeeService.
-func (e *EmployeeDefault) GetById(id int) (*models.Employee, error) {
+func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 	data, err := e.rp.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
 	if data == nil {
-		return nil, errors.ErrorNotFound
+		return nil, customErrors.ErrorNotFound
 	}
 
-	return data, nil
+	dataMap := mappers.EmployeeToEmployeeDoc(*data)
+
+	return &dataMap, nil
 }
 
 // Create implements EmployeeService.
-func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.Employee, error) {
+func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.EmployeeDoc, error) {
 
-	//map request to model
-	newEmployeeMap := mappers.RequestEmployeeToEmployee(request)
+	//1. validate model
 
-	data, err := e.rp.Create(newEmployeeMap)
-	if err != nil {
-		return nil, errors.ErrorInternalServerError
+	//2. validate if employee already exist
+	existingEmployee, err := e.rp.FindByCardNumberID(request.CardNumberID)
+	if err == nil && existingEmployee != nil {
+		return nil, customErrors.ErrorConflict
 	}
 
-	return &data, nil
+	//3. map request to model
+	newEmployeeMap := mappers.RequestEmployeeToEmployee(request)
+
+	//4. create new Employee
+	data, err := e.rp.Create(newEmployeeMap)
+	if err != nil {
+		return nil, customErrors.ErrorInternalServerError
+	}
+
+	//5. map model to doc
+	dataMap := mappers.EmployeeToEmployeeDoc(data)
+	return &dataMap, nil
+}
+
+// Delete implements EmployeeService.
+func (e *EmployeeDefault) Delete(id int) error {
+	err := e.rp.Delete(id)
+
+	if err != nil {
+		return customErrors.ErrorNotFound
+	}
+
+	return nil
 }
