@@ -47,6 +47,7 @@ func (a *ServerChi) Run() (err error) {
 	// - routes
 	routes.RegisterEmployeeRoutes(r)
 	routes.RegisterSellerRoutes(r)
+	routes.RegisterBuyerRoutes(r)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, r)
