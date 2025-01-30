@@ -14,14 +14,31 @@ type BuyerMap struct {
 	db map[int]models.Buyer
 }
 
+// UpdateBuyer implements BuyerRepository.
+func (b *BuyerMap) UpdateBuyer(id int, buyer models.Buyer)models.Buyer {
+	b.db[id] = buyer
+	return buyer
+}
+
+// ValidateIfExistsById implements BuyerRepository.
+func (b *BuyerMap) ValidateIfExistsById(id int) (exists bool) {
+	_, exists = b.db[id]
+	return
+}
+
+// DeleteBuyer implements BuyerRepository.
+func (b *BuyerMap) DeleteBuyer(buyerId int) {
+	delete(b.db, buyerId)
+}
+
 // ValidateCardNumberId implements BuyerRepository.
-func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool ){
-	for _, value := range b.db{
-		if cardNumber == value.CardNumberId{
+func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
+	for _, value := range b.db {
+		if cardNumber == value.CardNumberId {
 			return true
 		}
 	}
-	return 
+	return
 }
 
 // CreateBuyer implements BuyerRepository.
