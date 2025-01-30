@@ -8,6 +8,7 @@ import (
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	customResponse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -48,7 +49,8 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		new, err := h.sv.Create(req.Cid, req.CompanyName, req.Address, req.Telephone)
+		sDoc := models.NewSellerDoc(-1, req.Cid, req.CompanyName, req.Address, req.Telephone)
+		new, err := h.sv.Create(*sDoc)
 
 		// Error handling
 		if err != nil {

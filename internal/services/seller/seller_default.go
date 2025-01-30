@@ -31,13 +31,14 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 	return s, nil
 }
 
-func (sv *SellerServiceDefault) Create(cid int, companyName string, address string, telephone int) (models.SellerDoc, error) {
+func (sv *SellerServiceDefault) Create(sDoc models.SellerDoc) (models.SellerDoc, error) {
 	// Validate Seller
-	if err := validators.ValidateSellerAttrs(cid, companyName, address, telephone); err != nil {
+
+	if err := validators.ValidateSellerAttrs(sDoc); err != nil {
 		return models.SellerDoc{}, err
 	}
 
-	new, err := sv.rp.Save(cid, companyName, address, telephone)
+	new, err := sv.rp.Save(mappers.SellerDocToSeller(sDoc))
 	if err != nil {
 		return models.SellerDoc{}, err
 	}

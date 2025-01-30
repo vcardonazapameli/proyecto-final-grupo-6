@@ -50,16 +50,16 @@ func (r *SellerRepositoryJSON) GetBiggestID() (max int) {
 	return
 }
 
-func (r *SellerRepositoryJSON) Save(cid int, companyName string, address string, telephone int) (models.Seller, error) {
-	if _, exists := r.SearchByCID(cid); exists {
+func (r *SellerRepositoryJSON) Save(s models.Seller) (models.Seller, error) {
+	if _, exists := r.SearchByCID(s.Cid); exists {
 		return models.Seller{}, errors.ErrorConflict
 	}
 
 	// If does not exist, save.
-	id := r.GetBiggestID() + 1
-	newSeller := *models.NewSeller(id, cid, companyName, address, telephone)
-	r.db[id] = newSeller
-	return newSeller, nil
+	s.Id = r.GetBiggestID() + 1
+
+	r.db[s.Id] = s
+	return s, nil
 }
 
 func (r *SellerRepositoryJSON) Delete(id int) error {
