@@ -52,13 +52,12 @@ func (r *WarehouseMap) CreateWarehouse(warehouse models.Warehouse) (models.Wareh
 }
 
 func (r *WarehouseMap) DeleteWarehouse(idWarehouse int) error {
-	warehouses, err := r.GetAll()
-	if err != nil {
-		return err
+	_, exists := r.db[idWarehouse]
+	if !exists {
+		return errorsCustom.ErrorNotFound
 	}
-	delete(warehouses, idWarehouse)
+	delete(r.db, idWarehouse)
 	return nil
-
 }
 
 func (r *WarehouseMap) UpdateWarehouse(id int, warehouse models.Warehouse) (models.Warehouse, error) {

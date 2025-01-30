@@ -2,7 +2,6 @@ package warehouse
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -36,14 +35,6 @@ func (s *WarehouseDefault) CreateWarehouse(warehouse models.Warehouse) (models.W
 }
 
 func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
-	warehouse, err := s.rp.GetById(idWarehouse)
-	if err != nil {
-		return err
-	}
-	warehouseEmpty := models.Warehouse{}
-	if warehouse == warehouseEmpty {
-		return errors.ErrorNotFound
-	}
 	return s.rp.DeleteWarehouse(idWarehouse)
 }
 
