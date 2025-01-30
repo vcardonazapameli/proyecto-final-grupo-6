@@ -1,6 +1,10 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 var (
 	// Generics
@@ -10,3 +14,11 @@ var (
 	ErrorBadRequest           error = errors.New("bad request")
 	ErrorUnprocessableContent error = errors.New("unprocessable content")
 )
+
+type ValidationError struct {
+	Messages []string
+}
+
+func (ve ValidationError) Error() string {
+	return fmt.Sprintf("There were some errors validating seller: \n %s", strings.Join(ve.Messages, ", "))
+}
