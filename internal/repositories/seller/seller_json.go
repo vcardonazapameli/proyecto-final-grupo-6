@@ -2,22 +2,20 @@ package seller
 
 import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
-	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/seller"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
 type SellerRepositoryJSON struct {
-	db     map[int]models.Seller
-	loader loader.SellerLoader
+	db map[int]models.Seller
 }
 
-func NewSellerRepositoryJSON(db map[int]models.Seller, loader loader.SellerLoader) *SellerRepositoryJSON {
+func NewSellerRepositoryJSON(db map[int]models.Seller) *SellerRepositoryJSON {
 	// default db
 	defaultDb := make(map[int]models.Seller)
 	if db != nil {
 		defaultDb = db
 	}
-	return &SellerRepositoryJSON{db: defaultDb, loader: loader}
+	return &SellerRepositoryJSON{db: defaultDb}
 }
 
 func (r *SellerRepositoryJSON) GetAll() (s map[int]models.Seller, err error) {
