@@ -19,12 +19,13 @@ type WarehouseMap struct {
 }
 
 func (r *WarehouseMap) GetAll() (v map[int]models.Warehouse, err error) {
+	if len(r.db) == 1 && r.db[1].Id == 0 {
+		return nil, errorsCustom.ErrorNotFound
+	}
 	v = make(map[int]models.Warehouse)
-	// copy db
 	for key, value := range r.db {
 		v[key] = value
 	}
-
 	return
 }
 

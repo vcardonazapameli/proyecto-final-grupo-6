@@ -25,11 +25,15 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		warehouses, err := h.sv.GetAll()
 		if err != nil {
-			response.JSON(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError)
+			if err == errorsCustom.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			}
 			return
 		}
 
-		data := []models.WarehouseDoc{}
+		data := make([]models.WarehouseDoc, 0, len(warehouses))
 		for _, value := range warehouses {
 			data = append(data, mapper.WarehouseToWarehouseDoc(value))
 		}
