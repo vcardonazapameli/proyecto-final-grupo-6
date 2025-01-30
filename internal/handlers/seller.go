@@ -7,7 +7,8 @@ import (
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
+	customResponse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
+	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -24,11 +25,11 @@ func (h *SellerHandler) GetAll() http.HandlerFunc {
 		s, err := h.sv.GetAll()
 
 		if err != nil {
-			response.Error(w, err)
+			customResponse.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusOK, s)
+		customResponse.JSON(w, http.StatusOK, s)
 	}
 }
 
@@ -43,7 +44,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &SellerRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			customResponse.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
@@ -51,7 +52,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 
 		// Error handling
 		if err != nil {
-			response.Error(w, err)
+			customResponse.Error(w, err)
 			return
 		}
 
@@ -67,7 +68,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, err) // BadRequest
+			customResponse.Error(w, err) // BadRequest
 			return
 		}
 
@@ -75,7 +76,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 
 		// Error handling
 		if err != nil {
-			response.Error(w, err)
+			customResponse.Error(w, err)
 			return
 		}
 
@@ -91,13 +92,13 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest) // BadRequest
+			customResponse.Error(w, defaultErrors.ErrorBadRequest) // BadRequest
 			return
 		}
 
 		// Error handling
 		if err := h.sv.Delete(id); err != nil {
-			response.Error(w, err)
+			customResponse.Error(w, err)
 			return
 		}
 
@@ -119,13 +120,13 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			customResponse.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		req := &UpdateSellerRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			customResponse.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
@@ -134,7 +135,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		// Error handling
 		// TODO: ValidationError
 		if err != nil {
-			response.Error(w, err)
+			customResponse.Error(w, err)
 			return
 		}
 

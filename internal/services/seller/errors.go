@@ -10,5 +10,5 @@ type ValidationError struct {
 }
 
 func (ve ValidationError) Error() string {
-	return fmt.Sprintf("There were some errors validating seller: \n %s", strings.Join(ve.messages, "\n"))
+	return fmt.Sprintf("There were some errors validating seller: \n %s", strings.Join(ve.messages, ", "))
 }
