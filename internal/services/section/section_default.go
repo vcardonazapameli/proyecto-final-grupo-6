@@ -2,6 +2,7 @@ package section
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -30,6 +31,12 @@ func (s *SectionDefault) GetByID(id int) (models.Section, error) {
 }
 
 func (s *SectionDefault) Create(section models.Section) (models.Section, error) {
+	if err := validators.ValidateCapacity(section); err != nil {
+		return models.Section{}, err
+	}
+	if err := validators.ValidateTemperature(section); err != nil {
+		return models.Section{}, err
+	}
 	section, err := s.rp.Create(section)
 	if err != nil {
 		return models.Section{}, err
@@ -40,6 +47,12 @@ func (s *SectionDefault) Create(section models.Section) (models.Section, error) 
 func (s *SectionDefault) Update(id int, sectionDTO models.UpdateSectionDto) (models.Section, error) {
 	section, err := s.rp.Update(id, sectionDTO)
 	if err != nil {
+		return models.Section{}, err
+	}
+	if err := validators.ValidateCapacity(section); err != nil {
+		return models.Section{}, err
+	}
+	if err := validators.ValidateTemperature(section); err != nil {
 		return models.Section{}, err
 	}
 	return section, nil
