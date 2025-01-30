@@ -33,5 +33,8 @@ func RegisterBuyerRoutes(r chi.Router) {
 		// - GET /vehicles
 		rt.Get("/", hd.GetAll())
 		rt.Get("/{id}", hd.GetById())
+		rt.Post("/", hd.CreateBuyer())
+		rt.Delete("/{id}", hd.DeleteBuyer())
+		rt.Patch("/{id}",hd.UpdateBuyer())
 	})
 }

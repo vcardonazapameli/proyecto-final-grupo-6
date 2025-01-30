@@ -22,25 +22,18 @@ func ValidateNoEmptyFields(v any) error {
 	return nil
 }
 
-func UpdateEntityFromDTO[T any](dto any, entity T) T {
+func UpdateEntity[T any](dto any, entity T) T {
 	entityValue := reflect.ValueOf(entity).Elem()
-	entityType := entityValue.Type()
-	newEntityPtr := reflect.New(entityType)
-	newEntity := newEntityPtr.Elem()
-	newEntity.Set(entityValue)
 	dtoValue := reflect.ValueOf(dto)
-	if dtoValue.NumField() == 0 {
-		return newEntityPtr.Interface().(T)
-	}
 	for i := 0; i < dtoValue.NumField(); i++ {
 		dtoField := dtoValue.Field(i)
 		fieldType := dtoValue.Type().Field(i)
-		if dtoField.Kind() == reflect.Ptr && !dtoField.IsNil() {
-			entityField := newEntity.FieldByName(fieldType.Name)
-			if entityField.CanSet() {
+		entityField := entityValue.FieldByName(fieldType.Name)
+		if entityField.IsValid() && entityField.CanSet() {
+			if dtoField.Kind() == reflect.Ptr && !dtoField.IsNil() {
 				entityField.Set(dtoField.Elem())
 			}
 		}
 	}
-	return newEntityPtr.Interface().(T)
+	return entity
 }

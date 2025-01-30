@@ -7,4 +7,7 @@ type BuyerRepository interface{
 	GetById(id int)(models.Buyer, bool)
 	CreateBuyer(buyer models.Buyer)
 	ValidateCardNumberId(cardNumber int)(exists bool)
+	ValidateIfExistsById(id int)(exists bool)
+	DeleteBuyer(buyerId int)
+	UpdateBuyer(id int , buyer models.Buyer)models.Buyer
 }
