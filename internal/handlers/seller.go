@@ -9,7 +9,6 @@ import (
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	customResponse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -58,10 +57,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "success",
-			"data":    new,
-		})
+		customResponse.JSON(w, http.StatusCreated, new)
 	}
 }
 
@@ -82,10 +78,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 			return
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "success",
-			"data":    s,
-		})
+		customResponse.JSON(w, http.StatusOK, s)
 	}
 }
 
@@ -105,7 +98,7 @@ func (h *SellerHandler) Delete() http.HandlerFunc {
 		}
 
 		// Deleted Successfully
-		response.JSON(w, http.StatusNoContent, nil)
+		customResponse.JSON(w, http.StatusNoContent, nil)
 
 	}
 }
@@ -135,15 +128,11 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone)
 
 		// Error handling
-		// TODO: ValidationError
 		if err != nil {
 			customResponse.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "updated successfully",
-			"data":    sellerDoc,
-		})
+		customResponse.JSON(w, http.StatusOK, sellerDoc)
 	}
 }
