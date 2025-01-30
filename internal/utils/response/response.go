@@ -51,6 +51,10 @@ func Error(w http.ResponseWriter, err error) {
 		statusCode = http.StatusBadRequest
 		message = err.Error()
 
+	case errors.As(err, &e.ValidationError{}):
+		statusCode = http.StatusBadRequest
+		message = err.Error()
+
 	default:
 		statusCode = http.StatusInternalServerError
 		message = "Internal Server Error"
