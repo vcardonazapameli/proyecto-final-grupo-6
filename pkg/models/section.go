@@ -29,3 +29,15 @@ type SectionDoc struct {
 	WarehouseId        int     `json:"warehouse_id"`
 	ProductBatchId     []int   `json:"product_batch_id"`
 }
+
+type SectionValidation struct {
+	SectionNumber      string  `json:"section_number"`
+	CurrentCapacity    int     `json:"current_capacity"`
+	CurrentTemperature float64 `json:"current_temperature"`
+	MaximumCapacity    int     `json:"maximum_capacity"`
+	MinimumCapacity    int     `json:"minimum_capacity"`
+	MinimumTemperature float64 `json:"minimum_temperature"`
+	ProductTypeId      int     `json:"product_type_id"`
+	WarehouseId        int     `json:"warehouse_id"`
+	ProductBatchId     []int   `json:"product_batch_id"`
+}

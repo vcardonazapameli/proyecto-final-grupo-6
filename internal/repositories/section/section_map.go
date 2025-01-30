@@ -1,7 +1,11 @@
 package section
 
 import (
+	"fmt"
+
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -33,10 +37,11 @@ func (s *SectionMap) GetByID(id int) (models.Section, error) {
 
 // Create a new section
 func (s *SectionMap) Create(section models.Section) (models.Section, error) {
-	if section.SectionNumber == "" {
+	sectionDoc := mappers.SectionToSectionValidation(section)
+	if err := validators.ValidateNoEmptyFields(sectionDoc); err != nil {
+		fmt.Println("Validation error:", err)
 		return models.Section{}, errors.ErrorUnprocessableContent
 	}
-
 	for _, sec := range s.db {
 		if sec.SectionNumber == section.SectionNumber {
 			return models.Section{}, errors.ErrorConflict
@@ -48,14 +53,16 @@ func (s *SectionMap) Create(section models.Section) (models.Section, error) {
 	return section, nil
 }
 
-// Update a section
 func (s *SectionMap) Update(id int, section models.Section) (models.Section, error) {
+	sectionDoc := mappers.SectionToSectionValidation(section)
 	existSection, ok := s.db[id]
 	if !ok {
 		return models.Section{}, errors.ErrorNotFound
 	}
-	s.db[id] = existSection
-	return existSection, nil
+
+	updatedSection := validators.UpdateEntity(sectionDoc, &existSection)
+	s.db[id] = *updatedSection
+	return *updatedSection, nil
 }
 
 func (s *SectionMap) Delete(id int) error {

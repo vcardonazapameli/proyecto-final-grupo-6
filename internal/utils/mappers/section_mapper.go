@@ -32,3 +32,17 @@ func SectionDocToSection(sections models.SectionDoc) models.Section {
 		},
 	}
 }
+
+func SectionToSectionValidation(section models.Section) models.SectionValidation {
+	return models.SectionValidation{
+		SectionNumber:      section.SectionNumber,
+		CurrentCapacity:    section.CurrentCapacity,
+		CurrentTemperature: section.CurrentTemperature,
+		MaximumCapacity:    section.MaximumCapacity,
+		MinimumCapacity:    section.MinimumCapacity,
+		MinimumTemperature: section.MinimumTemperature,
+		ProductTypeId:      section.ProductTypeId,
+		WarehouseId:        section.WarehouseId,
+		ProductBatchId:     section.ProductBatchId,
+	}
+}
