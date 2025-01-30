@@ -30,8 +30,8 @@ func UpdateEntity[T any](dto any, entity T) T {
 		fieldType := dtoValue.Type().Field(i)
 		entityField := entityValue.FieldByName(fieldType.Name)
 		if entityField.IsValid() && entityField.CanSet() {
-			if dtoField.Kind() == entityField.Kind() {
-				entityField.Set(dtoField)
+			if dtoField.Kind() == reflect.Ptr && !dtoField.IsNil() {
+				entityField.Set(dtoField.Elem())
 			}
 		}
 	}

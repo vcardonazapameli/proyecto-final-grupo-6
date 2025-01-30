@@ -61,7 +61,17 @@ func (r *ProductMap) GenerateId() int {
 	return assignedId
 }
 
-func (r *ProductMap) Update(id int, product models.Product) error {
-	r.db[id] = product
+func (r *ProductMap) Update(id int, product *models.Product) error {
+	r.db[id] = *product
 	return nil
+}
+
+func (r *ProductMap) MatchWithTheSameProductCode(id int, productCode string) bool {
+	var numberOfMatches int = 0
+	for _, product := range r.db {
+		if product.Id != id && strings.EqualFold(product.ProductCode, productCode) {
+			numberOfMatches++
+		}
+	}
+	return numberOfMatches > 0
 }

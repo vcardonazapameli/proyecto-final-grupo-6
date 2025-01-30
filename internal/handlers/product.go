@@ -1,14 +1,16 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/product"
 	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	responseCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+	"github.com/bootcamp-go/web/request"
 	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
@@ -64,19 +66,18 @@ func (h *ProductHandler) Delete() http.HandlerFunc {
 
 func (h *ProductHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		productDoc := models.ProductDoc{}
-		if err := json.NewDecoder(r.Body).Decode(&productDoc); err != nil {
+		productDoc := models.ProductDocRequest{}
+		if err := request.JSON(r, &productDoc); err != nil {
 			response.Error(w, http.StatusUnprocessableEntity, "datos del registro mal formados o incompletos")
+			return
+		}
+		if err := validators.ValidateNoEmptyFields(productDoc); err != nil {
+			response.Error(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		product, err := h.sv.Create(productDoc)
 		if err != nil {
-			if errors.Is(err, errorCustom.ErrorConflict) {
-				response.Error(w, http.StatusConflict, err.Error())
-				return
-			}
-			response.Error(w, http.StatusInternalServerError, errorCustom.ErrorInternalServerError.Error())
-			return
+			responseCustom.Error(w, err)
 		}
 		response.JSON(w, http.StatusCreated, product)
 	}
@@ -85,19 +86,14 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 func (h *ProductHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-		productDoc := models.ProductDoc{}
-		if err := json.NewDecoder(r.Body).Decode(&productDoc); err != nil {
+		productDoc := models.ProductUpdateDocRequest{}
+		if err := request.JSON(r, &productDoc); err != nil {
 			response.Error(w, http.StatusUnprocessableEntity, "datos del registro mal formados o incompletos")
 			return
 		}
 		product, err := h.sv.Update(id, productDoc)
 		if err != nil {
-			if errors.Is(err, errorCustom.ErrorNotFound) {
-				response.Error(w, http.StatusNotFound, err.Error())
-				return
-			}
-			response.Error(w, http.StatusInternalServerError, errorCustom.ErrorInternalServerError.Error())
-			return
+			responseCustom.Error(w, err)
 		}
 		response.JSON(w, http.StatusOK, product)
 	}

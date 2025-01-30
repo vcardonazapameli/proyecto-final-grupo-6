@@ -1,9 +1,12 @@
 package product
 
 import (
+	"sort"
+
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
 	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -15,13 +18,20 @@ type ProductDefault struct {
 	rp repository.ProductRepository
 }
 
-func (s *ProductDefault) GetAll() (map[int]models.ProductDoc, error) {
+func (s *ProductDefault) GetAll() ([]models.ProductDocResponse, error) {
 	products, _ := s.rp.GetAll()
 	productsDoc := mappers.ProductsToProductsDoc(products)
-	return productsDoc, nil
+	productsSlice := []models.ProductDocResponse{}
+	for _, product := range productsDoc {
+		productsSlice = append(productsSlice, product)
+	}
+	sort.Slice(productsSlice, func(i, j int) bool {
+		return productsSlice[i].Id < productsSlice[j].Id
+	})
+	return productsSlice, nil
 }
 
-func (s *ProductDefault) GetById(id int) (*models.ProductDoc, error) {
+func (s *ProductDefault) GetById(id int) (*models.ProductDocResponse, error) {
 	product, _ := s.rp.GetById(id)
 	if product == nil {
 		return nil, errorCustom.ErrorNotFound
@@ -39,31 +49,41 @@ func (s *ProductDefault) Delete(id int) error {
 	return nil
 }
 
-func (s *ProductDefault) Create(productDoc models.ProductDoc) (*models.ProductDoc, error) {
-	existInDb := s.rp.ExistInDb(productDoc.ProductCode)
+func (s *ProductDefault) Create(productDocRquest models.ProductDocRequest) (*models.ProductDocResponse, error) {
+	if errorValidateFields := validators.ValidateFields(productDocRquest); errorValidateFields != nil {
+		return nil, errorValidateFields
+	}
+	existInDb := s.rp.ExistInDb(productDocRquest.ProductCode)
 	if existInDb {
 		return nil, errorCustom.ErrorConflict
 	}
-	product := mappers.ProductDocToProduct(productDoc)
+	product := mappers.ProductDocRequestToProduct(productDocRquest)
 	product.Id = s.rp.GenerateId()
 	err := s.rp.Create(product)
 	if err != nil {
 		return nil, nil
 	}
-	productDoc = mappers.ProductToProductDoc(product)
+	productDoc := mappers.ProductToProductDoc(product)
 	return &productDoc, nil
 }
 
-func (s *ProductDefault) Update(id int, productDoc models.ProductDoc) (*models.ProductDoc, error) {
-	if product, _ := s.rp.GetById(id); product == nil {
+func (s *ProductDefault) Update(id int, productDocRequest models.ProductUpdateDocRequest) (*models.ProductDocResponse, error) {
+	product, _ := s.rp.GetById(id)
+	if product == nil {
 		return nil, errorCustom.ErrorNotFound
 	}
-	product := mappers.ProductDocToProduct(productDoc)
-	product.Id = id
-	err := s.rp.Update(id, product)
+	productUpdate := validators.UpdateEntity(productDocRequest, product)
+	if s.rp.MatchWithTheSameProductCode(productUpdate.Id, productUpdate.ProductCode) {
+		return nil, errorCustom.ErrorConflict
+	}
+	productUpdateDocRequest := mappers.ProductUpdateDocRequestToProductDocRequest(productUpdate)
+	if errorValidateFields := validators.ValidateFields(productUpdateDocRequest); errorValidateFields != nil {
+		return nil, errorValidateFields
+	}
+	err := s.rp.Update(id, productUpdate)
 	if err != nil {
 		return nil, nil
 	}
-	productDoc = mappers.ProductToProductDoc(product)
+	productDoc := mappers.ProductToProductDoc(*productUpdate)
 	return &productDoc, nil
 }

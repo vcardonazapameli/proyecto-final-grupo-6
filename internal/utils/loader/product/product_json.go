@@ -24,7 +24,7 @@ func (l *ProductJSONFile) Load() (products map[int]models.Product, err error) {
 	}
 	defer file.Close()
 
-	var productsJSON []models.ProductDoc
+	var productsJSON []models.ProductDocResponse
 	err = json.NewDecoder(file).Decode(&productsJSON)
 	if err != nil {
 		return
