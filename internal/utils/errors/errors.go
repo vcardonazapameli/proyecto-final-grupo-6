@@ -8,10 +8,11 @@ import (
 
 var (
 	// Generics
-	ErrorNotFound            error = errors.New("resource not found")
-	ErrorInternalServerError error = errors.New("internal server error")
-	ErrorConflict            error = errors.New("conflict occurred")
-	ErrorBadRequest          error = errors.New("bad request")
+	ErrorNotFound             error = errors.New("resource not found")
+	ErrorInternalServerError  error = errors.New("internal server error")
+	ErrorConflict             error = errors.New("conflict occurred")
+	ErrorBadRequest           error = errors.New("bad request")
+	ErrorUnprocessableContent error = errors.New("unprocessable content")
 )
 
 type ValidationError struct {
@@ -19,5 +20,5 @@ type ValidationError struct {
 }
 
 func (ve ValidationError) Error() string {
-	return fmt.Sprintf("There were some errors validating seller: \n %s", strings.Join(ve.Messages, ", "))
+	return fmt.Sprintf("There were some errors validating:  %s", strings.Join(ve.Messages, ", "))
 }
