@@ -6,10 +6,10 @@ import (
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -25,7 +25,7 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sections, err := h.sv.GetAll()
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, "An error occurred while getting sections")
+			response.Error(w, err)
 			return
 		}
 
@@ -33,10 +33,7 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 		for id, section := range sections {
 			sectionDocs[id] = mappers.SectionToSectionDoc(section)
 		}
-
-		response.JSON(w, http.StatusOK, map[string]any{
-			"data": sectionDocs,
-		})
+		response.JSON(w, http.StatusOK, sectionDocs)
 
 	}
 }
@@ -45,27 +42,24 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		if id == "" || id == "0" {
-			response.Error(w, http.StatusBadRequest, "ID is required")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		idConv, err := strconv.Atoi(id)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		s, err := h.sv.GetByID(idConv)
 		if err != nil {
-			response.Error(w, http.StatusNotFound, errors.ErrorNotFound.Error())
+			response.Error(w, err)
 			return
 		}
 
 		sectionDoc := mappers.SectionToSectionDoc(s)
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Section found",
-			"data":    sectionDoc,
-		})
+		response.JSON(w, http.StatusOK, sectionDoc)
 	}
 }
 
@@ -73,29 +67,18 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var s models.SectionDoc
 		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid request body")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		section := mappers.SectionDocToSection(s)
 		createdSection, err := h.sv.Create(section)
 		if err != nil {
-			switch err {
-			case errors.ErrorUnprocessableContent:
-				response.Error(w, http.StatusUnprocessableEntity, err.Error())
-			case errors.ErrorConflict:
-				response.Error(w, http.StatusConflict, err.Error())
-			default:
-				response.Error(w, http.StatusInternalServerError, "An error occurred while creating the section")
-			}
+			response.Error(w, err)
 			return
 		}
-
 		createdSectionDoc := mappers.SectionToSectionDoc(createdSection)
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"message": "Section created",
-			"data":    createdSectionDoc,
-		})
+		response.JSON(w, http.StatusCreated, createdSectionDoc)
 	}
 }
 
@@ -103,30 +86,23 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 		var s models.SectionDoc
 		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid request body")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		section := mappers.SectionDocToSection(s)
 		updatedSection, err := h.sv.Update(idConv, section)
 		if err != nil {
-			if err == errors.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, err.Error())
-			} else {
-				response.Error(w, http.StatusInternalServerError, "An error occurred while updating the section")
-			}
+			response.Error(w, err)
 			return
 		}
 		updateSectionDoc := mappers.SectionToSectionDoc(updatedSection)
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": "Section updated",
-			"data":    updateSectionDoc,
-		})
+		response.JSON(w, http.StatusOK, updateSectionDoc)
 	}
 }
 
@@ -134,21 +110,15 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, "Invalid ID")
+			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
 		err = h.sv.Delete(idConv)
 		if err != nil {
-			if err == errors.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, err.Error())
-			} else {
-				response.Error(w, http.StatusInternalServerError, "An error occurred while deleting the section")
-			}
+			response.Error(w, err)
 			return
 		}
-		response.JSON(w, http.StatusNoContent, map[string]any{
-			"message": "Section deleted",
-		})
+		response.JSON(w, http.StatusNoContent, nil)
 	}
 }
