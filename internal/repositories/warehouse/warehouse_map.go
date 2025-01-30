@@ -38,17 +38,16 @@ func (r *WarehouseMap) GetById(idWarehouse int) (models.Warehouse, error) {
 }
 
 func (r *WarehouseMap) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
-	warehouses, err := r.GetAll()
-	if err != nil {
-		return models.Warehouse{}, err
-	}
-	for _, warehouseData := range warehouses {
+	for _, warehouseData := range r.db {
 		if warehouseData.Warehouse_code == warehouse.Warehouse_code {
 			return models.Warehouse{}, errorsCustom.ErrorWarehouseCoreRepeat
 		}
 	}
-	warehouse.Id = len(warehouses) + 1
-	warehouses[warehouse.Id] = warehouse
+
+	newID := len(r.db) + 1
+	warehouse.Id = newID
+
+	r.db[newID] = warehouse
 	return warehouse, nil
 }
 
@@ -60,4 +59,28 @@ func (r *WarehouseMap) DeleteWarehouse(idWarehouse int) error {
 	delete(warehouses, idWarehouse)
 	return nil
 
+}
+
+func (r *WarehouseMap) UpdateWarehouse(id int, warehouse models.Warehouse) (models.Warehouse, error) {
+	existingWarehouse, exists := r.db[id]
+	if !exists {
+		return models.Warehouse{}, errorsCustom.ErrorNotFound
+	}
+
+	for key, wh := range r.db {
+		if key != id && wh.Warehouse_code == warehouse.Warehouse_code {
+			return models.Warehouse{}, errorsCustom.ErrorWarehouseCoreRepeat
+		}
+	}
+
+	existingWarehouse.Warehouse_code = warehouse.Warehouse_code
+	existingWarehouse.Address = warehouse.Address
+	existingWarehouse.Telephone = warehouse.Telephone
+	existingWarehouse.Minimun_capacity = warehouse.Minimun_capacity
+	existingWarehouse.Minimun_temperature = warehouse.Minimun_temperature
+	existingWarehouse.Locality_id = warehouse.Locality_id
+
+	r.db[id] = existingWarehouse
+
+	return existingWarehouse, nil
 }

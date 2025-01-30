@@ -131,24 +131,21 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 			return
 		}
 
-		warehouseRepository, err := h.sv.UpdateWarehouse(id, warehouseData)
-		if warehouseRepository == (models.Warehouse{}) && err == nil {
-			response.Error(w, http.StatusConflict, errorsCustom.ErrorConflict.Error())
-			return
-		}
+		updatedWarehouse, err := h.sv.UpdateWarehouse(id, warehouseData)
 		if err != nil {
-			response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			if err == errorsCustom.ErrorNotFound {
+				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+			} else if err == errorsCustom.ErrorWarehouseCoreRepeat {
+				response.Error(w, http.StatusConflict, errorsCustom.ErrorWarehouseCoreRepeat.Error())
+			} else {
+				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+			}
 			return
 		}
-		warehouseRepository.Warehouse_code = warehouseData.Warehouse_code
-		warehouseRepository.Address = warehouseData.Address
-		warehouseRepository.Telephone = warehouseData.Telephone
-		warehouseRepository.Minimun_capacity = warehouseData.Minimun_capacity
-		warehouseRepository.Minimun_temperature = warehouseData.Minimun_temperature
-		warehouseRepository.Locality_id = warehouseData.Locality_id
+		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
 
-		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouseRepository)
-
-		response.JSON(w, http.StatusOK, warehouseResponse)
+		response.JSON(w, http.StatusOK, map[string]any{
+			"data": warehouseResponse,
+		})
 	}
 }

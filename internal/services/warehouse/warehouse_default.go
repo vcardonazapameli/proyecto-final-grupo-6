@@ -32,11 +32,7 @@ func (s *WarehouseDefault) GetById(idWarehouse int) (models.Warehouse, error) {
 }
 
 func (s *WarehouseDefault) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
-	newWarehouse, err := s.rp.CreateWarehouse(warehouse)
-	if err != nil {
-		return models.Warehouse{}, err
-	}
-	return newWarehouse, nil
+	return s.rp.CreateWarehouse(warehouse)
 }
 
 func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
@@ -52,12 +48,5 @@ func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
 }
 
 func (s *WarehouseDefault) UpdateWarehouse(id int, warehouse models.Warehouse) (models.Warehouse, error) {
-	warehouseData, err := s.rp.GetById(id)
-	if err != nil {
-		return models.Warehouse{}, err
-	}
-	if warehouseData.Warehouse_code == warehouse.Warehouse_code {
-		return models.Warehouse{}, nil
-	}
-	return warehouse, nil
+	return s.rp.UpdateWarehouse(id, warehouse)
 }

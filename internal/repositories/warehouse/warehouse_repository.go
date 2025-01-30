@@ -7,4 +7,5 @@ type WarehouseRepository interface {
 	GetById(int) (models.Warehouse, error)
 	CreateWarehouse(models.Warehouse) (models.Warehouse, error)
 	DeleteWarehouse(int) error
+	UpdateWarehouse(int, models.Warehouse) (models.Warehouse, error)
 }
