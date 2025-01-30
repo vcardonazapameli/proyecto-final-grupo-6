@@ -19,3 +19,7 @@ type SellerDoc struct {
 func NewSeller(id int, cid int, companyName string, address string, telephone int) *Seller {
 	return &Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
 }
+
+func NewSellerDoc(id int, cid int, companyName string, address string, telephone int) *SellerDoc {
+	return &SellerDoc{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+}
