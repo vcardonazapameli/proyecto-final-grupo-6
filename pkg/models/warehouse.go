@@ -23,3 +23,13 @@ type WarehouseDoc struct {
 	Minimun_temperature float64 `json:"minimun_temperature"`
 	Locality_id         uint64  `json:"locality_id"`
 }
+
+type WarehouseDocUpdate struct {
+	ID                  *int     `json:"id"`
+	Warehouse_code      *string  `json:"warehouse_code"`
+	Address             *string  `json:"address"`
+	Telephone           *string  `json:"telephone"`
+	Minimun_capacity    *uint64  `json:"minimun_capacity"`
+	Minimun_temperature *float64 `json:"minimun_temperature"`
+	Locality_id         *uint64  `json:"locality_id"`
+}

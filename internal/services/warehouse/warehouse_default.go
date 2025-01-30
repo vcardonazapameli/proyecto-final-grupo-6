@@ -2,6 +2,7 @@ package warehouse
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
+	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -38,6 +39,28 @@ func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
 	return s.rp.DeleteWarehouse(idWarehouse)
 }
 
-func (s *WarehouseDefault) UpdateWarehouse(id int, warehouse models.Warehouse) (models.Warehouse, error) {
-	return s.rp.UpdateWarehouse(id, warehouse)
+func (s *WarehouseDefault) UpdateWarehouse(id int, warehouseData models.WarehouseDocUpdate) (models.Warehouse, error) {
+	existingWarehouse, err := s.rp.GetById(id)
+	if err != nil {
+		return models.Warehouse{}, errorsCustom.ErrorNotFound
+	}
+	if warehouseData.Warehouse_code != nil {
+		existingWarehouse.Warehouse_code = *warehouseData.Warehouse_code
+	}
+	if warehouseData.Address != nil {
+		existingWarehouse.Address = *warehouseData.Address
+	}
+	if warehouseData.Telephone != nil {
+		existingWarehouse.Telephone = *warehouseData.Telephone
+	}
+	if warehouseData.Minimun_capacity != nil {
+		existingWarehouse.Minimun_capacity = *warehouseData.Minimun_capacity
+	}
+	if warehouseData.Minimun_temperature != nil {
+		existingWarehouse.Minimun_temperature = *warehouseData.Minimun_temperature
+	}
+	if warehouseData.Locality_id != nil {
+		existingWarehouse.Locality_id = *warehouseData.Locality_id
+	}
+	return s.rp.UpdateWarehouse(id, existingWarehouse)
 }

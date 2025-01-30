@@ -119,7 +119,7 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 			return
 		}
 
-		var warehouseData models.Warehouse
+		var warehouseData models.WarehouseDocUpdate
 		err = json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
 			response.Error(w, errorsCustom.ErrorDataIncorrect)
