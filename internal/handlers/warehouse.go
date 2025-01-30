@@ -8,8 +8,8 @@ import (
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
 	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	mapper "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -26,9 +26,9 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 		warehouses, err := h.sv.GetAll()
 		if err != nil {
 			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+				response.Error(w, errorsCustom.ErrorNotFound)
 			} else {
-				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+				response.Error(w, errorsCustom.ErrorInternalServerError)
 			}
 			return
 		}
@@ -38,10 +38,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 			data = append(data, mapper.WarehouseToWarehouseDoc(value))
 		}
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"message": http.StatusOK,
-			"data":    data,
-		})
+		response.JSON(w, http.StatusOK, data)
 	}
 }
 
@@ -50,23 +47,21 @@ func (h *WarehouseHandler) GetById() http.HandlerFunc {
 		strId := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(strId)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorBadRequest.Error())
+			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
 			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+				response.Error(w, errorsCustom.ErrorNotFound)
 			} else {
-				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+				response.Error(w, errorsCustom.ErrorInternalServerError)
 			}
 			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouse)
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"data": warehouseResponse,
-		})
+		response.JSON(w, http.StatusOK, warehouseResponse)
 	}
 }
 
@@ -75,22 +70,21 @@ func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 		var warehouseData models.Warehouse
 		err := json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorDataIncorrect.Error())
+			response.Error(w, errorsCustom.ErrorDataIncorrect)
 			return
 		}
 		newWarehouse, err := h.sv.CreateWarehouse(warehouseData)
 		if err != nil {
 			if err.Error() == errorsCustom.ErrorWarehouseCoreRepeat.Error() {
-				response.Error(w, http.StatusConflict, errorsCustom.ErrorDataIncorrect.Error())
+				response.Error(w, errorsCustom.ErrorDataIncorrect)
 			} else {
-				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+				response.Error(w, errorsCustom.ErrorInternalServerError)
 			}
 			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(newWarehouse)
-		response.JSON(w, http.StatusCreated, map[string]any{
-			"data": warehouseResponse,
-		})
+
+		response.JSON(w, http.StatusCreated, warehouseResponse)
 	}
 }
 
@@ -99,15 +93,16 @@ func (h *WarehouseHandler) DeleteWarehouse() http.HandlerFunc {
 		strId := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(strId)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorBadRequest.Error())
+			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
+
 		err = h.sv.DeleteWarehouse(id)
 		if err != nil {
 			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+				response.Error(w, errorsCustom.ErrorNotFound)
 			} else {
-				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+				response.Error(w, errorsCustom.ErrorInternalServerError)
 			}
 			return
 		}
@@ -120,32 +115,30 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 		strId := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(strId)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorBadRequest.Error())
+			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
 
 		var warehouseData models.Warehouse
 		err = json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
-			response.Error(w, http.StatusBadRequest, errorsCustom.ErrorDataIncorrect.Error())
+			response.Error(w, errorsCustom.ErrorDataIncorrect)
 			return
 		}
 
 		updatedWarehouse, err := h.sv.UpdateWarehouse(id, warehouseData)
 		if err != nil {
 			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, http.StatusNotFound, errorsCustom.ErrorNotFound.Error())
+				response.Error(w, errorsCustom.ErrorNotFound)
 			} else if err == errorsCustom.ErrorWarehouseCoreRepeat {
-				response.Error(w, http.StatusConflict, errorsCustom.ErrorWarehouseCoreRepeat.Error())
+				response.Error(w, errorsCustom.ErrorWarehouseCoreRepeat)
 			} else {
-				response.Error(w, http.StatusInternalServerError, errorsCustom.ErrorInternalServerError.Error())
+				response.Error(w, errorsCustom.ErrorInternalServerError)
 			}
 			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
 
-		response.JSON(w, http.StatusOK, map[string]any{
-			"data": warehouseResponse,
-		})
+		response.JSON(w, http.StatusOK, warehouseResponse)
 	}
 }
