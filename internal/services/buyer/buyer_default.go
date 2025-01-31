@@ -22,9 +22,10 @@ func (b *BuyerDefault) UpdateBuyer(id int , buyerDto models.UpdateBuyerDto) (mod
 		return models.Buyer{}, err
 	}
 	updatedBuyer := validators.UpdateEntity(buyerDto, buyerToUpdate)
-	if b.rp.ValidateCardNumberId(updatedBuyer.CardNumberId){
+	if b.rp.ValidateCardNumberIdToUpdate(updatedBuyer.CardNumberId, id){
 		return models.Buyer{}, customErrors.ErrorConflict
 	}
+	
 	b.rp.UpdateBuyer(id, *updatedBuyer)
 	return *updatedBuyer, nil
 }
@@ -39,13 +40,14 @@ func (b *BuyerDefault) DeleteBuyer(buyerId int) error {
 }
 
 // CreateBuyer implements BuyerService.
-func (b *BuyerDefault) CreateBuyer(buyer models.Buyer) error {
+func (b *BuyerDefault) CreateBuyer(buyer models.BuyerAttributes) error {
 
 	if err := validators.ValidateNoEmptyFields(buyer); err != nil {
 		return customErrors.ErrorUnprocessableContent
 	}
-	if !validators.ValidateBuyer(buyer) {
-		return customErrors.ErrorUnprocessableContent
+	
+	if b.rp.ValidateCardNumberId(buyer.CardNumberId){
+		return customErrors.ErrorConflict
 	}
 	b.rp.CreateBuyer(buyer)
 	return nil

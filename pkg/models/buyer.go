@@ -7,9 +7,9 @@ type  Buyer struct {
 }
 
 type BuyerAttributes struct{
-	CardNumberId 	int
-	FirstName 		string
-	LastName 		string
+	CardNumberId 	int     
+	FirstName 		string  
+	LastName 		string	
 }
 
 type BuyerDoc struct {
@@ -23,4 +23,9 @@ type UpdateBuyerDto struct{
 	CardNumberId 	*int			`json:"card_number_id"`
 	FirstName		*string			`json:"first_name"`
 	LastName 		*string			`json:"last_name"`
+}
+type CreateBuyerDto struct{
+	CardNumberId 	int				`json:"card_number_id"`
+	FirstName		string			`json:"first_name"`
+	LastName 		string			`json:"last_name"`
 }
