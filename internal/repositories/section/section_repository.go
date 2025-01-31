@@ -1,0 +1,13 @@
+package section
+
+import "github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+
+type SectionRepository interface {
+	GetAll() (map[int]models.Section, error)
+	GetByID(id int) (models.Section, error)
+	Create(section models.Section) (models.Section, error)
+	Update(id int, section models.Section) (models.Section, error)
+	Delete(id int) error
+	SearchBySectionNumber(sn string) (models.Section, bool)
+	GetBiggestID() (max int)
+}

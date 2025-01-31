@@ -14,8 +14,19 @@ type BuyerMap struct {
 	db map[int]models.Buyer
 }
 
+// IncrementId implements BuyerRepository.
+func (b *BuyerMap) IncrementId() int {
+	maxId:= 0
+	for _,value := range b.db{
+		if maxId < value.Id{
+			maxId = value.Id
+		}
+	}
+	return maxId
+}
+
 // UpdateBuyer implements BuyerRepository.
-func (b *BuyerMap) UpdateBuyer(id int, buyer models.Buyer)models.Buyer {
+func (b *BuyerMap) UpdateBuyer(id int, buyer models.Buyer) models.Buyer {
 	b.db[id] = buyer
 	return buyer
 }
@@ -43,7 +54,7 @@ func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
 
 // CreateBuyer implements BuyerRepository.
 func (b *BuyerMap) CreateBuyer(buyer models.Buyer) {
-	id := len(b.db) + 1
+	id := b.IncrementId()
 	buyer.Id = id
 	b.db[id] = buyer
 }

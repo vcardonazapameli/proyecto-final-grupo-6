@@ -13,7 +13,7 @@ import (
 
 func RegisterBuyerRoutes(r chi.Router) {
 
-	ld := loader.NewBuyerJsonFile("../docs/buyer.json")
+	ld := loader.NewBuyerJsonFile("docs/buyer.json")
 	// datos cargados
 	db, err := ld.Load()
 	if err != nil {

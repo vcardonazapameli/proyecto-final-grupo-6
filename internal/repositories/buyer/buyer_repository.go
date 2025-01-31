@@ -10,4 +10,5 @@ type BuyerRepository interface{
 	ValidateIfExistsById(id int)(exists bool)
 	DeleteBuyer(buyerId int)
 	UpdateBuyer(id int , buyer models.Buyer)models.Buyer
+	
 }
