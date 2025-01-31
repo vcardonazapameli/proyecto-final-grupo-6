@@ -45,8 +45,10 @@ func (a *ServerChi) Run() (err error) {
 	// - middlewares
 
 	// - routes
-	//routes.RegisterEmployeeRoutes(r)
+
 	routes.RegisterWarehouseRoutes(r)
+	routes.RegisterEmployeeRoutes(r)
+	routes.RegisterBuyerRoutes(r)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, r)
