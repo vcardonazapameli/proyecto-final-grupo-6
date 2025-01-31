@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "card_number_id": "123456789",
+        "first_name": "John",
+        "last_name": "Doe",
+        "warehouse_id": 5
+    },
+    {
+        "id": 2,
+        "card_number_id": "987654321",
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "warehouse_id": 3
+    },
+    {
+        "id": 3,
+        "card_number_id": "456789123",
+        "first_name": "Alice",
+        "last_name": "Johnson",
+        "warehouse_id": 4
+    },
+    {
+        "id": 4,
+        "card_number_id": "321654987",
+        "first_name": "Bob",
+        "last_name": "Brown",
+        "warehouse_id": 2
+    },
+    {
+        "id": 5,
+        "card_number_id": "654321789",
+        "first_name": "Charlie",
+        "last_name": "Davis",
+        "warehouse_id": 1
+    }
+]
