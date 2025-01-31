@@ -22,7 +22,7 @@ func (b *BuyerMap) IncrementId() int {
 			maxId = value.Id
 		}
 	}
-	return maxId
+	return maxId + 1
 }
 
 // UpdateBuyer implements BuyerRepository.
@@ -43,6 +43,14 @@ func (b *BuyerMap) DeleteBuyer(buyerId int) {
 }
 
 // ValidateCardNumberId implements BuyerRepository.
+func (b *BuyerMap) ValidateCardNumberIdToUpdate(cardNumber, id int) (exists bool) {
+	for _, value := range b.db {
+		if value.Id != id && cardNumber == value.CardNumberId {
+			return true
+		}
+	}
+	return
+}
 func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
 	for _, value := range b.db {
 		if cardNumber == value.CardNumberId {
@@ -53,10 +61,13 @@ func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
 }
 
 // CreateBuyer implements BuyerRepository.
-func (b *BuyerMap) CreateBuyer(buyer models.Buyer) {
+func (b *BuyerMap) CreateBuyer(buyer models.BuyerAttributes) {
 	id := b.IncrementId()
-	buyer.Id = id
-	b.db[id] = buyer
+	newBuyer := models.Buyer{
+		Id: id,
+		BuyerAttributes: buyer,
+	}
+	b.db[id] = newBuyer
 }
 
 // GetById implements BuyerRepository.

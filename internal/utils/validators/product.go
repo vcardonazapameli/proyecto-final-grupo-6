@@ -5,7 +5,9 @@ import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
+
 func ValidateFieldsProduct(productDocRequest models.ProductDocRequest) error {
+
 	messages := make([]string, 0)
 	if len(productDocRequest.ProductCode) < 4 {
 		messages = append(messages, "product_code must be at least 5 characters long")

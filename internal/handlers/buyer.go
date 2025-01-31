@@ -41,10 +41,12 @@ func (handler *BuyerHandler)GetById()http.HandlerFunc{
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil{
 			response.Error(w, customErrors.ErrorBadRequest )
+			return
 		}
 		buyer,err := handler.sv.GetById(id)
 		if  err!= nil {
 			response.Error(w, customErrors.ErrorNotFound)
+			return
 		}
 		response.JSON(w,http.StatusOK,buyer)
 	}
@@ -52,12 +54,12 @@ func (handler *BuyerHandler)GetById()http.HandlerFunc{
 
 func (handler *BuyerHandler)CreateBuyer()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		var buyerDoc models.BuyerDoc
+		buyerDoc := models.CreateBuyerDto{}
 		if err := json.NewDecoder(r.Body).Decode(&buyerDoc); err != nil{
 			response.Error(w, customErrors.ErrorBadRequest)
 			return	
 		}
-		newBuyer := mappers.BuyerDocToBuyer(buyerDoc)
+		newBuyer := mappers.BuyerDocToBuyerAttributes(buyerDoc)
 		err := handler.sv.CreateBuyer(newBuyer)
 		if err != nil {
 			response.Error(w, err)
@@ -71,6 +73,7 @@ func (handler *BuyerHandler)DeleteBuyer()http.HandlerFunc{
 		id, err := strconv.Atoi(chi.URLParam(r,"id"))
 		if err!= nil{
 			response.Error(w, customErrors.ErrorBadRequest)
+			return
 		}
 		if err = handler.sv.DeleteBuyer(id); err != nil {
 			response.Error(w, err)
@@ -84,11 +87,11 @@ func (handler *BuyerHandler)UpdateBuyer()http.HandlerFunc{
 		id, err := strconv.Atoi(chi.URLParam(r,"id"))
 		var buyerDoc models.UpdateBuyerDto
 		if err != nil {
-			response.Error(w, err)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 		if err := json.NewDecoder(r.Body).Decode(&buyerDoc); err != nil{
-			response.Error(w, err)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return	
 		}
 		updatedBuyer, err := handler.sv.UpdateBuyer(id, buyerDoc)

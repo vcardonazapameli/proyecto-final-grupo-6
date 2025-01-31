@@ -6,7 +6,7 @@ import "github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 type BuyerService interface{
 	GetAll()(map[int]models.Buyer,error)
 	GetById(id int)(*models.Buyer, error)
-	CreateBuyer(buyer models.Buyer)error
+	CreateBuyer(buyer models.BuyerAttributes)error
 	DeleteBuyer(buyerId int)(error)
 	UpdateBuyer(id int , buyerDoc models.UpdateBuyerDto)(models.Buyer, error)
 }

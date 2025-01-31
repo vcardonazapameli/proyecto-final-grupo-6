@@ -50,7 +50,9 @@ func (s *ProductDefault) Delete(id int) error {
 }
 
 func (s *ProductDefault) Create(productDocRquest models.ProductDocRequest) (*models.ProductDocResponse, error) {
+
 	if errorValidateFields := validators.ValidateFieldsProduct(productDocRquest); errorValidateFields != nil {
+
 		return nil, errorValidateFields
 	}
 	existInDb := s.rp.ExistInDb(productDocRquest.ProductCode)
@@ -77,7 +79,9 @@ func (s *ProductDefault) Update(id int, productDocRequest models.ProductUpdateDo
 		return nil, errorCustom.ErrorConflict
 	}
 	productUpdateDocRequest := mappers.ProductUpdateDocRequestToProductDocRequest(productUpdate)
+
 	if errorValidateFields := validators.ValidateFieldsProduct(productUpdateDocRequest); errorValidateFields != nil {
+
 		return nil, errorValidateFields
 	}
 	err := s.rp.Update(id, productUpdate)
