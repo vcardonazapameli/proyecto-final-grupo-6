@@ -2,7 +2,7 @@ package seller
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
@@ -21,7 +21,7 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 	sellers, err := sv.rp.GetAll()
 
 	if err != nil {
-		return s, errors.ErrorInternalServerError
+		return s, customErrors.ErrorInternalServerError
 	}
 
 	for _, sel := range sellers {
@@ -74,7 +74,7 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 	if cid != nil {
 		// If exists a Seller with same CID that the one trying to update, raise conflcit.
 		if s, exists := sv.rp.SearchByCID(*cid); exists && s.Id != id {
-			return models.SellerDoc{}, errors.ErrorConflict
+			return models.SellerDoc{}, customErrors.ErrorConflict
 		}
 
 		seller.Cid = *cid

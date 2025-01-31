@@ -1,7 +1,7 @@
 package seller
 
 import (
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -24,7 +24,7 @@ func (r *SellerRepositoryJSON) GetAll() (s map[int]models.Seller, err error) {
 
 func (r *SellerRepositoryJSON) GetByID(id int) (models.Seller, error) {
 	if s, ok := r.db[id]; !ok {
-		return models.Seller{}, errors.ErrorNotFound
+		return models.Seller{}, customErrors.ErrorNotFound
 	} else {
 		return s, nil
 	}
@@ -50,7 +50,7 @@ func (r *SellerRepositoryJSON) GetBiggestID() (max int) {
 
 func (r *SellerRepositoryJSON) Save(s models.Seller) (models.Seller, error) {
 	if _, exists := r.SearchByCID(s.Cid); exists {
-		return models.Seller{}, errors.ErrorConflict
+		return models.Seller{}, customErrors.ErrorConflict
 	}
 
 	// If does not exist, save.
@@ -62,7 +62,7 @@ func (r *SellerRepositoryJSON) Save(s models.Seller) (models.Seller, error) {
 
 func (r *SellerRepositoryJSON) Delete(id int) error {
 	if _, exists := r.db[id]; !exists {
-		return errors.ErrorNotFound
+		return customErrors.ErrorNotFound
 	}
 	delete(r.db, id)
 	return nil

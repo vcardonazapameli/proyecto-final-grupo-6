@@ -1,7 +1,7 @@
 package validators
 
 import (
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 

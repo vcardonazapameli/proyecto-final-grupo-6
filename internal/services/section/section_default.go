@@ -2,7 +2,7 @@ package section
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -54,7 +54,7 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 	if sectionDto.SectionNumber != nil {
 		_, exists := s.rp.SearchBySectionNumber(updatedSection.SectionNumber)
 		if exists {
-			return models.Section{}, errors.ErrorConflict
+			return models.Section{}, customErrors.ErrorConflict
 		}
 	}
 

@@ -3,7 +3,7 @@ package validators
 import (
 	"strings"
 
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -32,7 +32,7 @@ func ValidateFieldsWarehouse(warehouse models.Warehouse) error {
 		messages = append(messages, "La longitud del teléfono debe ser mayor o igual a 8 y menor o igual a 10")
 	}
 	if len(messages) > 0 {
-		return errors.ValidationError{Messages: messages}
+		return customErrors.ValidationError{Messages: messages}
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func ValidateFieldsUpdate(warehouse models.Warehouse) error {
 		messages = append(messages, "La longitud del teléfono debe ser mayor o igual a 8 y menor o igual a 10")
 	}
 	if len(messages) > 0 {
-		return errors.ValidationError{Messages: messages}
+		return customErrors.ValidationError{Messages: messages}
 	}
 	return nil
 }

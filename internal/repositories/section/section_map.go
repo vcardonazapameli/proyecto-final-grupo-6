@@ -1,7 +1,7 @@
 package section
 
 import (
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
@@ -32,7 +32,7 @@ func (s *SectionMap) GetAll() (map[int]models.Section, error) {
 func (s *SectionMap) GetByID(id int) (models.Section, error) {
 	section, ok := s.db[id]
 	if !ok {
-		return models.Section{}, errors.ErrorNotFound
+		return models.Section{}, customErrors.ErrorNotFound
 	}
 	return section, nil
 }
@@ -59,11 +59,11 @@ func (s *SectionMap) GetBiggestID() (max int) {
 func (s *SectionMap) Create(section models.Section) (models.Section, error) {
 	sectionDoc := mappers.SectionToSectionValidation(section)
 	if err := validators.ValidateNoEmptyFields(sectionDoc); err != nil {
-		return models.Section{}, errors.ErrorUnprocessableContent
+		return models.Section{}, customErrors.ErrorUnprocessableContent
 	}
 
 	if _, exists := s.SearchBySectionNumber(section.SectionNumber); exists {
-		return models.Section{}, errors.ErrorConflict
+		return models.Section{}, customErrors.ErrorConflict
 	}
 	section.Id = s.nextID
 	s.nextID++
@@ -80,7 +80,7 @@ func (s *SectionMap) Update(id int, section models.Section) (models.Section, err
 func (s *SectionMap) Delete(id int) error {
 	_, ok := s.db[id]
 	if !ok {
-		return errors.ErrorNotFound
+		return customErrors.ErrorNotFound
 	}
 	delete(s.db, id)
 	return nil

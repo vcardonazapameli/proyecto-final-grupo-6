@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
-	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	mapper "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"

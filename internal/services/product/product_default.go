@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
-	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"

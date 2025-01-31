@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
-	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	customResponse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/go-chi/chi/v5"

@@ -1,7 +1,7 @@
 package warehouse
 
 import (
-	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )

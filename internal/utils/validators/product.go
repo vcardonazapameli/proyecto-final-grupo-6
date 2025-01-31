@@ -1,10 +1,9 @@
 package validators
 
 import (
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
-
 
 func ValidateFieldsProduct(productDocRequest models.ProductDocRequest) error {
 
@@ -40,7 +39,7 @@ func ValidateFieldsProduct(productDocRequest models.ProductDocRequest) error {
 		messages = append(messages, "seller_id cannot be negative")
 	}
 	if len(messages) > 0 {
-		return errors.ValidationError{Messages: messages}
+		return customErrors.ValidationError{Messages: messages}
 	}
 	return nil
 }

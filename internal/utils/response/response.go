@@ -54,7 +54,7 @@ func Error(w http.ResponseWriter, err error) {
 		statusCode = http.StatusBadRequest
 		message = err.Error()
 
-	case errors.Is(err, e.ErrorUnprocessableContent) || errors.As(err, &e.ValidationError{}):
+	case errors.Is(err, customErrors.ErrorUnprocessableContent) || errors.As(err, &customErrors.ValidationError{}):
 		statusCode = http.StatusUnprocessableEntity
 		message = err.Error()
 

@@ -2,7 +2,7 @@ package warehouse
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
-	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
