@@ -45,7 +45,12 @@ func (a *ServerChi) Run() (err error) {
 	// - middlewares
 
 	// - routes
+
+	routes.RegisterWarehouseRoutes(r)
 	routes.RegisterEmployeeRoutes(r)
+	routes.RegisterSellerRoutes(r)
+	routes.RegisterSectionRoutes(r)
+	routes.RegisterProductRoutes(r)
 	routes.RegisterBuyerRoutes(r)
 
 	// run server
