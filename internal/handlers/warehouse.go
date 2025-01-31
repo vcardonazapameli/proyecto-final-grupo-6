@@ -26,6 +26,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 		warehouses, err := h.sv.GetAll()
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 
 		data := make([]models.WarehouseDoc, 0, len(warehouses))
@@ -48,6 +49,7 @@ func (h *WarehouseHandler) GetById() http.HandlerFunc {
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouse)
 
@@ -66,6 +68,7 @@ func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 		newWarehouse, err := h.sv.CreateWarehouse(warehouseData)
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(newWarehouse)
 
@@ -85,6 +88,7 @@ func (h *WarehouseHandler) DeleteWarehouse() http.HandlerFunc {
 		err = h.sv.DeleteWarehouse(id)
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 		response.JSON(w, http.StatusNoContent, "")
 	}
@@ -102,13 +106,14 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 		var warehouseData models.WarehouseDocUpdate
 		err = json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
-			response.Error(w, errorsCustom.ErrorUnprocessableContent)
+			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
 
 		updatedWarehouse, err := h.sv.UpdateWarehouse(id, warehouseData)
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
 
