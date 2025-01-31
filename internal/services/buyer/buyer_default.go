@@ -2,7 +2,7 @@ package buyer
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/buyer"
-	customErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	customErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -16,8 +16,8 @@ type BuyerDefault struct {
 }
 
 // UpdateBuyer implements BuyerService.
-func (b *BuyerDefault) UpdateBuyer(id int , buyerDto models.UpdateBuyerDto) (models.Buyer, error) {
-	buyerToUpdate,err := b.GetById(id)
+func (b *BuyerDefault) UpdateBuyer(id int, buyerDto models.UpdateBuyerDto) (models.Buyer, error) {
+	buyerToUpdate, err := b.GetById(id)
 	if err != nil {
 		return models.Buyer{}, err
 	}

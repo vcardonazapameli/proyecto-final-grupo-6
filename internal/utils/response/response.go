@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	e "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 )
 
 type customResponse struct {
@@ -42,15 +42,15 @@ func Error(w http.ResponseWriter, err error) {
 	var message string
 
 	switch {
-	case errors.Is(err, e.ErrorNotFound):
+	case errors.Is(err, customErrors.ErrorNotFound):
 		statusCode = http.StatusNotFound
 		message = err.Error()
 
-	case errors.Is(err, e.ErrorConflict):
+	case errors.Is(err, customErrors.ErrorConflict):
 		statusCode = http.StatusConflict
 		message = err.Error()
 
-	case errors.Is(err, e.ErrorBadRequest):
+	case errors.Is(err, customErrors.ErrorBadRequest):
 		statusCode = http.StatusBadRequest
 		message = err.Error()
 
