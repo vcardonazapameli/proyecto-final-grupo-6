@@ -1,6 +1,8 @@
 package employee
 
 import (
+	"fmt"
+
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
@@ -56,6 +58,10 @@ func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.EmployeeDoc, error) {
 
 	//1. validate model (empty fields)
+	err := validators.ValidateNoEmptyFields(request)
+	if err != nil {
+		return nil, fmt.Errorf("%w : %s", customErrors.ErrorUnprocessableContent, err)
+	}
 
 	//2. validate if cardNumberID already exist
 	existCardNumberID, err := e.rp.FindByCardNumberID(request.CardNumberID)

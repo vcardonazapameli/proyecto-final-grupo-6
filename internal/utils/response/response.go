@@ -11,15 +11,13 @@ import (
 type customResponse struct {
 	Message string `json:"message"`
 	Data    any    `json:"data"`
-	Error   bool   `json:"error"`
 }
 
 func JSON(w http.ResponseWriter, code int, data any) {
 
 	response := customResponse{
 		Data:    data,
-		Message: "Successful request",
-		Error:   false,
+		Message: "Success",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -31,6 +29,11 @@ func JSON(w http.ResponseWriter, code int, data any) {
 		// default error
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+type customErrorResponse struct {
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"message"`
 }
 
 func Error(w http.ResponseWriter, err error) {
@@ -51,6 +54,14 @@ func Error(w http.ResponseWriter, err error) {
 		statusCode = http.StatusBadRequest
 		message = err.Error()
 
+	case errors.Is(err, customErrors.ErrorUnprocessableContent):
+		statusCode = http.StatusUnprocessableEntity
+		message = err.Error()
+
+	case errors.As(err, &customErrors.ValidationError{}):
+		statusCode = http.StatusBadRequest
+		message = err.Error()
+
 	default:
 		statusCode = http.StatusInternalServerError
 		message = "Internal Server Error"
@@ -59,10 +70,9 @@ func Error(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	response := customResponse{
-		Data:    nil,
-		Message: message,
-		Error:   true,
+	response := customErrorResponse{
+		StatusCode: statusCode,
+		Message:    message,
 	}
 	// encode response
 	err = json.NewEncoder(w).Encode(response)
