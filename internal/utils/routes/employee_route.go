@@ -13,7 +13,7 @@ import (
 
 func RegisterEmployeeRoutes(r chi.Router) {
 
-	ld := loader.NewEmployeeJSONFile("../docs/employee.json")
+	ld := loader.NewEmployeeJSONFile("docs/employee.json")
 	// datos cargados
 	db, err := ld.Load()
 	if err != nil {
