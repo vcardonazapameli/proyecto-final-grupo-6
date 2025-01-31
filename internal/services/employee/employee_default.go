@@ -4,6 +4,7 @@ import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -54,12 +55,15 @@ func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 // Create implements EmployeeService.
 func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.EmployeeDoc, error) {
 
-	//1. validate model
+	//1. validate model (empty fields)
 
-	//2. validate if employee already exist
-	existingEmployee, err := e.rp.FindByCardNumberID(request.CardNumberID)
-	if err == nil && existingEmployee != nil {
+	//2. validate if cardNumberID already exist
+	existCardNumberID, err := e.rp.FindByCardNumberID(request.CardNumberID)
+	if err == nil && existCardNumberID != nil {
 		return nil, customErrors.ErrorConflict
+	}
+	if err != nil {
+		return nil, customErrors.ErrorInternalServerError
 	}
 
 	//3. map request to model
@@ -73,6 +77,40 @@ func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.Employ
 
 	//5. map model to doc
 	dataMap := mappers.EmployeeToEmployeeDoc(data)
+	return &dataMap, nil
+}
+
+// Update implements EmployeeService.
+func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models.EmployeeDoc, error) {
+
+	/// 1. Get the existing employee
+	existingEmployee, err := e.rp.GetById(id)
+	if err != nil {
+		return nil, customErrors.ErrorNotFound
+	}
+
+	//2. validate if cardNumberID already exist
+	if request.CardNumberID != nil {
+		existCardNumberID, err := e.rp.FindByCardNumberID(*request.CardNumberID)
+		if err == nil && existCardNumberID != nil && existCardNumberID.Id != id {
+			return nil, customErrors.ErrorConflict
+		}
+		if err != nil {
+			return nil, customErrors.ErrorInternalServerError
+		}
+	}
+
+	// 3. Update the fields that are not empty
+	updatedEmployee := validators.UpdateEntity(request, existingEmployee)
+
+	// 4. Save the updated employee
+	err = e.rp.Update(id, updatedEmployee)
+	if err != nil {
+		return nil, customErrors.ErrorInternalServerError
+	}
+
+	// 4. Map model to doc
+	dataMap := mappers.EmployeeToEmployeeDoc(*updatedEmployee)
 	return &dataMap, nil
 }
 

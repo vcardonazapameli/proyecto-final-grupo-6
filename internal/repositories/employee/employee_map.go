@@ -28,7 +28,7 @@ func (r *EmployeeMap) FindByCardNumberID(cardNumberID string) (*models.Employee,
 			return &employee, nil
 		}
 	}
-	return nil, customErrors.ErrorNotFound
+	return nil, nil
 }
 
 // FindAll is a method that returns a map of all vehicles
@@ -74,6 +74,13 @@ func (r *EmployeeMap) Create(newEmployee models.Employee) (models.Employee, erro
 	r.db[newId] = newEmployee
 
 	return newEmployee, nil
+}
+
+// Update implements EmployeeRepository.
+func (r *EmployeeMap) Update(id int, request *models.Employee) error {
+	r.db[id] = *request
+
+	return nil
 }
 
 // Create implements EmployeeRepository.

@@ -74,6 +74,32 @@ func (h *EmployeeHandler) Create() http.HandlerFunc {
 	}
 }
 
+func (h *EmployeeHandler) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		idStr := chi.URLParam(r, "id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.Error(w, customErrors.ErrorBadRequest)
+			return
+		}
+
+		var updEmployee models.UpdateEmployee
+		if err := json.NewDecoder(r.Body).Decode(&updEmployee); err != nil {
+			response.Error(w, customErrors.ErrorBadRequest)
+			return
+		}
+
+		data, err := h.sv.Update(id, updEmployee)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
+
+		response.JSON(w, http.StatusOK, data)
+	}
+}
+
 func (h *EmployeeHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
