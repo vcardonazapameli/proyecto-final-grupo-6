@@ -33,7 +33,7 @@ func (s *WarehouseDefault) GetById(idWarehouse int) (models.Warehouse, error) {
 }
 
 func (s *WarehouseDefault) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
-	if err := validators.ValidateFields(warehouse); err != nil {
+	if err := validators.ValidateFieldsWarehouse(warehouse); err != nil {
 		return models.Warehouse{}, err
 	}
 	return s.rp.CreateWarehouse(warehouse)

@@ -7,7 +7,7 @@ import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func ValidateFields(warehouse models.Warehouse) error {
+func ValidateFieldsWarehouse(warehouse models.Warehouse) error {
 	messages := make([]string, 0)
 
 	if strings.TrimSpace(warehouse.Warehouse_code) == "" {
