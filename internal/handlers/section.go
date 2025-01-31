@@ -94,7 +94,9 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
-		updatedSection, err := h.sv.Update(idConv, sectionDoc)
+
+		updatedSection, err := h.sv.Update(idConv, sectionDoc) // section Doc puede ser:: nil | valor puntero
+
 		if err != nil {
 			response.Error(w, err)
 			return
