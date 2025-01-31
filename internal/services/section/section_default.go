@@ -2,6 +2,7 @@ package section
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -44,18 +45,27 @@ func (s *SectionDefault) Create(section models.Section) (models.Section, error) 
 	return section, nil
 }
 
-func (s *SectionDefault) Update(id int, sectionDTO models.UpdateSectionDto) (models.Section, error) {
-	section, err := s.rp.Update(id, sectionDTO)
+func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (models.Section, error) {
+	sectionToUpdate, err := s.rp.GetByID(id)
 	if err != nil {
 		return models.Section{}, err
 	}
-	if err := validators.ValidateCapacity(section); err != nil {
+	updatedSection := validators.UpdateEntity(sectionDto, &sectionToUpdate)
+	if sectionDto.SectionNumber != nil {
+		_, exists := s.rp.SearchBySectionNumber(updatedSection.SectionNumber)
+		if exists {
+			return models.Section{}, errors.ErrorConflict
+		}
+	}
+
+	if err := validators.ValidateCapacity(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
-	if err := validators.ValidateTemperature(section); err != nil {
+	if err := validators.ValidateTemperature(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
-	return section, nil
+	s.rp.Update(id, *updatedSection)
+	return *updatedSection, nil
 }
 
 func (s *SectionDefault) Delete(id int) error {
