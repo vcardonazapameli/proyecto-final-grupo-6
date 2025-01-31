@@ -24,15 +24,15 @@ func (l *ProductJSONFile) Load() (products map[int]models.Product, err error) {
 	}
 	defer file.Close()
 
-	var productsJSON []models.ProductDoc
+	var productsJSON []models.ProductDocResponse
 	err = json.NewDecoder(file).Decode(&productsJSON)
 	if err != nil {
 		return
 	}
 
 	products = make(map[int]models.Product)
-	for _, product := range productsJSON {
-		products[product.Id] = models.Product{
+	for key, product := range productsJSON {
+		products[key] = models.Product{
 			Id: product.Id,
 			ProductAttributes: models.ProductAttributes{
 				ProductCode:                    product.ProductCode,
