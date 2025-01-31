@@ -40,11 +40,11 @@ func (r *WarehouseMap) GetById(idWarehouse int) (models.Warehouse, error) {
 func (r *WarehouseMap) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
 	for _, warehouseData := range r.db {
 		if warehouseData.Warehouse_code == warehouse.Warehouse_code {
-			return models.Warehouse{}, errorsCustom.ErrorWarehouseCoreRepeat
+			return models.Warehouse{}, errorsCustom.ErrorConflict
 		}
 	}
 
-	newID := len(r.db) + 1
+	newID := r.getMaxWarehouseID() + 1
 	warehouse.Id = newID
 
 	r.db[newID] = warehouse
@@ -68,7 +68,7 @@ func (r *WarehouseMap) UpdateWarehouse(id int, warehouse models.Warehouse) (mode
 
 	for key, wh := range r.db {
 		if key != id && wh.Warehouse_code == warehouse.Warehouse_code {
-			return models.Warehouse{}, errorsCustom.ErrorWarehouseCoreRepeat
+			return models.Warehouse{}, errorsCustom.ErrorConflict
 		}
 	}
 
@@ -82,4 +82,14 @@ func (r *WarehouseMap) UpdateWarehouse(id int, warehouse models.Warehouse) (mode
 	r.db[id] = existingWarehouse
 
 	return existingWarehouse, nil
+}
+
+func (r *WarehouseMap) getMaxWarehouseID() int {
+	maxID := 0
+	for _, warehouse := range r.db {
+		if warehouse.Id > maxID {
+			maxID = warehouse.Id
+		}
+	}
+	return maxID
 }

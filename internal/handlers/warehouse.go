@@ -25,12 +25,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		warehouses, err := h.sv.GetAll()
 		if err != nil {
-			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, errorsCustom.ErrorNotFound)
-			} else {
-				response.Error(w, errorsCustom.ErrorInternalServerError)
-			}
-			return
+			response.Error(w, err)
 		}
 
 		data := make([]models.WarehouseDoc, 0, len(warehouses))
@@ -52,12 +47,7 @@ func (h *WarehouseHandler) GetById() http.HandlerFunc {
 		}
 		warehouse, err := h.sv.GetById(id)
 		if err != nil {
-			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, errorsCustom.ErrorNotFound)
-			} else {
-				response.Error(w, errorsCustom.ErrorInternalServerError)
-			}
-			return
+			response.Error(w, err)
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouse)
 
@@ -70,17 +60,12 @@ func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 		var warehouseData models.Warehouse
 		err := json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
-			response.Error(w, errorsCustom.ErrorDataIncorrect)
+			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
 		newWarehouse, err := h.sv.CreateWarehouse(warehouseData)
 		if err != nil {
-			if err.Error() == errorsCustom.ErrorWarehouseCoreRepeat.Error() {
-				response.Error(w, errorsCustom.ErrorDataIncorrect)
-			} else {
-				response.Error(w, errorsCustom.ErrorInternalServerError)
-			}
-			return
+			response.Error(w, err)
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(newWarehouse)
 
@@ -99,14 +84,9 @@ func (h *WarehouseHandler) DeleteWarehouse() http.HandlerFunc {
 
 		err = h.sv.DeleteWarehouse(id)
 		if err != nil {
-			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, errorsCustom.ErrorNotFound)
-			} else {
-				response.Error(w, errorsCustom.ErrorInternalServerError)
-			}
-			return
+			response.Error(w, err)
 		}
-		response.JSON(w, http.StatusNoContent, "Warehouse deleted")
+		response.JSON(w, http.StatusNoContent, "")
 	}
 }
 
@@ -122,20 +102,13 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 		var warehouseData models.WarehouseDocUpdate
 		err = json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
-			response.Error(w, errorsCustom.ErrorDataIncorrect)
+			response.Error(w, errorsCustom.ErrorUnprocessableContent)
 			return
 		}
 
 		updatedWarehouse, err := h.sv.UpdateWarehouse(id, warehouseData)
 		if err != nil {
-			if err == errorsCustom.ErrorNotFound {
-				response.Error(w, errorsCustom.ErrorNotFound)
-			} else if err == errorsCustom.ErrorWarehouseCoreRepeat {
-				response.Error(w, errorsCustom.ErrorWarehouseCoreRepeat)
-			} else {
-				response.Error(w, errorsCustom.ErrorInternalServerError)
-			}
-			return
+			response.Error(w, err)
 		}
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
 
