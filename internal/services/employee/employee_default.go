@@ -95,28 +95,38 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 		return nil, customErrors.ErrorNotFound
 	}
 
-	//2. validate if cardNumberID already exist
-	if request.CardNumberID != nil {
-		existCardNumberID, err := e.rp.FindByCardNumberID(*request.CardNumberID)
-		if err == nil && existCardNumberID != nil && existCardNumberID.Id != id {
+	// 2. Validar y actualizar los campos que no son nil
+	if request.CardNumberID != nil && *request.CardNumberID != "" {
+
+		//3. validate if cardNumberID already exist
+		exists, err := e.rp.FindByCardNumberID(*request.CardNumberID)
+		if exists != nil && exists.Id != id {
 			return nil, customErrors.ErrorConflict
 		}
 		if err != nil {
 			return nil, customErrors.ErrorInternalServerError
 		}
+
+		existingEmployee.EmployeeAttributes.CardNumberID = *request.CardNumberID
+	}
+	if request.FirstName != nil && *request.FirstName != "" {
+		existingEmployee.EmployeeAttributes.FirstName = *request.FirstName
+	}
+	if request.LastName != nil && *request.LastName != "" {
+		existingEmployee.EmployeeAttributes.LastName = *request.LastName
+	}
+	if request.WarehouseID != nil && *request.WarehouseID > 0 {
+		existingEmployee.EmployeeAttributes.WarehouseID = *request.WarehouseID
 	}
 
-	// 3. Update the fields that are not empty
-	updatedEmployee := validators.UpdateEntity(request, existingEmployee)
-
 	// 4. Save the updated employee
-	err = e.rp.Update(id, updatedEmployee)
+	err = e.rp.Update(id, existingEmployee)
 	if err != nil {
 		return nil, customErrors.ErrorInternalServerError
 	}
 
 	// 4. Map model to doc
-	dataMap := mappers.EmployeeToEmployeeDoc(*updatedEmployee)
+	dataMap := mappers.EmployeeToEmployeeDoc(*existingEmployee)
 	return &dataMap, nil
 }
 
