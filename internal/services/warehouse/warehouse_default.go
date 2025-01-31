@@ -3,6 +3,7 @@ package warehouse
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
 	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -32,6 +33,9 @@ func (s *WarehouseDefault) GetById(idWarehouse int) (models.Warehouse, error) {
 }
 
 func (s *WarehouseDefault) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
+	if err := validators.ValidateFields(warehouse); err != nil {
+		return models.Warehouse{}, err
+	}
 	return s.rp.CreateWarehouse(warehouse)
 }
 
@@ -43,6 +47,10 @@ func (s *WarehouseDefault) UpdateWarehouse(id int, warehouseData models.Warehous
 	existingWarehouse, err := s.rp.GetById(id)
 	if err != nil {
 		return models.Warehouse{}, errorsCustom.ErrorNotFound
+	}
+	updatedWarehouse := validators.UpdateEntity(warehouseData, &existingWarehouse)
+	if err := validators.ValidateFieldsUpdate(*updatedWarehouse); err != nil {
+		return models.Warehouse{}, err
 	}
 	if warehouseData.Warehouse_code != nil {
 		existingWarehouse.Warehouse_code = *warehouseData.Warehouse_code
