@@ -1,8 +1,6 @@
 package employee
 
 import (
-	"fmt"
-
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
@@ -58,9 +56,9 @@ func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.EmployeeDoc, error) {
 
 	//1. validate model (empty fields)
-	err := validators.ValidateNoEmptyFields(request)
+	err := validators.ValidateCreateEmployee(request)
 	if err != nil {
-		return nil, fmt.Errorf("%w : %s", customErrors.ErrorUnprocessableContent, err)
+		return nil, err
 	}
 
 	//2. validate if cardNumberID already exist
@@ -95,9 +93,14 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 		return nil, customErrors.ErrorNotFound
 	}
 
-	// 2. Validar y actualizar los campos que no son nil
-	if request.CardNumberID != nil && *request.CardNumberID != "" {
+	// 2. Validate request fields
+	err = validators.ValidateUpdateEmployee(request)
+	if err != nil {
+		return nil, err
+	}
 
+	// 3. Validate if cardNumberid already exist y Actualizar los campos que no son nil
+	if request.CardNumberID != nil {
 		//3. validate if cardNumberID already exist
 		exists, err := e.rp.FindByCardNumberID(*request.CardNumberID)
 		if exists != nil && exists.Id != id {
@@ -109,13 +112,16 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 
 		existingEmployee.EmployeeAttributes.CardNumberID = *request.CardNumberID
 	}
-	if request.FirstName != nil && *request.FirstName != "" {
+	if request.CardNumberID != nil {
+		existingEmployee.EmployeeAttributes.CardNumberID = *request.CardNumberID
+	}
+	if request.FirstName != nil {
 		existingEmployee.EmployeeAttributes.FirstName = *request.FirstName
 	}
-	if request.LastName != nil && *request.LastName != "" {
+	if request.LastName != nil {
 		existingEmployee.EmployeeAttributes.LastName = *request.LastName
 	}
-	if request.WarehouseID != nil && *request.WarehouseID > 0 {
+	if request.WarehouseID != nil {
 		existingEmployee.EmployeeAttributes.WarehouseID = *request.WarehouseID
 	}
 
