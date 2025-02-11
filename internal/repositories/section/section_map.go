@@ -24,21 +24,21 @@ type SectionMap struct {
 }
 
 // List all sections
-func (s *SectionMap) GetAll() (map[int]models.Section, error) {
-	return s.db, nil
+func (r *SectionMap) GetAll() (map[int]models.Section, error) {
+	return r.db, nil
 }
 
 // Get a section by ID
-func (s *SectionMap) GetByID(id int) (models.Section, error) {
-	section, ok := s.db[id]
+func (r *SectionMap) GetByID(id int) (models.Section, error) {
+	section, ok := r.db[id]
 	if !ok {
 		return models.Section{}, customErrors.ErrorNotFound
 	}
 	return section, nil
 }
 
-func (s *SectionMap) SearchBySectionNumber(sn string) (models.Section, bool) {
-	for _, section := range s.db {
+func (r *SectionMap) SearchBySectionNumber(sn string) (models.Section, bool) {
+	for _, section := range r.db {
 		if section.SectionNumber == sn {
 			return section, true
 		}
@@ -46,8 +46,8 @@ func (s *SectionMap) SearchBySectionNumber(sn string) (models.Section, bool) {
 	return models.Section{}, false
 }
 
-func (s *SectionMap) GetBiggestID() (max int) {
-	for _, section := range s.db {
+func (r *SectionMap) GetBiggestID() (max int) {
+	for _, section := range r.db {
 		if section.Id > max {
 			max = section.Id
 		}
@@ -56,32 +56,32 @@ func (s *SectionMap) GetBiggestID() (max int) {
 }
 
 // Create a new section
-func (s *SectionMap) Create(section models.Section) (models.Section, error) {
+func (r *SectionMap) Create(section models.Section) (models.Section, error) {
 	sectionDoc := mappers.SectionToSectionValidation(section)
 	if err := validators.ValidateNoEmptyFields(sectionDoc); err != nil {
 		return models.Section{}, customErrors.ErrorUnprocessableContent
 	}
 
-	if _, exists := s.SearchBySectionNumber(section.SectionNumber); exists {
+	if _, exists := r.SearchBySectionNumber(section.SectionNumber); exists {
 		return models.Section{}, customErrors.ErrorConflict
 	}
-	section.Id = s.nextID
-	s.nextID++
+	section.Id = r.nextID
+	r.nextID++
 
-	s.db[section.Id] = section
+	r.db[section.Id] = section
 	return section, nil
 }
 
-func (s *SectionMap) Update(id int, section models.Section) (models.Section, error) {
-	s.db[id] = section
+func (r *SectionMap) Update(id int, section models.Section) (models.Section, error) {
+	r.db[id] = section
 	return section, nil
 }
 
-func (s *SectionMap) Delete(id int) error {
-	_, ok := s.db[id]
+func (r *SectionMap) Delete(id int) error {
+	_, ok := r.db[id]
 	if !ok {
 		return customErrors.ErrorNotFound
 	}
-	delete(s.db, id)
+	delete(r.db, id)
 	return nil
 }
