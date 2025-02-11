@@ -14,8 +14,19 @@ type BuyerMap struct {
 	db map[int]models.Buyer
 }
 
+// IncrementId implements BuyerRepository.
+func (b *BuyerMap) IncrementId() int {
+	maxId:= 0
+	for _,value := range b.db{
+		if maxId < value.Id{
+			maxId = value.Id
+		}
+	}
+	return maxId + 1
+}
+
 // UpdateBuyer implements BuyerRepository.
-func (b *BuyerMap) UpdateBuyer(id int, buyer models.Buyer)models.Buyer {
+func (b *BuyerMap) UpdateBuyer(id int, buyer models.Buyer) models.Buyer {
 	b.db[id] = buyer
 	return buyer
 }
@@ -32,6 +43,14 @@ func (b *BuyerMap) DeleteBuyer(buyerId int) {
 }
 
 // ValidateCardNumberId implements BuyerRepository.
+func (b *BuyerMap) ValidateCardNumberIdToUpdate(cardNumber, id int) (exists bool) {
+	for _, value := range b.db {
+		if value.Id != id && cardNumber == value.CardNumberId {
+			return true
+		}
+	}
+	return
+}
 func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
 	for _, value := range b.db {
 		if cardNumber == value.CardNumberId {
@@ -42,10 +61,13 @@ func (b *BuyerMap) ValidateCardNumberId(cardNumber int) (exists bool) {
 }
 
 // CreateBuyer implements BuyerRepository.
-func (b *BuyerMap) CreateBuyer(buyer models.Buyer) {
-	id := len(b.db) + 1
-	buyer.Id = id
-	b.db[id] = buyer
+func (b *BuyerMap) CreateBuyer(buyer models.BuyerAttributes) {
+	id := b.IncrementId()
+	newBuyer := models.Buyer{
+		Id: id,
+		BuyerAttributes: buyer,
+	}
+	b.db[id] = newBuyer
 }
 
 // GetById implements BuyerRepository.

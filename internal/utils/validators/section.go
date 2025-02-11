@@ -1,7 +1,7 @@
 package validators
 
 import (
-	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 

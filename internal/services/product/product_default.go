@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
-	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/errors"
+	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
@@ -50,7 +50,9 @@ func (s *ProductDefault) Delete(id int) error {
 }
 
 func (s *ProductDefault) Create(productDocRquest models.ProductDocRequest) (*models.ProductDocResponse, error) {
-	if errorValidateFields := validators.ValidateFields(productDocRquest); errorValidateFields != nil {
+
+	if errorValidateFields := validators.ValidateFieldsProduct(productDocRquest); errorValidateFields != nil {
+
 		return nil, errorValidateFields
 	}
 	existInDb := s.rp.ExistInDb(productDocRquest.ProductCode)
@@ -77,7 +79,9 @@ func (s *ProductDefault) Update(id int, productDocRequest models.ProductUpdateDo
 		return nil, errorCustom.ErrorConflict
 	}
 	productUpdateDocRequest := mappers.ProductUpdateDocRequestToProductDocRequest(productUpdate)
-	if errorValidateFields := validators.ValidateFields(productUpdateDocRequest); errorValidateFields != nil {
+
+	if errorValidateFields := validators.ValidateFieldsProduct(productUpdateDocRequest); errorValidateFields != nil {
+
 		return nil, errorValidateFields
 	}
 	err := s.rp.Update(id, productUpdate)

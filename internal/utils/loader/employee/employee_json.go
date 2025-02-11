@@ -1,13 +1,14 @@
 package employee
 
 import (
+	"encoding/json"
 	"os"
 
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
 // NewVehicleJSONFile is a function that returns a new instance of VehicleJSONFile
-func NewEmployeeJSONFile(path string) *EmployeeJSONFile {
+func NewEmployeeJSONFile(path string) EmployeeLoader {
 	return &EmployeeJSONFile{
 		path: path,
 	}
@@ -28,37 +29,26 @@ func (l *EmployeeJSONFile) Load() (v map[int]models.Employee, err error) {
 	}
 	defer file.Close()
 
-	// decode file
-	// var vehiclesJSON []models.VehicleDoc
-	// err = json.NewDecoder(file).Decode(&vehiclesJSON)
-	// if err != nil {
-	// 	return
-	// }
+	//decode file
+	var employeeJSON []models.EmployeeDoc
+	err = json.NewDecoder(file).Decode(&employeeJSON)
+	if err != nil {
+		return
+	}
 
-	// // serialize vehicles
-	// v = make(map[int]models.Vehicle)
-	// for _, vh := range vehiclesJSON {
-	// 	v[vh.ID] = models.Vehicle{
-	// 		Id: vh.ID,
-	// 		VehicleAttributes: models.VehicleAttributes{
-	// 			Brand:           vh.Brand,
-	// 			Model:           vh.Model,
-	// 			Registration:    vh.Registration,
-	// 			Color:           vh.Color,
-	// 			FabricationYear: vh.FabricationYear,
-	// 			Capacity:        vh.Capacity,
-	// 			MaxSpeed:        vh.MaxSpeed,
-	// 			FuelType:        vh.FuelType,
-	// 			Transmission:    vh.Transmission,
-	// 			Weight:          vh.Weight,
-	// 			Dimensions: models.Dimensions{
-	// 				Height: vh.Height,
-	// 				Length: vh.Length,
-	// 				Width:  vh.Width,
-	// 			},
-	// 		},
-	// 	}
-	// }
+	// serialize vehicles
+	v = make(map[int]models.Employee)
+	for _, em := range employeeJSON {
+		v[em.Id] = models.Employee{
+			Id: em.Id,
+			EmployeeAttributes: models.EmployeeAttributes{
+				CardNumberID: em.CardNumberID,
+				FirstName:    em.FirstName,
+				LastName:     em.LastName,
+				WarehouseID:  em.WarehouseID,
+			},
+		}
+	}
 
 	return
 }
