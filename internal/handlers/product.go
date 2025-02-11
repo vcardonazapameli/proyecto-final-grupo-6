@@ -12,17 +12,17 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func NewProductHandler(sv product.ProductService) *ProductHandler {
-	return &ProductHandler{sv: sv}
+func NewProductHandler(service product.ProductService) *ProductHandler {
+	return &ProductHandler{service: service}
 }
 
 type ProductHandler struct {
-	sv product.ProductService
+	service product.ProductService
 }
 
-func (h *ProductHandler) GetAll() http.HandlerFunc {
+func (productHandler *ProductHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		productsDoc, err := h.sv.GetAll()
+		productsDoc, err := productHandler.service.GetAll()
 		if err != nil {
 			response.Error(w, err)
 			return
@@ -31,10 +31,10 @@ func (h *ProductHandler) GetAll() http.HandlerFunc {
 	}
 }
 
-func (h *ProductHandler) GetById() http.HandlerFunc {
+func (productHandler *ProductHandler) GetById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-		productDoc, err := h.sv.GetById(id)
+		productDoc, err := productHandler.service.GetById(id)
 		if err != nil {
 			response.Error(w, err)
 			return
@@ -43,10 +43,10 @@ func (h *ProductHandler) GetById() http.HandlerFunc {
 	}
 }
 
-func (h *ProductHandler) Delete() http.HandlerFunc {
+func (productHandler *ProductHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-		err := h.sv.Delete(id)
+		err := productHandler.service.Delete(id)
 		if err != nil {
 			response.Error(w, err)
 			return
@@ -55,7 +55,7 @@ func (h *ProductHandler) Delete() http.HandlerFunc {
 	}
 }
 
-func (h *ProductHandler) Create() http.HandlerFunc {
+func (productHandler *ProductHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		productDoc := models.ProductDocRequest{}
 		if err := request.JSON(r, &productDoc); err != nil {
@@ -66,7 +66,7 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 			response.Error(w, err)
 			return
 		}
-		product, err := h.sv.Create(productDoc)
+		product, err := productHandler.service.Create(productDoc)
 		if err != nil {
 			response.Error(w, err)
 			return
@@ -75,7 +75,7 @@ func (h *ProductHandler) Create() http.HandlerFunc {
 	}
 }
 
-func (h *ProductHandler) Update() http.HandlerFunc {
+func (productHandler *ProductHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 		productDoc := models.ProductUpdateDocRequest{}
@@ -83,7 +83,7 @@ func (h *ProductHandler) Update() http.HandlerFunc {
 			response.Error(w, err)
 			return
 		}
-		product, err := h.sv.Update(id, productDoc)
+		product, err := productHandler.service.Update(id, productDoc)
 		if err != nil {
 			response.Error(w, err)
 			return
