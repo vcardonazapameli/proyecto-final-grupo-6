@@ -1,77 +1,151 @@
 package product
 
 import (
-	"strings"
+	"database/sql"
+	"log"
 
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewProductMap(db map[int]models.Product) ProductRepository {
-	defaultDb := make(map[int]models.Product)
-	if db != nil {
-		defaultDb = db
+type productRepository struct {
+	db *sql.DB
+}
+
+func NewProductRepository(db *sql.DB) ProductRepository {
+	repository := &productRepository{
+		db: db,
 	}
-	return &ProductMap{db: defaultDb}
+	return repository
 }
 
-type ProductMap struct {
-	db map[int]models.Product
+func (productRepository *productRepository) GetAll() ([]models.ProductDocResponse, error) {
+	rows, err := productRepository.db.Query("select id, product_code, description, expiration_rate, recommended_freezing_temperature, freezing_rate, width, height, length, net_weight, product_type_id, seller_id from products;")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.ProductDocResponse
+	for rows.Next() {
+		var product models.ProductDocResponse
+		err := rows.Scan(
+			&product.Id,
+			&product.ProductCode,
+			&product.Description,
+			&product.ExpirationRate,
+			&product.RecommendedFreezingTemperature,
+			&product.FreezingRate,
+			&product.Width,
+			&product.Height,
+			&product.Length,
+			&product.NetWeight,
+			&product.ProductType,
+			&product.Seller,
+		)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		products = append(products, product)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
-func (r *ProductMap) GetAll() (map[int]models.Product, error) {
-	return r.db, nil
-}
-
-func (r *ProductMap) GetById(id int) (*models.Product, error) {
-	product, exist := r.db[id]
-	if !exist {
-		return nil, nil
+func (productRepository *productRepository) GetById(id int) (*models.ProductDocResponse, error) {
+	row := productRepository.db.QueryRow("select id, product_code, description, expiration_rate, recommended_freezing_temperature, freezing_rate, width, height, length, net_weight, product_type_id, seller_id from products where id = ?;", id)
+	var product models.ProductDocResponse
+	err := row.Scan(
+		&product.Id,
+		&product.ProductCode,
+		&product.Description,
+		&product.ExpirationRate,
+		&product.RecommendedFreezingTemperature,
+		&product.FreezingRate,
+		&product.Width,
+		&product.Height,
+		&product.Length,
+		&product.NetWeight,
+		&product.ProductType,
+		&product.Seller,
+	)
+	if err != nil {
+		return nil, err
 	}
 	return &product, nil
 }
 
-func (r *ProductMap) Delete(id int) error {
-	delete(r.db, id)
+func (productRepository *productRepository) Delete(id int) error {
+	_, err := productRepository.db.Exec("delete from products where id = ?", id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (r *ProductMap) Create(product models.Product) error {
-	r.db[product.Id] = product
+func (productRepository *productRepository) Create(product *models.ProductDocResponse) error {
+	result, err := productRepository.db.Exec("insert into products (product_code, description, expiration_rate, recommended_freezing_temperature, freezing_rate, width, height, length, net_weight, product_type_id, seller_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		product.ProductCode,
+		product.Description,
+		product.ExpirationRate,
+		product.RecommendedFreezingTemperature,
+		product.FreezingRate,
+		product.Width,
+		product.Height,
+		product.Length,
+		product.NetWeight,
+		product.ProductType,
+		product.Seller,
+	)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	product.Id = int(id)
 	return nil
 }
 
-func (r *ProductMap) ExistInDb(productCode string) bool {
-	for _, product := range r.db {
-		if strings.EqualFold(product.ProductCode, productCode) {
-			return true
-		}
+func (productRepository *productRepository) ExistInDb(productCode string) (bool, error) {
+	var exist bool
+	query := "select exists(select 1 from products p where p.product_code = ?)"
+	err := productRepository.db.QueryRow(query, productCode).Scan(&exist)
+	if err != nil {
+		return false, err
 	}
-	return false
+	return exist, nil
 }
 
-func (r *ProductMap) GenerateId() int {
-	var assignedId int = 1
-	var firstIteration bool = true
-	for _, product := range r.db {
-		if firstIteration || product.Id >= assignedId {
-			firstIteration = false
-			assignedId = product.Id + 1
-		}
+func (productRepository *productRepository) Update(id int, product *models.ProductDocResponse) error {
+	_, err := productRepository.db.Exec("update products set product_code = ?, description = ?, expiration_rate = ?, recommended_freezing_temperature = ?, freezing_rate = ?, width = ?, height = ?, length = ?, net_weight = ?, product_type_id = ?, seller_id = ? where id = ?",
+		product.ProductCode,
+		product.Description,
+		product.ExpirationRate,
+		product.RecommendedFreezingTemperature,
+		product.FreezingRate,
+		product.Width,
+		product.Height,
+		product.Length,
+		product.NetWeight,
+		product.ProductType,
+		product.Seller,
+		id,
+	)
+	if err != nil {
+		return err
 	}
-	return assignedId
-}
-
-func (r *ProductMap) Update(id int, product *models.Product) error {
-	r.db[id] = *product
 	return nil
 }
 
-func (r *ProductMap) MatchWithTheSameProductCode(id int, productCode string) bool {
-	var numberOfMatches int = 0
-	for _, product := range r.db {
-		if product.Id != id && strings.EqualFold(product.ProductCode, productCode) {
-			numberOfMatches++
-		}
+func (productRepository *productRepository) MatchWithTheSameProductCode(id int, productCode string) (bool, error) {
+	var numberOfMatches int
+	query := "select count(*) from products where id != ? and product_code = ?"
+	err := productRepository.db.QueryRow(query, id, productCode).Scan(&numberOfMatches)
+	if err != nil {
+		return false, err
 	}
-	return numberOfMatches > 0
+	return numberOfMatches > 0, nil
 }
