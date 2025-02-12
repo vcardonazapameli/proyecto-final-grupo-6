@@ -53,3 +53,9 @@ type UpdateSectionDto struct {
 	WarehouseId        *int     `json:"warehouse_id"`
 	ProductBatchId     *[]int   `json:"product_batch_id"`
 }
+
+type SectionReport struct {
+	SectionId     int    `json:"section_id"`
+	SectionNumber string `json:"section_number"`
+	ProductsCount int    `json:"products_count"`
+}
