@@ -6,3 +6,14 @@ type Locality struct {
 	ProvinceName string `json:"province_name"`
 	CountryName  string `json:"country_name"`
 }
+
+type Country struct {
+	Id   int
+	Name string
+}
+
+type Province struct {
+	Id        int
+	Name      string
+	CountryId int
+}

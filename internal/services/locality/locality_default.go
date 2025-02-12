@@ -20,6 +20,12 @@ func (s *LocalityServiceDefault) Create(loc *models.Locality) error {
 		return err
 	}
 
-	err = s.rp.Save(loc)
+	// Searches if exists Province with same name and Same country name, if not 404.
+	p, err := s.rp.GetProvinceWithCountryNames(loc.ProvinceName, loc.CountryName)
+	if err != nil {
+		return err
+	}
+
+	err = s.rp.Save(loc.Id, loc.LocalityName, p.Id)
 	return err
 }
