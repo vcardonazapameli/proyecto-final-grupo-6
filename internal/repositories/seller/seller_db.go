@@ -29,7 +29,17 @@ func (r SellerRepositoryDB) GetAll() (map[int]models.Seller, error) {
 
 // GetByID implements SellerRepository.
 func (r SellerRepositoryDB) GetByID(id int) (models.Seller, error) {
-	panic("unimplemented")
+	row := r.db.QueryRow("SELECT id, cid, company_name, address, telephone, locality_id FROM sellers WHERE id = ?", id)
+	var seller models.Seller
+	err := row.Scan(&seller.Id, &seller.Cid, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.LocalityID)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Seller{}, customErrors.ErrorNotFound
+		}
+		return models.Seller{}, err
+	}
+	return seller, nil
 }
 
 // Save implements SellerRepository.
