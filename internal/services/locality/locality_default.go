@@ -2,6 +2,7 @@ package locality
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/locality"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -28,4 +29,17 @@ func (s *LocalityServiceDefault) Create(loc *models.LocalityDoc) error {
 
 	err = s.rp.Save(loc.Id, loc.LocalityName, p.Id)
 	return err
+}
+
+func (s *LocalityServiceDefault) GetSellerCountByLocalityID(locId int) ([]models.LocalitySellerCountDoc, error) {
+	if locId <= 0 {
+		return []models.LocalitySellerCountDoc{}, customErrors.ValidationError{Messages: append(make([]string, 0), "ID cannot be zero nor negative")}
+	}
+	locSeller, err := s.rp.GetSellersByLocalityIDCount(locId)
+
+	return []models.LocalitySellerCountDoc{locSeller}, err
+}
+
+func (s *LocalityServiceDefault) GetAllSellerCountByLocalityID() ([]models.LocalitySellerCountDoc, error) {
+	return s.rp.GetAllSellersByLocalityIDCount()
 }
