@@ -6,6 +6,7 @@ type Seller struct {
 	CompanyName string
 	Address     string
 	Telephone   int
+	LocalityID  int
 }
 
 type SellerDoc struct {
@@ -14,12 +15,13 @@ type SellerDoc struct {
 	CompanyName string `json:"company_name"`
 	Address     string `json:"address"`
 	Telephone   int    `json:"telephone"`
+	LocalityID  int    `json:"locality_id"`
 }
 
-func NewSeller(id int, cid int, companyName string, address string, telephone int) *Seller {
-	return &Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+func NewSeller(id int, cid int, companyName string, address string, telephone int, localityId int) *Seller {
+	return &Seller{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone, LocalityID: localityId}
 }
 
-func NewSellerDoc(id int, cid int, companyName string, address string, telephone int) *SellerDoc {
-	return &SellerDoc{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone}
+func NewSellerDoc(id int, cid int, companyName string, address string, telephone int, localityId int) *SellerDoc {
+	return &SellerDoc{Id: id, Cid: cid, CompanyName: companyName, Address: address, Telephone: telephone, LocalityID: localityId}
 }

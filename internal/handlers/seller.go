@@ -38,6 +38,7 @@ type SellerRequest struct {
 	CompanyName string `json:"company_name"`
 	Address     string `json:"address"`
 	Telephone   int    `json:"telephone"`
+	LocalityID  int    `json:"locality_id"`
 }
 
 func (h *SellerHandler) Create() http.HandlerFunc {
@@ -48,7 +49,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		sDoc := models.NewSellerDoc(-1, req.Cid, req.CompanyName, req.Address, req.Telephone)
+		sDoc := models.NewSellerDoc(-1, req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		new, err := h.sv.Create(*sDoc)
 
 		// Error handling
@@ -108,6 +109,7 @@ type UpdateSellerRequest struct {
 	CompanyName *string `json:"company_name"`
 	Address     *string `json:"address"`
 	Telephone   *int    `json:"telephone"`
+	LocalityID  *int    `json:"locality_id"`
 }
 
 func (h *SellerHandler) Update() http.HandlerFunc {
@@ -125,7 +127,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone)
+		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 
 		// Error handling
 		if err != nil {
