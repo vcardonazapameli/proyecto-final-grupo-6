@@ -11,13 +11,13 @@ func ValidateLocality(loc models.Locality) error {
 		messages = append(messages, "Wrong ID format")
 	}
 	if loc.CountryName == "" {
-		messages = append(messages, "Wrong ID format")
+		messages = append(messages, "Country name cannot be blank")
 	}
 	if loc.LocalityName == "" {
-		messages = append(messages, "Wrong ID format")
+		messages = append(messages, "Locality name cannot be blank")
 	}
 	if loc.ProvinceName == "" {
-		messages = append(messages, "Wrong ID format")
+		messages = append(messages, "Province name cannot be blank")
 	}
 
 	if len(messages) > 0 {
