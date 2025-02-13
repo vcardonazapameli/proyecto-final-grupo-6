@@ -48,16 +48,16 @@ func (r *SellerRepositoryJSON) GetBiggestID() (max int) {
 	return
 }
 
-func (r *SellerRepositoryJSON) Save(s models.Seller) (models.Seller, error) {
+func (r *SellerRepositoryJSON) Save(s *models.Seller) error {
 	if _, exists := r.SearchByCID(s.Cid); exists {
-		return models.Seller{}, customErrors.ErrorConflict
+		return customErrors.ErrorConflict
 	}
 
 	// If does not exist, save.
 	s.Id = r.GetBiggestID() + 1
 
-	r.db[s.Id] = s
-	return s, nil
+	r.db[s.Id] = *s
+	return nil
 }
 
 func (r *SellerRepositoryJSON) Delete(id int) error {
