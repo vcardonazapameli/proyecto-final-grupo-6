@@ -62,7 +62,7 @@ func (a *ServerChi) Run(cfg config.Config) (err error) {
 
 	routes.RegisterWarehouseRoutes(r)
 	routes.RegisterEmployeeRoutes(r)
-	routes.RegisterSellerRoutes(r)
+	routes.RegisterSellerRoutes(r, database)
 	routes.RegisterSectionRoutes(r)
 	routes.RegisterProductRoutes(r, database)
 	routes.RegisterBuyerRoutes(r)

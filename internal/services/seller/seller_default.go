@@ -38,12 +38,13 @@ func (sv *SellerServiceDefault) Create(sDoc models.SellerDoc) (models.SellerDoc,
 		return models.SellerDoc{}, err
 	}
 
-	new, err := sv.rp.Save(mappers.SellerDocToSeller(sDoc))
+	seller := mappers.SellerDocToSeller(sDoc)
+	err := sv.rp.Save(&seller)
 	if err != nil {
 		return models.SellerDoc{}, err
 	}
 
-	newDoc := mappers.SellerToSellerDoc(new)
+	newDoc := mappers.SellerToSellerDoc(seller)
 	return newDoc, nil
 
 }
