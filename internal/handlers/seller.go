@@ -67,7 +67,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			customResponse.Error(w, err) // BadRequest
+			customResponse.Error(w, defaultErrors.ErrorBadRequest) // BadRequest
 			return
 		}
 
