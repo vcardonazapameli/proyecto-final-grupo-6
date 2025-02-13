@@ -19,12 +19,48 @@ func NewSellerRepositoryDB(db *sql.DB) *SellerRepositoryDB {
 
 // Delete implements SellerRepository.
 func (r SellerRepositoryDB) Delete(id int) error {
-	panic("unimplemented")
+	res, err := r.db.Exec("DELETE FROM sellers WHERE id = ?", id)
+	if err != nil {
+		return err // Error en la ejecución del SQL
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err // Error inesperado al obtener filas afectadas
+	}
+
+	if rowsAffected == 0 {
+		return customErrors.ErrorNotFound // Devolver 404 si no se eliminó nada
+	}
+
+	return nil // Eliminación exitosa
 }
 
 // GetAll implements SellerRepository.
 func (r SellerRepositoryDB) GetAll() (map[int]models.Seller, error) {
-	panic("unimplemented")
+	rows, err := r.db.Query("SELECT id, cid, company_name, address, telephone, locality_id FROM sellers")
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	sellers := make(map[int]models.Seller)
+
+	for rows.Next() {
+		var seller models.Seller
+		if err := rows.Scan(&seller.Id, &seller.Cid, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.LocalityID); err != nil {
+			return nil, err
+		}
+
+		sellers[seller.Id] = seller
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return sellers, nil
 }
 
 // GetByID implements SellerRepository.
@@ -79,8 +115,15 @@ func (r SellerRepositoryDB) Save(s *models.Seller) error {
 }
 
 // SearchByCID implements SellerRepository.
-func (r SellerRepositoryDB) SearchByCID(int) (models.Seller, bool) {
-	panic("unimplemented")
+func (r SellerRepositoryDB) SearchByCID(cid int) (models.Seller, bool) {
+	row := r.db.QueryRow("SELECT id, cid, company_name, address, telephone, locality_id FROM sellers WHERE cid = ?", cid)
+	var seller models.Seller
+	err := row.Scan(&seller.Id, &seller.Cid, &seller.CompanyName, &seller.Address, &seller.Telephone, &seller.LocalityID)
+
+	if err != nil {
+		return models.Seller{}, false
+	}
+	return seller, true
 }
 
 // Update implements SellerRepository.
