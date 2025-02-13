@@ -15,13 +15,13 @@ CREATE TABLE provinces (
 );
 
 CREATE TABLE localities (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY,
     locality_name VARCHAR(255) NOT NULL,
     province_id INT,
     FOREIGN KEY (province_id) REFERENCES provinces(id)
 );
 
-CREATE TABLE warehouse (
+CREATE TABLE warehouses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     address VARCHAR(255) NOT NULL,
     telephone VARCHAR(255) NOT NULL,
@@ -73,20 +73,20 @@ CREATE TABLE sections (
     product_type_id INT,
     warehouse_id INT,
     FOREIGN KEY (product_type_id) REFERENCES products_types(id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouse(id)
+    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
 );
 
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    product_code VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255) NOT NULL,
     expiration_rate DECIMAL(19,2) NOT NULL,
+    recommended_freezing_temperature DECIMAL(19,2) NOT NULL,
     freezing_rate DECIMAL(19,2) NOT NULL,
+    width DECIMAL(19,2) NOT NULL,
     height DECIMAL(19,2) NOT NULL,
     length DECIMAL(19,2) NOT NULL,
     net_weight DECIMAL(19,2) NOT NULL,
-    product_code VARCHAR(255) NOT NULL UNIQUE,
-    recommended_freezing_temperature DECIMAL(19,2) NOT NULL,
-    width DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     seller_id INT,
     FOREIGN KEY (product_type_id) REFERENCES products_types(id),
@@ -110,7 +110,7 @@ CREATE TABLE purchase_orders (
     FOREIGN KEY (buyer_id) REFERENCES buyers(id),
     FOREIGN KEY (carrier_id) REFERENCES carriers(id),
     FOREIGN KEY (order_status_id) REFERENCES order_status(id),
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouse(id)
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
 );
 
 CREATE TABLE employees (
@@ -119,7 +119,7 @@ CREATE TABLE employees (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     wareHouse_id INT,
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouse(id)
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
 );
 
 CREATE TABLE product_batches (
@@ -167,5 +167,5 @@ CREATE TABLE inbound_orders (
     wareHouse_id INT,
     FOREIGN KEY (employe_id) REFERENCES employees(id),
     FOREIGN KEY (product_batch_id) REFERENCES product_batches(id),
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouse(id)
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
 );
