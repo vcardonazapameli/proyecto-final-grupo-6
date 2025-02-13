@@ -1,6 +1,6 @@
 package models
 
-type Locality struct {
+type LocalityDoc struct {
 	Id           int    `json:"id"`
 	LocalityName string `json:"locality_name"`
 	ProvinceName string `json:"province_name"`

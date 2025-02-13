@@ -14,7 +14,7 @@ func NewLocalityServiceDefault(rp repository.LocalityRepository) *LocalityServic
 	return &LocalityServiceDefault{rp}
 }
 
-func (s *LocalityServiceDefault) Create(loc *models.Locality) error {
+func (s *LocalityServiceDefault) Create(loc *models.LocalityDoc) error {
 	err := validators.ValidateLocality(*loc)
 	if err != nil {
 		return err

@@ -5,7 +5,7 @@ import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func ValidateLocality(loc models.Locality) error {
+func ValidateLocality(loc models.LocalityDoc) error {
 	messages := make([]string, 0)
 	if loc.Id < 0 {
 		messages = append(messages, "Wrong ID format")

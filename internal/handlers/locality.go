@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/locality"
@@ -22,7 +21,7 @@ func NewLocalityHandler(sv service.LocalityService) *LocalityHandler {
 func (h *LocalityHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		newLocality := models.Locality{}
+		newLocality := models.LocalityDoc{}
 		if err := json.NewDecoder(r.Body).Decode(&newLocality); err != nil {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
@@ -30,7 +29,6 @@ func (h *LocalityHandler) Create() http.HandlerFunc {
 
 		err := h.sv.Create(&newLocality)
 		if err != nil {
-			fmt.Println(err.Error())
 			response.Error(w, err)
 			return
 		}
