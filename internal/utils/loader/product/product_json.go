@@ -31,8 +31,8 @@ func (l *ProductJSONFile) Load() (products map[int]models.Product, err error) {
 	}
 
 	products = make(map[int]models.Product)
-	for key, product := range productsJSON {
-		products[key] = models.Product{
+	for _, product := range productsJSON {
+		products[product.Id] = models.Product{
 			Id: product.Id,
 			ProductAttributes: models.ProductAttributes{
 				ProductCode:                    product.ProductCode,

@@ -13,7 +13,7 @@ import (
 
 func RegisterEmployeeRoutes(r chi.Router) {
 
-	ld := loader.NewEmployeeJSONFile("../docs/employee.json")
+	ld := loader.NewEmployeeJSONFile("docs/employee.json")
 	// datos cargados
 	db, err := ld.Load()
 	if err != nil {
@@ -32,5 +32,9 @@ func RegisterEmployeeRoutes(r chi.Router) {
 	r.Route("/employee", func(rt chi.Router) {
 		// - GET /vehicles
 		rt.Get("/", hd.GetAll())
+		rt.Get("/{id}", hd.GetById())
+		rt.Post("/", hd.Create())
+		rt.Patch("/{id}", hd.Update())
+		rt.Delete("/{id}", hd.Delete())
 	})
 }
