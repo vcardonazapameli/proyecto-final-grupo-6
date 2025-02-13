@@ -18,6 +18,7 @@ func RegisterProductRoutes(r chi.Router, database *sql.DB) {
 	r.Route("/products", func(r chi.Router) {
 		r.Get("/", handler.GetAll())
 		r.Get("/{id}", handler.GetById())
+		r.Get("/productRecords", handler.GetProductRecords())
 		r.Delete("/{id}", handler.Delete())
 		r.Post("/", handler.Create())
 		r.Patch("/{id}", handler.Update())
