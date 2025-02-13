@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/go-sql-driver/mysql"
@@ -59,4 +60,53 @@ func (r *LocalityRepositoryDB) GetProvinceWithCountryNames(provinceName string, 
 	}
 
 	return province, nil
+}
+
+func (r *LocalityRepositoryDB) GetSellersByLocalityIDCount(locId int) (models.LocalitySellerCountDoc, error) {
+	var locSeller models.LocalitySellerCountDoc
+	row := r.db.QueryRow(`
+	SELECT COUNT(s.id), l.id, l.locality_name 
+	FROM localities l 
+	LEFT JOIN sellers s ON s.locality_id = l.id 
+	WHERE l.id = ?
+	GROUP BY l.id, l.locality_name
+`, locId)
+
+	if err := row.Scan(&locSeller.SellerCount, &locSeller.LocalityID, &locSeller.LocalityName); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.LocalitySellerCountDoc{}, customErrors.ErrorNotFound
+		}
+		return models.LocalitySellerCountDoc{}, err
+	}
+	return locSeller, nil
+}
+
+func (r *LocalityRepositoryDB) GetAllSellersByLocalityIDCount() ([]models.LocalitySellerCountDoc, error) {
+	localities := make([]models.LocalitySellerCountDoc, 0)
+
+	row, err := r.db.Query(`
+	SELECT COUNT(s.id), l.id, l.locality_name 
+	FROM localities l 
+	LEFT JOIN sellers s ON s.locality_id = l.id
+	GROUP BY l.id, l.locality_name
+`)
+	if err != nil {
+		return []models.LocalitySellerCountDoc{}, err
+	}
+
+	defer row.Close()
+	for row.Next() {
+		var locSeller models.LocalitySellerCountDoc
+
+		if err := row.Scan(&locSeller.SellerCount, &locSeller.LocalityID, &locSeller.LocalityName); err != nil {
+			return []models.LocalitySellerCountDoc{}, err
+		}
+		localities = append(localities, locSeller)
+	}
+
+	if row.Err() != nil {
+		return []models.LocalitySellerCountDoc{}, nil
+	}
+
+	return localities, nil
 }
