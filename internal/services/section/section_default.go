@@ -32,17 +32,20 @@ func (s *SectionDefault) GetByID(id int) (models.Section, error) {
 }
 
 func (s *SectionDefault) Create(section models.Section) (models.Section, error) {
+	if err := validators.ValidateNoEmptyFields(section.SectionAttributes); err != nil {
+		return models.Section{}, customErrors.ErrorUnprocessableContent
+	}
 	if err := validators.ValidateCapacity(section); err != nil {
 		return models.Section{}, err
 	}
 	if err := validators.ValidateTemperature(section); err != nil {
 		return models.Section{}, err
 	}
-	section, err := s.rp.Create(section)
+	createdSection, err := s.rp.Create(section.SectionAttributes)
 	if err != nil {
 		return models.Section{}, err
 	}
-	return section, nil
+	return createdSection, nil
 }
 
 func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (models.Section, error) {
@@ -51,13 +54,6 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 		return models.Section{}, err
 	}
 	updatedSection := validators.UpdateEntity(sectionDto, &sectionToUpdate)
-	if sectionDto.SectionNumber != nil {
-		_, exists := s.rp.SearchBySectionNumber(updatedSection.SectionNumber)
-		if exists {
-			return models.Section{}, customErrors.ErrorConflict
-		}
-	}
-
 	if err := validators.ValidateCapacity(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
@@ -69,9 +65,7 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 }
 
 func (s *SectionDefault) Delete(id int) error {
-	err := s.rp.Delete(id)
-	if err != nil {
-		return err
-	}
+	section, _ := s.rp.GetByID(id)
+	s.rp.Delete(section.Id)
 	return nil
 }

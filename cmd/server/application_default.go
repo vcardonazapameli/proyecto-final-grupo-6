@@ -3,41 +3,55 @@ package server
 import (
 	"net/http"
 
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/config"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/db"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/routes"
 	"github.com/go-chi/chi/v5"
 )
 
-// ConfigServerChi is a struct that represents the configuration for ServerChi
 type ConfigServerChi struct {
-	// ServerAddress is the address where the server will be listening
 	ServerAddress string
 }
 
-// NewServerChi is a function that returns a new instance of ServerChi
-func NewServerChi(cfg *ConfigServerChi) *ServerChi {
-	// default values
-	defaultConfig := &ConfigServerChi{
+func NewServerChi(cfg *config.Config) *ServerChi {
+	defaultConfig := &config.Config{
 		ServerAddress: ":8080",
 	}
 	if cfg != nil {
 		if cfg.ServerAddress != "" {
 			defaultConfig.ServerAddress = cfg.ServerAddress
 		}
+		if cfg.DBHost != "" {
+			defaultConfig.DBHost = cfg.DBHost
+		}
+		if cfg.DBPort != "" {
+			defaultConfig.DBPort = cfg.DBPort
+		}
+		if cfg.DBUser != "" {
+			defaultConfig.DBUser = cfg.DBUser
+		}
+		if cfg.DBPassword != "" {
+			defaultConfig.DBPassword = cfg.DBPassword
+		}
+		if cfg.DBName != "" {
+			defaultConfig.DBName = cfg.DBName
+		}
 	}
 
 	return &ServerChi{
 		serverAddress: defaultConfig.ServerAddress,
+		config:        defaultConfig,
 	}
 }
 
-// ServerChi is a struct that implements the Application interface
 type ServerChi struct {
-	// serverAddress is the address where the server will be listening
 	serverAddress string
+	config        *config.Config
 }
 
-// Run is a method that runs the server
-func (a *ServerChi) Run() (err error) {
+func (a *ServerChi) Run(cfg config.Config) (err error) {
+	database := db.ConnectDB(&cfg)
+	defer database.Close()
 
 	// router
 	r := chi.NewRouter()
@@ -48,10 +62,12 @@ func (a *ServerChi) Run() (err error) {
 
 	routes.RegisterWarehouseRoutes(r)
 	routes.RegisterEmployeeRoutes(r)
-	routes.RegisterSellerRoutes(r)
-	routes.RegisterSectionRoutes(r)
-	routes.RegisterProductRoutes(r)
+	routes.RegisterSellerRoutes(r, database)
+	routes.RegisterSectionRoutes(r, database)
+	routes.RegisterProductRoutes(r, database)
+	routes.RegisterLocalityRoutes(r, database)
 	routes.RegisterBuyerRoutes(r)
+	routes.RegisterProductRecordRoutes(r, database)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, r)

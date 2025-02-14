@@ -1,8 +1,8 @@
 package models
 
 type Employee struct {
-	Id                 int
-	EmployeeAttributes EmployeeAttributes
+	Id int
+	EmployeeAttributes
 }
 
 type EmployeeAttributes struct {
