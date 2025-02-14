@@ -59,7 +59,7 @@ CREATE TABLE carriers (
 
 CREATE TABLE products_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(255) NOT NULL
+    description VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE sections (
