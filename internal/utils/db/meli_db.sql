@@ -11,14 +11,14 @@ CREATE TABLE provinces (
     id INT AUTO_INCREMENT PRIMARY KEY,
     province_name VARCHAR(255) NOT NULL,
     id_country_fk INT,
-    FOREIGN KEY (id_country_fk) REFERENCES countries(id)
+    FOREIGN KEY (id_country_fk) REFERENCES countries(id) ON DELETE SET NULL
 );
 
 CREATE TABLE localities (
     id INT PRIMARY KEY,
     locality_name VARCHAR(255) NOT NULL,
     province_id INT,
-    FOREIGN KEY (province_id) REFERENCES provinces(id)
+    FOREIGN KEY (province_id) REFERENCES provinces(id) ON DELETE SET NULL
 );
 
 CREATE TABLE warehouses (
@@ -29,7 +29,7 @@ CREATE TABLE warehouses (
     minimun_capacity INT NOT NULL,
     minimun_temperature INT NOT NULL,
     locality_id INT,
-    FOREIGN KEY (locality_id) REFERENCES localities(id)
+    FOREIGN KEY (locality_id) REFERENCES localities(id) ON DELETE SET NULL
 );
 
 CREATE TABLE sellers (
@@ -39,7 +39,7 @@ CREATE TABLE sellers (
     address VARCHAR(255) NOT NULL,
     telephone VARCHAR(255) NOT NULL,
     locality_id INT,
-    FOREIGN KEY (locality_id) REFERENCES localities(id)
+    FOREIGN KEY (locality_id) REFERENCES localities(id) ON DELETE SET NULL
 );
 
 CREATE TABLE buyers (
@@ -56,7 +56,7 @@ CREATE TABLE carriers (
     address VARCHAR(255) NOT NULL,
     telephone VARCHAR(255) NOT NULL,
     locality_id INT,
-    FOREIGN KEY (locality_id) REFERENCES localities(id)
+    FOREIGN KEY (locality_id) REFERENCES localities(id) ON DELETE SET NULL
 );
 
 CREATE TABLE products_types (
@@ -74,8 +74,8 @@ CREATE TABLE sections (
     minimum_temperature DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     warehouse_id INT,
-    FOREIGN KEY (product_type_id) REFERENCES products_types(id),
-    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id)
+    FOREIGN KEY (product_type_id) REFERENCES products_types(id) ON DELETE SET NULL,
+    FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE products (
@@ -91,8 +91,8 @@ CREATE TABLE products (
     net_weight DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     seller_id INT,
-    FOREIGN KEY (product_type_id) REFERENCES products_types(id),
-    FOREIGN KEY (seller_id) REFERENCES sellers(id)
+    FOREIGN KEY (product_type_id) REFERENCES products_types(id) ON DELETE SET NULL,
+    FOREIGN KEY (seller_id) REFERENCES sellers(id) ON DELETE SET NULL
 );
 
 CREATE TABLE order_status (
@@ -109,10 +109,10 @@ CREATE TABLE purchase_orders (
     carrier_id INT,
     order_status_id INT,
     wareHouse_id INT,
-    FOREIGN KEY (buyer_id) REFERENCES buyers(id),
-    FOREIGN KEY (carrier_id) REFERENCES carriers(id),
-    FOREIGN KEY (order_status_id) REFERENCES order_status(id),
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
+    FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE SET NULL,
+    FOREIGN KEY (carrier_id) REFERENCES carriers(id) ON DELETE SET NULL,
+    FOREIGN KEY (order_status_id) REFERENCES order_status(id) ON DELETE SET NULL,
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE employees (
@@ -121,7 +121,7 @@ CREATE TABLE employees (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     wareHouse_id INT,
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );
 
 CREATE TABLE product_batches (
@@ -136,8 +136,8 @@ CREATE TABLE product_batches (
     minimum_temperature DECIMAL(19,2) NOT NULL,
     product_id INT,
     section_id INT,
-    FOREIGN KEY (product_id) REFERENCES products(id),
-    FOREIGN KEY (section_id) REFERENCES sections(id)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL
 );
 
 CREATE TABLE product_records (
@@ -146,7 +146,7 @@ CREATE TABLE product_records (
     purchase_price DECIMAL(19,2) NOT NULL,
     sale_price DECIMAL(19,2) NOT NULL,
     product_id INT,
-    FOREIGN KEY (product_id) REFERENCES products(id)
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 );
 
 CREATE TABLE order_details (
@@ -156,8 +156,8 @@ CREATE TABLE order_details (
     temperature DECIMAL(19,2) NOT NULL,
     product_record_id INT,
     purchase_order_id INT,
-    FOREIGN KEY (product_record_id) REFERENCES product_records(id),
-    FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id)
+    FOREIGN KEY (product_record_id) REFERENCES product_records(id) ON DELETE SET NULL,
+    FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id) ON DELETE SET NULL
 );
 
 CREATE TABLE inbound_orders (
@@ -167,7 +167,7 @@ CREATE TABLE inbound_orders (
     employe_id INT,
     product_batch_id INT,
     wareHouse_id INT,
-    FOREIGN KEY (employe_id) REFERENCES employees(id),
-    FOREIGN KEY (product_batch_id) REFERENCES product_batches(id),
-    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id)
+    FOREIGN KEY (employe_id) REFERENCES employees(id) ON DELETE SET NULL,
+    FOREIGN KEY (product_batch_id) REFERENCES product_batches(id) ON DELETE SET NULL,
+    FOREIGN KEY (wareHouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );
