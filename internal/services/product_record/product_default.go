@@ -5,6 +5,7 @@ import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_record"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -18,15 +19,12 @@ type productRecordService struct {
 }
 
 func (productRecordService *productRecordService) Create(productRecordDocRequest models.ProductRecordDocRequest) (*models.ProductRecordDocResponse, error) {
-	// if errorValidateFields := validators.ValidateFieldsProduct(productDocRequest); errorValidateFields != nil {
-	// 	return nil, errorValidateFields
-	// }
-	ExistProductInDb, err := productRecordService.productRepository.GetById(productRecordDocRequest.ProductId)
-	if err != nil {
-		return nil, err
+	if errorValidateFields := validators.ValidateFieldsProductRecord(productRecordDocRequest); errorValidateFields != nil {
+		return nil, errorValidateFields
 	}
+	ExistProductInDb, _ := productRecordService.productRepository.GetById(productRecordDocRequest.ProductId)
 	if ExistProductInDb == nil {
-		return nil, customErrors.ErrorNotFound
+		return nil, customErrors.ErrorConflict
 	}
 	productRecord := mappers.ProductRecordDocRequestToProductRecordDocResponse(productRecordDocRequest)
 	if err := productRecordService.repository.Create(&productRecord); err != nil {

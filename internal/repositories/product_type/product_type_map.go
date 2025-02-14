@@ -2,8 +2,8 @@ package product
 
 import (
 	"database/sql"
-	"log"
 
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -21,7 +21,7 @@ func NewProductTypeRepository(db *sql.DB) ProductTypeRepository {
 func (productTypeRepository *productTypeRepository) GetAll() ([]models.ProductTypeDocResponse, error) {
 	rows, err := productTypeRepository.db.Query("select id, description from products_types;")
 	if err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	defer rows.Close()
 	var productTypes []models.ProductTypeDocResponse
@@ -32,13 +32,12 @@ func (productTypeRepository *productTypeRepository) GetAll() ([]models.ProductTy
 			&productType.Description,
 		)
 		if err != nil {
-			log.Println(err)
 			continue
 		}
 		productTypes = append(productTypes, productType)
 	}
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	return productTypes, nil
 }
@@ -51,7 +50,7 @@ func (productTypeRepository *productTypeRepository) GetById(id int) (*models.Pro
 		&productType.Description,
 	)
 	if err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	return &productType, nil
 }
@@ -61,11 +60,11 @@ func (productTypeRepository *productTypeRepository) Create(product *models.Produ
 		product.Description,
 	)
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	product.Id = int(id)
 	return nil
@@ -76,7 +75,7 @@ func (productTypeRepository *productTypeRepository) ExistInDb(description string
 	query := "select exists(select 1 from products_types pt where pt.description = ?)"
 	err := productTypeRepository.db.QueryRow(query, description).Scan(&exist)
 	if err != nil {
-		return false, err
+		return false, customErrors.HandleSqlError(err)
 	}
 	return exist, nil
 }
