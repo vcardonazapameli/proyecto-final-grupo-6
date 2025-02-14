@@ -1,8 +1,10 @@
 package buyer
 
 import (
+
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/buyer"
 	customErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -16,18 +18,19 @@ type BuyerDefault struct {
 }
 
 // UpdateBuyer implements BuyerService.
-func (b *BuyerDefault) UpdateBuyer(id int, buyerDto models.UpdateBuyerDto) (models.Buyer, error) {
-	buyerToUpdate, err := b.GetById(id)
-	if err != nil {
-		return models.Buyer{}, err
-	}
-	updatedBuyer := validators.UpdateEntity(buyerDto, buyerToUpdate)
-	if b.rp.ValidateCardNumberIdToUpdate(updatedBuyer.CardNumberId, id){
-		return models.Buyer{}, customErrors.ErrorConflict
-	}
+func (b *BuyerDefault) UpdateBuyer(id int, buyerRequest models.UpdateBuyerDto) (*models.BuyerDocResponse, error) {
+	buyerToUpdate, _ := b.GetById(id)
 	
-	b.rp.UpdateBuyer(id, *updatedBuyer)
-	return *updatedBuyer, nil
+	
+	updatedBuyer := validators.UpdateEntity(buyerRequest, buyerToUpdate)
+	if b.rp.ValidateCardNumberIdToUpdate(updatedBuyer.CardNumberId, id){
+		return nil, customErrors.ErrorConflict
+	}
+	buyerDoc := mappers.BuyerDocResponseToBuyerDocRequest(*updatedBuyer)
+	if err := b.rp.UpdateBuyer(id, &buyerDoc); err != nil {
+		return nil, nil
+	}
+	return updatedBuyer, nil
 }
 
 // DeleteBuyer implements BuyerService.
@@ -40,33 +43,41 @@ func (b *BuyerDefault) DeleteBuyer(buyerId int) error {
 }
 
 // CreateBuyer implements BuyerService.
-func (b *BuyerDefault) CreateBuyer(buyer models.BuyerAttributes) error {
+func (b *BuyerDefault) CreateBuyer(buyer models.BuyerDocRequest) (*models.BuyerDocResponse,error) {
 
 	if err := validators.ValidateNoEmptyFields(buyer); err != nil {
-		return customErrors.ErrorUnprocessableContent
+		return nil,customErrors.ErrorUnprocessableContent
 	}
 	
 	if b.rp.ValidateCardNumberId(buyer.CardNumberId){
-		return customErrors.ErrorConflict
+		return nil,customErrors.ErrorConflict
 	}
-	b.rp.CreateBuyer(buyer)
-	return nil
+	buyerDocResponse := mappers.BuyerDocRequestToBuyerDocResponse(buyer)
+	b.rp.CreateBuyer(&buyerDocResponse)
+	return &buyerDocResponse, nil
 }
 
 // GetById implements BuyerService.
-func (b *BuyerDefault) GetById(id int) (*models.Buyer, error) {
-	buyer, exists := b.rp.GetById(id)
-	if !exists {
+func (b *BuyerDefault) GetById(id int) (*models.BuyerDocResponse, error) {
+	buyer, err := b.rp.GetById(id)
+	if err != nil {
 		return nil, customErrors.ErrorNotFound
 	}
-	return &buyer, nil
+	return buyer, nil
 }
 
 // GetAll implements BuyerService.
-func (b *BuyerDefault) GetAll() (map[int]models.Buyer, error) {
-	buyers := b.rp.GetAll()
-	if len(buyers) == 0 {
+func (b *BuyerDefault) GetAll() ([]models.BuyerDocResponse, error) {
+	buyers, err := b.rp.GetAll()
+	if err != nil {
 		return buyers, customErrors.ErrorNotFound
 	}
 	return buyers, nil
+}
+func (p *BuyerDefault) GetPurchasesReports(cardNumberId int) ([]models.PurchaseOrderReport, error) {
+	purchaseReports, err := p.rp.GetPurchasesReports(cardNumberId)
+	if err != nil {
+		return purchaseReports, customErrors.ErrorNotFound
+	}
+	return purchaseReports, nil
 }

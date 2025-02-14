@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -21,4 +23,18 @@ type ValidationError struct {
 
 func (ve ValidationError) Error() string {
 	return fmt.Sprintf("There were some errors validating:  %s", strings.Join(ve.Messages, ", "))
+}
+func HandleSqlError(err error) error{
+	var mysqlErr *mysql.MySQLError
+	if errors.As(err, &mysqlErr) {
+		switch mysqlErr.Number {
+		case 1452: // BuyerId, carrier id, orderstatusid or warehouseid not found
+			return ErrorNotFound
+		case 1062: // Duplicated Order Number
+			return ErrorConflict
+		default:
+			return err
+		}
+	}
+	return err
 }
