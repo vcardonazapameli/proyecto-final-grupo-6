@@ -9,6 +9,7 @@ func SellerDocToSeller(sellerDoc models.SellerDoc) models.Seller {
 		CompanyName: sellerDoc.CompanyName,
 		Address:     sellerDoc.Address,
 		Telephone:   sellerDoc.Telephone,
+		LocalityID:  sellerDoc.LocalityID,
 	}
 }
 
@@ -19,5 +20,6 @@ func SellerToSellerDoc(seller models.Seller) models.SellerDoc {
 		CompanyName: seller.CompanyName,
 		Address:     seller.Address,
 		Telephone:   seller.Telephone,
+		LocalityID:  seller.LocalityID,
 	}
 }

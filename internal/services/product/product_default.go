@@ -29,6 +29,14 @@ func (productService *productService) GetById(id int) (*models.ProductDocRespons
 	return product, nil
 }
 
+func (productService *productService) GetProductRecords(id *int, productTypeId *int, productCode *string) ([]models.ProductRecordByProductResponse, error) {
+	products, err := productService.repository.GetProductRecords(id, productTypeId, productCode)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
 func (productService *productService) Delete(id int) error {
 	product, _ := productService.repository.GetById(id)
 	if product == nil {
