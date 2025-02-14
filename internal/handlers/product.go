@@ -43,6 +43,32 @@ func (productHandler *ProductHandler) GetById() http.HandlerFunc {
 	}
 }
 
+func (productHandler *ProductHandler) GetProductRecords() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		queryParamId := r.URL.Query().Get("id")
+		queryParamProductTypeId := r.URL.Query().Get("product_type_id")
+		queryParamProductCode := r.URL.Query().Get("product_code")
+		var id *int
+		var productTypeId *int
+		var productCode *string
+		switch {
+		case queryParamId != "":
+			productId, _ := strconv.Atoi(queryParamId)
+			id = &productId
+		case queryParamProductTypeId != "":
+			productType, _ := strconv.Atoi(queryParamProductTypeId)
+			productTypeId = &productType
+		case queryParamProductCode != "":
+			productCode = &queryParamProductCode
+		}
+		products, err := productHandler.service.GetProductRecords(id, productTypeId, productCode)
+		if err != nil {
+			response.Error(w, err)
+		}
+		response.JSON(w, http.StatusOK, products)
+	}
+}
+
 func (productHandler *ProductHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(chi.URLParam(r, "id"))

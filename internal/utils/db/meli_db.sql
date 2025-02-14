@@ -15,7 +15,7 @@ CREATE TABLE provinces (
 );
 
 CREATE TABLE localities (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY,
     locality_name VARCHAR(255) NOT NULL,
     province_id INT,
     FOREIGN KEY (province_id) REFERENCES provinces(id)
@@ -61,7 +61,7 @@ CREATE TABLE carriers (
 
 CREATE TABLE products_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(255) NOT NULL
+    description VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE sections (
@@ -80,15 +80,15 @@ CREATE TABLE sections (
 
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    product_code VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255) NOT NULL,
     expiration_rate DECIMAL(19,2) NOT NULL,
+    recommended_freezing_temperature DECIMAL(19,2) NOT NULL,
     freezing_rate DECIMAL(19,2) NOT NULL,
+    width DECIMAL(19,2) NOT NULL,
     height DECIMAL(19,2) NOT NULL,
     length DECIMAL(19,2) NOT NULL,
     net_weight DECIMAL(19,2) NOT NULL,
-    product_code VARCHAR(255) NOT NULL UNIQUE,
-    recommended_freezing_temperature DECIMAL(19,2) NOT NULL,
-    width DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     seller_id INT,
     FOREIGN KEY (product_type_id) REFERENCES products_types(id),

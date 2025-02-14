@@ -2,18 +2,20 @@ package product
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
+	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewProductService(repository repository.ProductRepository) ProductService {
-	return &productService{repository: repository}
+func NewProductService(repository repository.ProductRepository, productTypeRepository productTypeRepository.ProductTypeRepository) ProductService {
+	return &productService{repository: repository, productTypeRespository: productTypeRepository}
 }
 
 type productService struct {
-	repository repository.ProductRepository
+	repository             repository.ProductRepository
+	productTypeRespository productTypeRepository.ProductTypeRepository
 }
 
 func (productService *productService) GetAll() ([]models.ProductDocResponse, error) {
@@ -27,6 +29,14 @@ func (productService *productService) GetById(id int) (*models.ProductDocRespons
 		return nil, errorCustom.ErrorNotFound
 	}
 	return product, nil
+}
+
+func (productService *productService) GetProductRecords(id *int, productTypeId *int, productCode *string) ([]models.ProductRecordByProductResponse, error) {
+	products, err := productService.repository.GetProductRecords(id, productTypeId, productCode)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 func (productService *productService) Delete(id int) error {
@@ -49,6 +59,10 @@ func (productService *productService) Create(productDocRequest models.ProductDoc
 	if existInDb {
 		return nil, errorCustom.ErrorConflict
 	}
+	productType, _ := productService.productTypeRespository.GetById(productDocRequest.ProductType)
+	if productType == nil {
+		return nil, errorCustom.ErrorNotFound
+	}
 	product := mappers.ProductDocRequestToProductDocResponse(productDocRequest)
 	if err := productService.repository.Create(&product); err != nil {
 		return nil, nil
@@ -68,6 +82,10 @@ func (productService *productService) Update(id int, productDocRequest models.Pr
 	}
 	if productCodeAlreadyAssociated {
 		return nil, errorCustom.ErrorConflict
+	}
+	productType, _ := productService.productTypeRespository.GetById(productUpdate.ProductType)
+	if productType == nil {
+		return nil, errorCustom.ErrorNotFound
 	}
 	productDoc := mappers.ProductDocResponseToProductDocRequest(productUpdate)
 	if errorValidateFields := validators.ValidateFieldsProduct(productDoc); errorValidateFields != nil {

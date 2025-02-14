@@ -76,6 +76,29 @@ func (productRepository *productRepository) GetById(id int) (*models.ProductDocR
 	return &product, nil
 }
 
+func (productRepository *productRepository) GetProductRecords(id *int, productTypeId *int, productCode *string) ([]models.ProductRecordByProductResponse, error) {
+	query := "select p.id, p.description, count(pr.id) as record_counts from products p inner join product_records pr on pr.product_id = p.id"
+	rows, err := productRepository.createQuery(id, productTypeId, productCode, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []models.ProductRecordByProductResponse
+	for rows.Next() {
+		var productRecord models.ProductRecordByProductResponse
+		err := rows.Scan(
+			&productRecord.ProductId,
+			&productRecord.Description,
+			&productRecord.RecordsCount,
+		)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, productRecord)
+	}
+	return products, nil
+}
+
 func (productRepository *productRepository) Delete(id int) error {
 	_, err := productRepository.db.Exec("delete from products where id = ?", id)
 	if err != nil {
@@ -148,4 +171,21 @@ func (productRepository *productRepository) MatchWithTheSameProductCode(id int, 
 		return false, err
 	}
 	return numberOfMatches > 0, nil
+}
+
+func (productRepository *productRepository) createQuery(id *int, productTypeId *int, productCode *string, query string) (*sql.Rows, error) {
+	var args []interface{}
+	switch {
+	case id != nil:
+		query += " where p.id = ?"
+		args = append(args, *id)
+	case productTypeId != nil:
+		query += " where p.product_type_id = ?"
+		args = append(args, *productTypeId)
+	case productCode != nil:
+		query += " where p.product_code = ?"
+		args = append(args, *productCode)
+	}
+	query += " group by p.id"
+	return productRepository.db.Query(query, args...)
 }
