@@ -2,8 +2,8 @@ package product
 
 import (
 	"database/sql"
-	"log"
 
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -21,7 +21,7 @@ func NewProductRepository(db *sql.DB) ProductRepository {
 func (productRepository *productRepository) GetAll() ([]models.ProductDocResponse, error) {
 	rows, err := productRepository.db.Query("select id, product_code, description, expiration_rate, recommended_freezing_temperature, freezing_rate, width, height, length, net_weight, product_type_id, seller_id from products;")
 	if err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	defer rows.Close()
 	var products []models.ProductDocResponse
@@ -42,13 +42,12 @@ func (productRepository *productRepository) GetAll() ([]models.ProductDocRespons
 			&product.Seller,
 		)
 		if err != nil {
-			log.Println(err)
 			continue
 		}
 		products = append(products, product)
 	}
 	if err = rows.Err(); err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	return products, nil
 }
@@ -71,7 +70,7 @@ func (productRepository *productRepository) GetById(id int) (*models.ProductDocR
 		&product.Seller,
 	)
 	if err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	return &product, nil
 }
@@ -92,7 +91,7 @@ func (productRepository *productRepository) GetProductRecords(id *int, productTy
 			&productRecord.RecordsCount,
 		)
 		if err != nil {
-			return nil, err
+			return nil, customErrors.HandleSqlError(err)
 		}
 		products = append(products, productRecord)
 	}
@@ -102,7 +101,7 @@ func (productRepository *productRepository) GetProductRecords(id *int, productTy
 func (productRepository *productRepository) Delete(id int) error {
 	_, err := productRepository.db.Exec("delete from products where id = ?", id)
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	return nil
 }
@@ -122,11 +121,11 @@ func (productRepository *productRepository) Create(product *models.ProductDocRes
 		product.Seller,
 	)
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	product.Id = int(id)
 	return nil
@@ -137,7 +136,7 @@ func (productRepository *productRepository) ExistInDb(productCode string) (bool,
 	query := "select exists(select 1 from products p where p.product_code = ?)"
 	err := productRepository.db.QueryRow(query, productCode).Scan(&exist)
 	if err != nil {
-		return false, err
+		return false, customErrors.HandleSqlError(err)
 	}
 	return exist, nil
 }
@@ -158,7 +157,7 @@ func (productRepository *productRepository) Update(id int, product *models.Produ
 		id,
 	)
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	return nil
 }
@@ -168,7 +167,7 @@ func (productRepository *productRepository) MatchWithTheSameProductCode(id int, 
 	query := "select count(*) from products where id != ? and product_code = ?"
 	err := productRepository.db.QueryRow(query, id, productCode).Scan(&numberOfMatches)
 	if err != nil {
-		return false, err
+		return false, customErrors.HandleSqlError(err)
 	}
 	return numberOfMatches > 0, nil
 }

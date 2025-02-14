@@ -4,6 +4,7 @@ import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -29,6 +30,9 @@ func (productTypeService *productTypeService) GetById(id int) (*models.ProductTy
 }
 
 func (productTypeService *productTypeService) Create(productTypeDocRequest models.ProductTypeDocRequest) (*models.ProductTypeDocResponse, error) {
+	if errorValidateFields := validators.ValidateFieldsProductType(productTypeDocRequest); errorValidateFields != nil {
+		return nil, errorValidateFields
+	}
 	existInDb, err := productTypeService.repository.ExistInDb(productTypeDocRequest.Description)
 	if err != nil {
 		return nil, err

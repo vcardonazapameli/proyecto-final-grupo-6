@@ -7,9 +7,9 @@ import (
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/buyer"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+	"github.com/bootcamp-go/web/request"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -32,13 +32,7 @@ func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 			return
 		}
 
-		var buyersMap []models.BuyerDoc
-		for _, value := range buyers {
-			buyerDoc := mappers.BuyerToBuyerDoc(value)
-			buyersMap = append(buyersMap, buyerDoc)
-		}
-
-		response.JSON(w, http.StatusOK, buyersMap)
+		response.JSON(w, http.StatusOK, buyers)
 	}
 }
 
@@ -55,28 +49,26 @@ func (handler *BuyerHandler) GetById() http.HandlerFunc {
 			return
 		}
 
-		buyerDoc := mappers.BuyerToBuyerDoc(*buyer)
-
-		response.JSON(w, http.StatusOK, buyerDoc)
+		response.JSON(w, http.StatusOK, buyer)
 	}
 }
 
 func (handler *BuyerHandler) CreateBuyer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		buyerDoc := models.CreateBuyerDto{}
+		buyerDoc := models.BuyerDocRequest{}
 		if err := json.NewDecoder(r.Body).Decode(&buyerDoc); err != nil {
 			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
-		newBuyer := mappers.BuyerDocToBuyerAttributes(buyerDoc)
-		err := handler.sv.CreateBuyer(newBuyer)
+	
+		createdBuyer, err := handler.sv.CreateBuyer(buyerDoc)
 		if err != nil {
 			response.Error(w, err)
 			return
 		}
 
-		response.JSON(w, http.StatusCreated, "Creado con exito")
+		response.JSON(w, http.StatusCreated, createdBuyer)
 	}
 }
 func (handler *BuyerHandler) DeleteBuyer() http.HandlerFunc {
@@ -102,10 +94,12 @@ func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
 			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
-		if err := json.NewDecoder(r.Body).Decode(&buyerDoc); err != nil {
+		
+		if err := request.JSON(r,&buyerDoc); err != nil {
 			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
+		
 		updatedBuyer, err := handler.sv.UpdateBuyer(id, buyerDoc)
 
 		if err != nil {
@@ -113,8 +107,27 @@ func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
 			return
 		}
 
-		buyerMap := mappers.BuyerToBuyerDoc(updatedBuyer)
+		response.JSON(w, 200, updatedBuyer)
+	}
+}
 
-		response.JSON(w, 200, buyerMap)
+func (handler *BuyerHandler)GetPurchaseOrderReports()http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		queryParam:= r.URL.Query()
+		var cardNumberId = 0
+		var err error
+		if queryParam.Get("card_number_id") != "" {
+			cardNumberId, err = strconv.Atoi( queryParam.Get("card_number_id"))
+			if err != nil {
+				response.Error(w, customErrors.ErrorBadRequest)
+				return
+			}
+		}
+		purchaseOrdersReports, err := handler.sv.GetPurchasesReports(cardNumberId)
+		if err!= nil {
+			response.Error(w, err)
+			return
+		}
+		response.JSON(w, http.StatusOK, purchaseOrdersReports)
 	}
 }

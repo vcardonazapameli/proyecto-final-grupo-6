@@ -60,13 +60,15 @@ func (a *ServerChi) Run(cfg config.Config) (err error) {
 
 	// - routes
 
-	routes.RegisterWarehouseRoutes(r)
+	routes.RegisterWarehouseRoutes(r, database)
 	routes.RegisterEmployeeRoutes(r)
 	routes.RegisterSellerRoutes(r, database)
 	routes.RegisterSectionRoutes(r, database)
 	routes.RegisterProductRoutes(r, database)
+	routes.RegisterBuyerRoutes(r, database)
+	routes.RegisterCarrierRoutes(r, database)
+	routes.RegisterPurchaseOrderRoutes(r, database)
 	routes.RegisterLocalityRoutes(r, database)
-	routes.RegisterBuyerRoutes(r)
 	routes.RegisterProductBatchRoutes(r, database)
 	routes.RegisterProductRecordRoutes(r, database)
 	routes.RegisterProductTypeRoutes(r, database)
