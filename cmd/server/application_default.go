@@ -65,8 +65,10 @@ func (a *ServerChi) Run(cfg config.Config) (err error) {
 	routes.RegisterSellerRoutes(r)
 	routes.RegisterSectionRoutes(r)
 	routes.RegisterProductRoutes(r, database)
-	routes.RegisterBuyerRoutes(r)
+	routes.RegisterBuyerRoutes(r,database)
 	routes.RegisterCarrierRoutes(r, database)
+	routes.RegisterPurchaseOrderRoutes(r, database)
+	
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, r)

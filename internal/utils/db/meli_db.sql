@@ -26,6 +26,8 @@ CREATE TABLE warehouses (
     address VARCHAR(255) NOT NULL,
     telephone VARCHAR(255) NOT NULL,
     warehouse_code VARCHAR(255) NOT NULL UNIQUE,
+    minimun_capacity INT NOT NULL,
+    minimun_temperature INT NOT NULL,
     locality_id INT,
     FOREIGN KEY (locality_id) REFERENCES localities(id)
 );
