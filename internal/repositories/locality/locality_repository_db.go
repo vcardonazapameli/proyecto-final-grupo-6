@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/go-sql-driver/mysql"
 )
@@ -28,7 +27,7 @@ func (r *LocalityRepositoryDB) Save(locId int, locName string, provId int) error
 	if err != nil {
 		if valErr, ok := err.(*mysql.MySQLError); ok {
 			if valErr.Number == 1062 {
-				return defaultErrors.ErrorConflict
+				return customErrors.ErrorConflict
 			}
 			return err
 		}
@@ -54,7 +53,7 @@ func (r *LocalityRepositoryDB) GetProvinceWithCountryNames(provinceName string, 
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Province{}, defaultErrors.ErrorNotFound
+			return models.Province{}, customErrors.ErrorNotFound
 		}
 		return models.Province{}, err
 	}
@@ -106,6 +105,55 @@ func (r *LocalityRepositoryDB) GetAllSellersByLocalityIDCount() ([]models.Locali
 
 	if row.Err() != nil {
 		return []models.LocalitySellerCountDoc{}, nil
+	}
+
+	return localities, nil
+}
+
+func (r *LocalityRepositoryDB) GetCarriesByLocalityIDCount(id int) (models.LocalityCarriesCountDoc, error) {
+	var locCarries models.LocalityCarriesCountDoc
+	query := `
+		SELECT COUNT(c.id), l.id, l.locality_name 
+		FROM localities l 
+		LEFT JOIN carriers c ON c.locality_id = l.id 
+		WHERE l.id = ?
+		GROUP BY l.id, l.locality_name
+	`
+	row := r.db.QueryRow(query, id)
+
+	if err := row.Scan(&locCarries.CarriesCount, &locCarries.LocalityID, &locCarries.LocalityName); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.LocalityCarriesCountDoc{}, customErrors.ErrorNotFound
+		}
+		return models.LocalityCarriesCountDoc{}, err
+	}
+	return locCarries, nil
+}
+
+func (r *LocalityRepositoryDB) GetAllCarriesByLocalityIDCount() ([]models.LocalityCarriesCountDoc, error) {
+	localities := make([]models.LocalityCarriesCountDoc, 0)
+	query := `
+		SELECT COUNT(c.id), l.id, l.locality_name 
+		FROM localities l 
+		LEFT JOIN carriers c ON c.locality_id = l.id
+		GROUP BY l.id, l.locality_name
+	`
+	row, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer row.Close()
+	for row.Next() {
+		var locCarries models.LocalityCarriesCountDoc
+
+		if err := row.Scan(&locCarries.CarriesCount, &locCarries.LocalityID, &locCarries.LocalityName); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, customErrors.ErrorNotFound
+			}
+			return nil, err
+		}
+		localities = append(localities, locCarries)
 	}
 
 	return localities, nil

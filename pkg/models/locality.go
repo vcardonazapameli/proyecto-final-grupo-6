@@ -23,3 +23,9 @@ type Province struct {
 	Name      string
 	CountryId int
 }
+
+type LocalityCarriesCountDoc struct {
+	LocalityID   int    `json:"locality_id"`
+	LocalityName string `json:"locality_name"`
+	CarriesCount int    `json:"carries_count"`
+}

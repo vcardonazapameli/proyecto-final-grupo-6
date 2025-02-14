@@ -31,15 +31,27 @@ func (s *LocalityServiceDefault) Create(loc *models.LocalityDoc) error {
 	return err
 }
 
-func (s *LocalityServiceDefault) GetSellerCountByLocalityID(locId int) ([]models.LocalitySellerCountDoc, error) {
-	if locId <= 0 {
+func (s *LocalityServiceDefault) GetSellerCountByLocalityID(id int) ([]models.LocalitySellerCountDoc, error) {
+	if id <= 0 {
 		return []models.LocalitySellerCountDoc{}, customErrors.ValidationError{Messages: append(make([]string, 0), "ID cannot be zero nor negative")}
 	}
-	locSeller, err := s.rp.GetSellersByLocalityIDCount(locId)
+	locSeller, err := s.rp.GetSellersByLocalityIDCount(id)
 
 	return []models.LocalitySellerCountDoc{locSeller}, err
 }
 
 func (s *LocalityServiceDefault) GetAllSellerCountByLocalityID() ([]models.LocalitySellerCountDoc, error) {
 	return s.rp.GetAllSellersByLocalityIDCount()
+}
+
+func (s *LocalityServiceDefault) GetCarriesByLocality(id int) ([]models.LocalityCarriesCountDoc, error) {
+	locCarries, err := s.rp.GetCarriesByLocalityIDCount(id)
+	if err != nil {
+		return nil, err
+	}
+	return []models.LocalityCarriesCountDoc{locCarries}, nil
+}
+
+func (s *LocalityServiceDefault) GetAllCarriesByLocality() ([]models.LocalityCarriesCountDoc, error) {
+	return s.rp.GetAllCarriesByLocalityIDCount()
 }
