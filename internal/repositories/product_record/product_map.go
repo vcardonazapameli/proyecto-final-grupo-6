@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
@@ -27,11 +28,11 @@ func (productRecordRepository *productRecordRepository) Create(productRecord *mo
 		productRecord.ProductId,
 	)
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return customErrors.HandleSqlError(err)
 	}
 	productRecord.Id = int(id)
 	return nil
