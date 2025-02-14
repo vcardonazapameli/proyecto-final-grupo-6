@@ -17,3 +17,7 @@ type ProductBatch struct {
 	ProductId          int       `json:"product_id"`
 	SectionId          int       `json:"section_id"`
 }
+
+type ProductBatchRequest struct {
+	Data ProductBatch `json:"data"`
+}
