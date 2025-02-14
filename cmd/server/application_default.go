@@ -68,6 +68,7 @@ func (a *ServerChi) Run(cfg config.Config) (err error) {
 	routes.RegisterLocalityRoutes(r, database)
 	routes.RegisterBuyerRoutes(r)
 	routes.RegisterProductRecordRoutes(r, database)
+	routes.RegisterProductTypeRoutes(r, database)
 
 	// run server
 	err = http.ListenAndServe(a.serverAddress, r)
