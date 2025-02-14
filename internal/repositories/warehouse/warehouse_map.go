@@ -2,6 +2,8 @@ package warehouse
 
 import (
 	"database/sql"
+	"errors"
+
 	"log"
 
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
@@ -27,6 +29,7 @@ func (r *warehouseRepository) GetAll() ([]models.WarehouseDocResponse, error) {
 	var warehouses []models.WarehouseDocResponse
 	for rows.Next() {
 		var warehouse models.WarehouseDocResponse
+		var localityID sql.NullInt64
 		err := rows.Scan(
 			&warehouse.ID,
 			&warehouse.Warehouse_code,
@@ -34,11 +37,17 @@ func (r *warehouseRepository) GetAll() ([]models.WarehouseDocResponse, error) {
 			&warehouse.Telephone,
 			&warehouse.Minimun_capacity,
 			&warehouse.Minimun_temperature,
-			&warehouse.Locality_id,
+			&localityID,
 		)
 		if err != nil {
 			log.Println(err)
 			continue
+		}
+		if localityID.Valid {
+			val := uint64(localityID.Int64)
+			warehouse.Locality_id = &val
+		} else {
+			warehouse.Locality_id = nil
 		}
 		warehouses = append(warehouses, warehouse)
 	}
@@ -51,6 +60,7 @@ func (r *warehouseRepository) GetAll() ([]models.WarehouseDocResponse, error) {
 func (r *warehouseRepository) GetById(id int) (*models.WarehouseDocResponse, error) {
 	row := r.db.QueryRow("select id, warehouse_code, address, telephone, minimun_capacity, minimun_temperature, locality_id from warehouses where id = ?;", id)
 	var warehouse models.WarehouseDocResponse
+	var localityID sql.NullInt64
 	err := row.Scan(
 		&warehouse.ID,
 		&warehouse.Warehouse_code,
@@ -58,16 +68,26 @@ func (r *warehouseRepository) GetById(id int) (*models.WarehouseDocResponse, err
 		&warehouse.Telephone,
 		&warehouse.Minimun_capacity,
 		&warehouse.Minimun_temperature,
-		&warehouse.Locality_id,
+		&localityID,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
+	if localityID.Valid {
+		val := uint64(localityID.Int64)
+		warehouse.Locality_id = &val
+	} else {
+		warehouse.Locality_id = nil
+	}
+
 	return &warehouse, nil
 }
 
 func (r *warehouseRepository) CreateWarehouse(warehouse *models.WarehouseDocResponse) error {
-	result, err := r.db.Exec("insert into warehouses (address, telephone, warehouse_code, minimun_capacity, minimun_temperature, locality_id) values (?, ?, ?, ?, ?, ?)",
+	_, err := r.db.Exec("insert into warehouses (address, telephone, warehouse_code, minimun_capacity, minimun_temperature, locality_id) values (?, ?, ?, ?, ?, ?)",
 		warehouse.Address,
 		warehouse.Telephone,
 		warehouse.Warehouse_code,
@@ -78,11 +98,6 @@ func (r *warehouseRepository) CreateWarehouse(warehouse *models.WarehouseDocResp
 	if err != nil {
 		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
-	warehouse.ID = int(id)
 	return nil
 }
 
@@ -94,7 +109,7 @@ func (r *warehouseRepository) DeleteWarehouse(id int) error {
 	return nil
 }
 
-func (r *warehouseRepository) UpdateWarehouse(id int, warehouseDoc *models.WarehouseDocResponse) error {
+func (r *warehouseRepository) UpdateWarehouse(id int, warehouseDoc *models.WarehouseUpdateDocResponse) error {
 	_, err := r.db.Exec("update warehouses set address = ?, telephone = ?, warehouse_code = ?, minimun_capacity = ?, minimun_temperature = ?, locality_id = ? where id = ?",
 		warehouseDoc.Address,
 		warehouseDoc.Telephone,
@@ -122,7 +137,7 @@ func (r *warehouseRepository) ExistInDbWarehouseCode(warehouse_code string) (boo
 
 func (r *warehouseRepository) MatchWarehouseCode(id int, warehouse_code string) (bool, error) {
 	var numberOfMatches int
-	query := "select count(*) from warehouses where id != ? and warehouse_code = ?"
+	query := "select exists(select 1 FROM warehouses w where w.id != ? AND w.warehouse_code = ?)"
 	err := r.db.QueryRow(query, id, warehouse_code).Scan(&numberOfMatches)
 	if err != nil {
 		return false, err

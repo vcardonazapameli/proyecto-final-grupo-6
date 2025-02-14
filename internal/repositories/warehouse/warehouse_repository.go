@@ -7,7 +7,7 @@ type WarehouseRepository interface {
 	GetById(int) (*models.WarehouseDocResponse, error)
 	CreateWarehouse(*models.WarehouseDocResponse) error
 	DeleteWarehouse(int) error
-	UpdateWarehouse(int, *models.WarehouseDocResponse) error
+	UpdateWarehouse(int, *models.WarehouseUpdateDocResponse) error
 	ExistInDbWarehouseCode(string) (bool, error)
 	MatchWarehouseCode(int, string) (bool, error)
 }
