@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
+	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
 )
@@ -13,7 +14,8 @@ import (
 func RegisterSectionRoutes(r chi.Router, db *sql.DB) {
 
 	rp := repository.NewSectionMap(db)
-	sv := service.NewSectionDefault(rp)
+	productTypeRepository := productTypeRepository.NewProductTypeRepository(db)
+	sv := service.NewSectionDefault(rp, productTypeRepository)
 	hd := handler.NewSectionHandler(sv)
 
 	r.Route("/sections", func(rt chi.Router) {
