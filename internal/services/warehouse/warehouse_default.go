@@ -77,7 +77,6 @@ func (s *warehouseService) UpdateWarehouse(id int, warehouseDocRequest models.Wa
 	if warehouse == nil {
 		return nil, errorCustom.ErrorNotFound
 	}
-	//warehouseUpdate := validators.UpdateEntity(warehouseDocRequest, warehouse)
 	if warehouseDocRequest.Warehouse_code != nil {
 		newCode := *warehouseDocRequest.Warehouse_code
 		warehouseCodeExists, err := s.rp.MatchWarehouseCode(warehouse.ID, newCode)

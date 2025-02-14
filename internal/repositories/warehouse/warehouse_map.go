@@ -87,7 +87,7 @@ func (r *warehouseRepository) GetById(id int) (*models.WarehouseDocResponse, err
 }
 
 func (r *warehouseRepository) CreateWarehouse(warehouse *models.WarehouseDocResponse) error {
-	_, err := r.db.Exec("insert into warehouses (address, telephone, warehouse_code, minimun_capacity, minimun_temperature, locality_id) values (?, ?, ?, ?, ?, ?)",
+	result, err := r.db.Exec("insert into warehouses (address, telephone, warehouse_code, minimun_capacity, minimun_temperature, locality_id) values (?, ?, ?, ?, ?, ?)",
 		warehouse.Address,
 		warehouse.Telephone,
 		warehouse.Warehouse_code,
@@ -98,6 +98,11 @@ func (r *warehouseRepository) CreateWarehouse(warehouse *models.WarehouseDocResp
 	if err != nil {
 		return err
 	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	warehouse.ID = int(id)
 	return nil
 }
 
