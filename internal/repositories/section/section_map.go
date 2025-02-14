@@ -129,9 +129,16 @@ func (r *SectionMap) Delete(id int) error {
 	if !r.SectionExists(id) {
 		return customErrors.ErrorNotFound
 	}
-	_, err := r.db.Exec("DELETE FROM sections WHERE id = ?", id)
+	res, err := r.db.Exec("DELETE FROM sections WHERE id = ?", id)
 	if err != nil {
 		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return customErrors.ErrorNotFound
 	}
 	return nil
 }
