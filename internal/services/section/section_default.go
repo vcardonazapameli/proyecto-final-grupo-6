@@ -1,18 +1,20 @@
 package section
 
 import (
+	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewSectionDefault(rp repository.SectionRepository) SectionService {
-	return &SectionDefault{rp: rp}
+func NewSectionDefault(rp repository.SectionRepository, productTypeRepository productTypeRepository.ProductTypeRepository) SectionService {
+	return &SectionDefault{rp: rp, productTypeRespository: productTypeRepository}
 }
 
 type SectionDefault struct {
-	rp repository.SectionRepository
+	rp                     repository.SectionRepository
+	productTypeRespository productTypeRepository.ProductTypeRepository
 }
 
 func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
@@ -41,6 +43,13 @@ func (s *SectionDefault) Create(section models.Section) (models.Section, error) 
 	if err := validators.ValidateTemperature(section); err != nil {
 		return models.Section{}, err
 	}
+	productType, err := s.productTypeRespository.GetById(section.ProductTypeId)
+	if err != nil {
+		return models.Section{}, err
+	}
+	if productType == nil {
+		return models.Section{}, customErrors.ErrorNotFound
+	}
 	createdSection, err := s.rp.Create(section.SectionAttributes)
 	if err != nil {
 		return models.Section{}, err
@@ -60,12 +69,36 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 	if err := validators.ValidateTemperature(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
+	productType, _ := s.productTypeRespository.GetById(updatedSection.ProductTypeId)
+	if productType == nil {
+		return models.Section{}, customErrors.ErrorNotFound
+	}
 	s.rp.Update(id, *updatedSection)
 	return *updatedSection, nil
 }
 
+func (s *SectionDefault) Recover(id int) (models.Section, error) {
+	err := s.rp.Recover(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+	recoveredSection, err := s.rp.GetByID(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+
+	return recoveredSection, nil
+}
+
 func (s *SectionDefault) Delete(id int) error {
-	section, _ := s.rp.GetByID(id)
-	s.rp.Delete(section.Id)
+	section, err := s.rp.GetByID(id)
+	if err != nil {
+		return err
+	}
+	err = s.rp.Delete(section.Id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

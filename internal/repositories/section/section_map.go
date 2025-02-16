@@ -38,7 +38,7 @@ func (r *SectionMap) SectionNumberExists(sn string) bool {
 }
 
 func (r *SectionMap) GetAll() (map[int]models.Section, error) {
-	rows, err := r.db.Query("SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections")
+	rows, err := r.db.Query("SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections WHERE is_deleted = FALSE")
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (r *SectionMap) GetAll() (map[int]models.Section, error) {
 }
 
 func (r *SectionMap) GetByID(id int) (models.Section, error) {
-	row := r.db.QueryRow("SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections WHERE id = ?", id)
+	row := r.db.QueryRow("SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections WHERE id = ? AND is_deleted = FALSE", id)
 	var section models.Section
 	err := row.Scan(
 		&section.Id,
@@ -76,12 +76,25 @@ func (r *SectionMap) GetByID(id int) (models.Section, error) {
 		&section.MinimumCapacity,
 		&section.MinimumTemperature,
 		&section.ProductTypeId,
-		&section.WarehouseId,
-	)
+		&section.WarehouseId)
 	if err != nil {
-		return models.Section{}, customErrors.ErrorNotFound
+		if err == sql.ErrNoRows {
+			return models.Section{}, customErrors.ErrorNotFound
+		}
+		return models.Section{}, err
 	}
 	return section, nil
+}
+
+func (r *SectionMap) Recover(id int) error {
+	if !r.SectionExists(id) {
+		return customErrors.ErrorNotFound
+	}
+	_, err := r.db.Exec("UPDATE sections SET is_deleted = FALSE WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *SectionMap) Create(section models.SectionAttributes) (models.Section, error) {
@@ -93,8 +106,8 @@ func (r *SectionMap) Create(section models.SectionAttributes) (models.Section, e
 		return models.Section{}, customErrors.ErrorConflict
 	}
 
-	row, err := r.db.Exec("INSERT INTO sections (section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		section.SectionNumber, section.CurrentCapacity, section.CurrentTemperature, section.MaximumCapacity, section.MinimumCapacity, section.MinimumTemperature, section.ProductTypeId, section.WarehouseId)
+	row, err := r.db.Exec("INSERT INTO sections (section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		section.SectionNumber, section.CurrentCapacity, section.CurrentTemperature, section.MaximumCapacity, section.MinimumCapacity, section.MinimumTemperature, section.ProductTypeId, section.WarehouseId, false)
 	if err != nil {
 		return models.Section{}, err
 	}
@@ -106,7 +119,7 @@ func (r *SectionMap) Create(section models.SectionAttributes) (models.Section, e
 }
 
 func (r *SectionMap) Update(id int, section models.Section) (models.Section, error) {
-	if err := validators.ValidateNoEmptyFields(section); err != nil {
+	if err := validators.ValidateNoEmptyFields(section.SectionAttributes); err != nil {
 		return models.Section{}, customErrors.ErrorUnprocessableContent
 	}
 
@@ -129,9 +142,16 @@ func (r *SectionMap) Delete(id int) error {
 	if !r.SectionExists(id) {
 		return customErrors.ErrorNotFound
 	}
-	_, err := r.db.Exec("DELETE FROM sections WHERE id = ?", id)
+	res, err := r.db.Exec("UPDATE sections SET is_deleted = TRUE WHERE id = ?", id)
 	if err != nil {
 		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return customErrors.ErrorNotFound
 	}
 	return nil
 }

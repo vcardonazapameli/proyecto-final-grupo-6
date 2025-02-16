@@ -8,4 +8,6 @@ type SectionRepository interface {
 	Create(section models.SectionAttributes) (models.Section, error)
 	Update(id int, section models.Section) (models.Section, error)
 	Delete(id int) error
+	Recover(id int) error
+	SectionExists(id int) bool
 }

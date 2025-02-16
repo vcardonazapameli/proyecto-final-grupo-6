@@ -37,4 +37,11 @@ type UpdateSectionDto struct {
 	MinimumTemperature *float64 `json:"minimum_temperature"`
 	ProductTypeId      *int     `json:"product_type_id"`
 	WarehouseId        *int     `json:"warehouse_id"`
+	IsDeleted          *bool    `json:"is_deleted"`
+}
+
+type SectionReport struct {
+	SectionId     int    `json:"section_id"`
+	SectionNumber string `json:"section_number"`
+	ProductsCount int    `json:"products_count"`
 }
