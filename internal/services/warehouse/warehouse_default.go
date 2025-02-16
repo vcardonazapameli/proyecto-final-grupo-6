@@ -2,20 +2,21 @@ package warehouse
 
 import (
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
-	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	validators "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
+	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewWarehouseDefault(rp repository.WarehouseRepository) WarehouseService {
-	return &WarehouseDefault{rp: rp}
+func NewWarehouseService(rp repository.WarehouseRepository) WarehouseService {
+	return &warehouseService{rp: rp}
 }
 
-type WarehouseDefault struct {
+type warehouseService struct {
 	rp repository.WarehouseRepository
 }
 
-func (s *WarehouseDefault) GetAll() (map[int]models.Warehouse, error) {
+func (s *warehouseService) GetAll() ([]models.WarehouseDocResponse, error) {
 	data, err := s.rp.GetAll()
 	if err != nil {
 		return nil, err
@@ -23,52 +24,91 @@ func (s *WarehouseDefault) GetAll() (map[int]models.Warehouse, error) {
 	return data, nil
 }
 
-func (s *WarehouseDefault) GetById(idWarehouse int) (models.Warehouse, error) {
-	warehouse, err := s.rp.GetById(idWarehouse)
-	if err != nil {
-		return models.Warehouse{}, err
+func (s *warehouseService) GetById(idWarehouse int) (*models.WarehouseDocResponse, error) {
+	warehouse, _ := s.rp.GetById(idWarehouse)
+	if warehouse == nil {
+		return nil, errorCustom.ErrorNotFound
 	}
 	return warehouse, nil
 
 }
 
-func (s *WarehouseDefault) CreateWarehouse(warehouse models.Warehouse) (models.Warehouse, error) {
-	if err := validators.ValidateFieldsWarehouse(warehouse); err != nil {
-		return models.Warehouse{}, err
+func (s *warehouseService) CreateWarehouse(warehouseDocRequest models.WarehouseDocRequest) (*models.WarehouseDocResponse, error) {
+	if err := validators.ValidateFieldsWarehouseCreate(warehouseDocRequest); err != nil {
+		return nil, err
 	}
-	return s.rp.CreateWarehouse(warehouse)
-}
-
-func (s *WarehouseDefault) DeleteWarehouse(idWarehouse int) error {
-	return s.rp.DeleteWarehouse(idWarehouse)
-}
-
-func (s *WarehouseDefault) UpdateWarehouse(id int, warehouseData models.WarehouseDocUpdate) (models.Warehouse, error) {
-	existingWarehouse, err := s.rp.GetById(id)
+	existInDb, err := s.rp.ExistInDbWarehouseCode(warehouseDocRequest.Warehouse_code)
 	if err != nil {
-		return models.Warehouse{}, errorsCustom.ErrorNotFound
+		return nil, err
 	}
-	updatedWarehouse := validators.UpdateEntity(warehouseData, &existingWarehouse)
-	if err := validators.ValidateFieldsUpdate(*updatedWarehouse); err != nil {
-		return models.Warehouse{}, err
+	if existInDb {
+		return nil, errorCustom.ErrorConflict
 	}
-	if warehouseData.Warehouse_code != nil {
-		existingWarehouse.Warehouse_code = *warehouseData.Warehouse_code
+	warehouse := mappers.WarehouseDocRequestToWarehouseDocResponse(warehouseDocRequest)
+	if err := s.rp.CreateWarehouse(&warehouse); err != nil {
+		return nil, nil
 	}
-	if warehouseData.Address != nil {
-		existingWarehouse.Address = *warehouseData.Address
+	return &warehouse, nil
+}
+
+func (s *warehouseService) DeleteWarehouse(id int) error {
+	warehouse, _ := s.rp.GetById(id)
+	if warehouse == nil {
+		return errorCustom.ErrorNotFound
 	}
-	if warehouseData.Telephone != nil {
-		existingWarehouse.Telephone = *warehouseData.Telephone
+	s.rp.DeleteWarehouse(warehouse.ID)
+	return nil
+}
+
+func (s *warehouseService) UpdateWarehouse(id int, warehouseDocRequest models.WarehouseUpdateDocRequest) (*models.WarehouseDocResponse, error) {
+	warehouse, _ := s.rp.GetById(id)
+	if warehouse == nil {
+		return nil, errorCustom.ErrorNotFound
 	}
-	if warehouseData.Minimun_capacity != nil {
-		existingWarehouse.Minimun_capacity = *warehouseData.Minimun_capacity
+	warehouseUpdate := validators.UpdateEntity(warehouseDocRequest, warehouse)
+	warehouseCodeExists, err := s.rp.MatchWarehouseCode(warehouseUpdate.ID, warehouseUpdate.Warehouse_code)
+	if err != nil {
+		return nil, err
 	}
-	if warehouseData.Minimun_temperature != nil {
-		existingWarehouse.Minimun_temperature = *warehouseData.Minimun_temperature
+	if warehouseCodeExists {
+		return nil, errorCustom.ErrorConflict
 	}
-	if warehouseData.Locality_id != nil {
-		existingWarehouse.Locality_id = *warehouseData.Locality_id
+
+	warehouseDoc := mappers.WarehouseDocResponseToWarehouseDocRequest(warehouseUpdate)
+	if errorValidateFields := validators.ValidateFieldsWarehouseUpdate(warehouseDoc); errorValidateFields != nil {
+		return nil, errorValidateFields
 	}
-	return s.rp.UpdateWarehouse(id, existingWarehouse)
+	if err := s.rp.UpdateWarehouse(id, warehouseUpdate); err != nil {
+		return nil, nil
+	}
+	return warehouseUpdate, nil
+	/*
+		existingWarehouse, err := s.rp.GetById(id)
+		if err != nil {
+			return models.WarehouseDocResponse{}, errorsCustom.ErrorNotFound
+		}
+		updatedWarehouse := validators.UpdateEntity(warehouseData, &existingWarehouse)
+		if err := validators.ValidateFieldsUpdate(*updatedWarehouse); err != nil {
+			return models.Warehouse{}, err
+		}
+		if warehouseData.Warehouse_code != nil {
+			existingWarehouse.Warehouse_code = *warehouseData.Warehouse_code
+		}
+		if warehouseData.Address != nil {
+			existingWarehouse.Address = *warehouseData.Address
+		}
+		if warehouseData.Telephone != nil {
+			existingWarehouse.Telephone = *warehouseData.Telephone
+		}
+		if warehouseData.Minimun_capacity != nil {
+			existingWarehouse.Minimun_capacity = *warehouseData.Minimun_capacity
+		}
+		if warehouseData.Minimun_temperature != nil {
+			existingWarehouse.Minimun_temperature = *warehouseData.Minimun_temperature
+		}
+		if warehouseData.Locality_id != nil {
+			existingWarehouse.Locality_id = *warehouseData.Locality_id
+		}
+		return s.rp.UpdateWarehouse(id, existingWarehouse)
+	*/
 }

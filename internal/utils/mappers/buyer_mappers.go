@@ -2,7 +2,7 @@ package mappers
 
 import "github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 
-func BuyerDocToBuyer(buyerDoc models.BuyerDoc) models.Buyer {
+func BuyerDocToBuyer(buyerDoc models.BuyerDocResponse) models.Buyer {
 	return models.Buyer{
 		Id: buyerDoc.Id,
 		BuyerAttributes: models.BuyerAttributes{
@@ -19,9 +19,15 @@ func BuyerDocToBuyerAttributes(buyerDoc models.CreateBuyerDto) models.BuyerAttri
 		LastName:     buyerDoc.LastName,
 	}
 }
-func BuyerToBuyerDoc(buyer models.Buyer) models.BuyerDoc {
-	return models.BuyerDoc{
-		Id:           buyer.Id,
+func BuyerDocRequestToBuyerDocResponse(buyer models.BuyerDocRequest) models.BuyerDocResponse {
+	return models.BuyerDocResponse{
+		CardNumberId: buyer.CardNumberId,
+		FirstName:    buyer.FirstName,
+		LastName:     buyer.LastName,
+	}
+}
+func BuyerDocResponseToBuyerDocRequest(buyer models.BuyerDocResponse) models.BuyerDocRequest {
+	return models.BuyerDocRequest{
 		CardNumberId: buyer.CardNumberId,
 		FirstName:    buyer.FirstName,
 		LastName:     buyer.LastName,
