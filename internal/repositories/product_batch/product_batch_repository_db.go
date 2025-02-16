@@ -3,41 +3,44 @@ package productbatch
 import (
 	"database/sql"
 
-	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/go-sql-driver/mysql"
 )
 
 type ProductBatchRepositoryDB struct {
 	db *sql.DB
 }
 
-func NewProductBatchRepositoryDB(db *sql.DB) *ProductBatchRepositoryDB {
+func NewProductBatchRepository(db *sql.DB) *ProductBatchRepositoryDB {
 	return &ProductBatchRepositoryDB{db}
 }
 
-func (r *ProductBatchRepositoryDB) Save(pb *models.ProductBatch) error {
-	result, err := r.db.Exec("INSERT INTO product_batches (batch_number, current_quantity, current_temperature, due_date, initial_quantity, manufacturing_date, manufacturing_hour, minimum_temperature, product_id, section_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		&pb.BatchNumber,
-		&pb.CurrentQuantity,
-		&pb.CurrentTemperature,
-		&pb.DueDate,
-		&pb.InitialQuantity,
-		&pb.ManufacturingDate,
-		&pb.ManufacturingHour,
-		&pb.MinimumTemperature,
-		&pb.ProductId,
-		&pb.SectionId,
+func (r *ProductBatchRepositoryDB) BatchNumberExists(batchNumber string) bool {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM product_batches WHERE batch_number = ?)", batchNumber).Scan(&exists)
+	if err != nil {
+		return false
+	}
+	return exists
+}
+
+func (r *ProductBatchRepositoryDB) Save(pb *models.ProductBatchResponse) error {
+	query := "INSERT INTO product_batches (batch_number, current_quantity, current_temperature, due_date, initial_quantity, manufacturing_date, manufacturing_hour, minimum_temperature, product_id, section_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	result, err := r.db.Exec(query,
+		pb.BatchNumber,
+		pb.CurrentQuantity,
+		pb.CurrentTemperature,
+		pb.DueDate.Format("2006-01-02 15:04:05"),
+		pb.InitialQuantity,
+		pb.ManufacturingDate.Format("2006-01-02 15:04:05"),
+		pb.ManufacturingHour.Format("2006-01-02 15:04:05"),
+		pb.MinimumTemperature,
+		pb.ProductId,
+		pb.SectionId,
 	)
 	if err != nil {
-		if v, ok := err.(*mysql.MySQLError); ok {
-			if v.Number == 1062 {
-				return defaultErrors.ErrorConflict
-			}
-		}
-		return err
+		return customErrors.HandleSqlError(err)
 	}
-
 	id, err := result.LastInsertId()
 	if err != nil {
 		return err

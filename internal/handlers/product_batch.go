@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/product_batch"
@@ -16,21 +15,20 @@ type ProductBatchHandler struct {
 }
 
 func NewProductBatchHandler(sv service.ProductBatchService) *ProductBatchHandler {
-	return &ProductBatchHandler{sv}
+	return &ProductBatchHandler{sv: sv}
 }
 
 func (h *ProductBatchHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := models.ProductBatchRequest{}
+		var req struct {
+			Data models.ProductBatchRequest `json:"data"`
+		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			fmt.Println("bodyy", r.Body)
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
 
-		newProductBatch := req.Data
-
-		err := h.sv.Create(&newProductBatch)
+		newProductBatch, err := h.sv.Create(req.Data)
 		if err != nil {
 			response.Error(w, err)
 			return

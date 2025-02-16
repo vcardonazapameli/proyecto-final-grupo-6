@@ -9,4 +9,5 @@ type SectionRepository interface {
 	Update(id int, section models.Section) (models.Section, error)
 	Delete(id int) error
 	Recover(id int) error
+	SectionExists(id int) bool
 }

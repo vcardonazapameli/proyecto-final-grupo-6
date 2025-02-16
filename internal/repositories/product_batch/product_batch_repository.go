@@ -5,5 +5,6 @@ import (
 )
 
 type ProductBatchRepository interface {
-	Save(pb *models.ProductBatch) error
+	Save(pb *models.ProductBatchResponse) error
+	BatchNumberExists(batchNumber string) bool
 }
