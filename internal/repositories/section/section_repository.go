@@ -10,4 +10,5 @@ type SectionRepository interface {
 	Delete(id int) error
 	Recover(id int) error
 	SectionExists(id int) bool
+	GetSectionReports(sectionId int) ([]models.SectionReport, error)
 }

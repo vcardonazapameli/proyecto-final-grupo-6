@@ -102,3 +102,11 @@ func (s *SectionDefault) Delete(id int) error {
 
 	return nil
 }
+
+func (s *SectionDefault) GetSectionReports(sectionId int) ([]models.SectionReport, error) {
+	sectionReports, err := s.rp.GetSectionReports(sectionId)
+	if err != nil {
+		return sectionReports, customErrors.ErrorNotFound
+	}
+	return sectionReports, nil
+}

@@ -24,5 +24,6 @@ func RegisterSectionRoutes(r chi.Router, db *sql.DB) {
 		rt.Post("/", hd.Create())
 		rt.Patch("/{id}", hd.Update())
 		rt.Delete("/{id}", hd.Delete())
+		rt.Get("/reportProducts", hd.GetSectionReports())
 	})
 }
