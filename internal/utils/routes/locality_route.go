@@ -17,5 +17,6 @@ func RegisterLocalityRoutes(r chi.Router, database *sql.DB) {
 	r.Route("/localities", func(r chi.Router) {
 		r.Post("/", handler.Create())
 		r.Get("/reportSellers", handler.GetSellerByLocalityID())
+		r.Get("/reportCarries", handler.GetCarriesReport())
 	})
 }

@@ -10,4 +10,6 @@ type LocalityRepository interface {
 	GetSellersByLocalityIDCount(locId int) (models.LocalitySellerCountDoc, error)
 	// Get the count of seller by matching Locality ID
 	GetAllSellersByLocalityIDCount() ([]models.LocalitySellerCountDoc, error)
+	GetCarriesByLocalityIDCount(int) (models.LocalityCarriesCountDoc, error)
+	GetAllCarriesByLocalityIDCount() ([]models.LocalityCarriesCountDoc, error)
 }

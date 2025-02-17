@@ -8,7 +8,6 @@ import (
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
 	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/bootcamp-go/web/request"
 	"github.com/go-chi/chi/v5"
@@ -59,10 +58,6 @@ func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
-		if err := validators.ValidateNoEmptyFields(warehouseData); err != nil {
-			response.Error(w, err)
-			return
-		}
 		warehouse, err := h.sv.CreateWarehouse(warehouseData)
 		if err != nil {
 			response.Error(w, err)
@@ -110,22 +105,4 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 		}
 		response.JSON(w, http.StatusOK, warehouse)
 	}
-
-	/*
-		var warehouseData models.WarehouseDocUpdate
-		err = json.NewDecoder(r.Body).Decode(&warehouseData)
-		if err != nil {
-			response.Error(w, errorsCustom.ErrorBadRequest)
-			return
-		}
-
-		updatedWarehouse, err := h.sv.UpdateWarehouse(id, warehouseData)
-		if err != nil {
-			response.Error(w, err)
-			return
-		}
-		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
-
-		response.JSON(w, http.StatusOK, warehouseResponse)
-	*/
 }
