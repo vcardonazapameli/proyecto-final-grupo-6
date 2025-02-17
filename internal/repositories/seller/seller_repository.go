@@ -8,5 +8,5 @@ type SellerRepository interface {
 	Save(*models.Seller) error
 	GetByID(id int) (models.Seller, error)
 	Delete(id int) error
-	Update(models.Seller)
+	Update(models.Seller) error
 }
