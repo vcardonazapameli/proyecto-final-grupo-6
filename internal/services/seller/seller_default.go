@@ -33,7 +33,6 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 
 func (sv *SellerServiceDefault) Create(sDoc models.SellerDoc) (models.SellerDoc, error) {
 	// Validate Seller
-
 	if err := validators.ValidateSellerAttrs(sDoc); err != nil {
 		return models.SellerDoc{}, err
 	}
