@@ -1,7 +1,7 @@
 package purchaseorder
 
 import (
-	"fmt"
+
 
 	br "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/buyer"
 	cr "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/carrier"
@@ -35,30 +35,25 @@ func (p *purchaseOrderService) CreatePurchaseOrder(purchaseOrder models.Purchase
 	}
 	//validar que no haya otro purchaseOrder con dicho numero
 	if p.repository.ValidateIfOrderNumberExist(purchaseOrder.OrderNumber){ 
-		fmt.Println("order number already  exists")
 
 		return nil, customErrors.ErrorConflict
 	}
 	//Validar si orderStatus existe
 	if !p.repository.ValidateIfOrderStatusExist(int(purchaseOrder.OrderStatusId)){
-		fmt.Println("order status not exists")
 			return nil, customErrors.ErrorConflict
 	}
 	//validar que exista el warehouseId
 	if _,err :=p.warehouseRepository.GetById(int(purchaseOrder.WarehouseId)); err != nil{ 
-		fmt.Println("warehouse not exists")
 
 		return nil, customErrors.ErrorConflict
 	}
 	//validar que exista el buyer
 	if !p.buyerRepository.ValidateIfExistsById(int(purchaseOrder.BuyerId)){ 
-		fmt.Println("buyer not exists")
 
 		return nil, customErrors.ErrorConflict
 	}
 	//validar que exista el carrier
 	if exist, _:=p.carrierRepository.ExistCarrierInDb(int(purchaseOrder.CarrierId)); !exist{
-		fmt.Println("carrier not exists")
 
 		return nil, customErrors.ErrorConflict
 	}
