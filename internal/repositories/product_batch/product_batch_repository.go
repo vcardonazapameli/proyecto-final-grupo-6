@@ -7,4 +7,5 @@ import (
 type ProductBatchRepository interface {
 	Save(pb *models.ProductBatchResponse) error
 	BatchNumberExists(batchNumber string) bool
+	ExistsByID(id int) (bool, error)
 }

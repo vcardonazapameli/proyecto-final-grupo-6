@@ -11,7 +11,7 @@ type ProductBatchRepositoryDB struct {
 	db *sql.DB
 }
 
-func NewProductBatchRepository(db *sql.DB) *ProductBatchRepositoryDB {
+func NewProductBatchRepository(db *sql.DB) ProductBatchRepository {
 	return &ProductBatchRepositoryDB{db}
 }
 
@@ -48,4 +48,14 @@ func (r *ProductBatchRepositoryDB) Save(pb *models.ProductBatchResponse) error {
 	pb.Id = int(id)
 	return nil
 
+}
+
+// ExistsByID implements ProductBatchRepository.
+func (r *ProductBatchRepositoryDB) ExistsByID(id int) (bool, error) {
+	row := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM product_batches WHERE id = ?)", id)
+	var exists bool
+	if err := row.Scan(&exists); err != nil {
+		return false, err
+	}
+	return exists, nil
 }

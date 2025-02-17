@@ -30,15 +30,15 @@ func (i *InboundOrderMap) ExistOrderNumber(orderNumber string) (bool, error) {
 
 // GetAllReport implements InboundOrderRepository.
 func (i *InboundOrderMap) GetAllReport() ([]models.EmployeeWithOrders, error) {
-	rows, err := i.db.Query(`SELECT e.id, 
-                                    e.first_name, 
-                                    e.last_name, 
-                                    e.id_card_number, 
-                                    e.warehouse_id,
-                                    count(*) inbound_orders_count
-                            FROM inbound_orders i
-                            INNER JOIN employees e ON i.employe_id = e.id
-                            GROUP BY i.employe_id`)
+	rows, err := i.db.Query(`SELECT  e.id, 
+									e.first_name, 
+									e.last_name, 
+									e.id_card_number, 
+									e.warehouse_id,
+									count(i.id) inbound_orders_count
+							FROM employees e
+							LEFT JOIN inbound_orders i ON e.id = i.employe_id
+							GROUP BY e.id`)
 	if err != nil {
 		log.Print("Error in GetAllReport InboundOrder: ", err)
 		return nil, err
@@ -62,16 +62,16 @@ func (i *InboundOrderMap) GetAllReport() ([]models.EmployeeWithOrders, error) {
 
 // GetReportByEmployeeID implements InboundOrderRepository.
 func (i *InboundOrderMap) GetReportByEmployeeID(id int) (*models.EmployeeWithOrders, error) {
-	row := i.db.QueryRow(`SELECT e.id, 
-                                    e.first_name, 
-                                    e.last_name, 
-                                    e.id_card_number, 
-                                    e.warehouse_id,
-                                    count(*) inbound_orders_count
-                            FROM inbound_orders i
-                            INNER JOIN employees e ON i.employe_id = e.id
+	row := i.db.QueryRow(`SELECT  e.id, 
+									e.first_name, 
+									e.last_name, 
+									e.id_card_number, 
+									e.warehouse_id,
+									count(i.id) inbound_orders_count
+							FROM employees e
+							LEFT JOIN inbound_orders i ON e.id = i.employe_id
                             WHERE e.id = ?
-                            GROUP BY i.employe_id`, id)
+							GROUP BY e.id`, id)
 	var employee models.EmployeeWithOrders
 	if err := row.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.CardNumberID, &employee.WarehouseID, &employee.InboundOrdersCount); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
