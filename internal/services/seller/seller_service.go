@@ -9,5 +9,5 @@ type SellerService interface {
 	Create(models.SellerDoc) (models.SellerDoc, error)
 	GetByID(id int) (models.SellerDoc, error)
 	Delete(id int) error
-	Update(id int, cid *int, companyName *string, address *string, telephone *int) (models.SellerDoc, error)
+	Update(id int, cid *int, companyName *string, address *string, telephone *int, localityId *int) (models.SellerDoc, error)
 }

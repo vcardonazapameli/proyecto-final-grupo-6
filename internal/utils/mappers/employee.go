@@ -24,9 +24,9 @@ func RequestEmployeeToEmployee(request models.RequestEmployee) models.Employee {
 func EmployeeToEmployeeDoc(Employee models.Employee) models.EmployeeDoc {
 	return models.EmployeeDoc{
 		Id:           Employee.Id,
-		CardNumberID: Employee.EmployeeAttributes.CardNumberID,
-		FirstName:    Employee.EmployeeAttributes.FirstName,
-		LastName:     Employee.EmployeeAttributes.LastName,
-		WarehouseID:  Employee.EmployeeAttributes.WarehouseID,
+		CardNumberID: Employee.CardNumberID,
+		FirstName:    Employee.FirstName,
+		LastName:     Employee.LastName,
+		WarehouseID:  Employee.WarehouseID,
 	}
 }

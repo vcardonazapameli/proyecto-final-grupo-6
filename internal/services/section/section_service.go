@@ -8,4 +8,5 @@ type SectionService interface {
 	Create(section models.Section) (models.Section, error)
 	Update(id int, sectionDto models.UpdateSectionDto) (models.Section, error)
 	Delete(id int) error
+	GetSectionReports(sectionId int) ([]models.SectionReport, error)
 }

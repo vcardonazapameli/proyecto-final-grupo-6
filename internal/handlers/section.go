@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
@@ -120,5 +121,26 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 			return
 		}
 		response.JSON(w, http.StatusNoContent, nil)
+	}
+}
+
+func (handler *SectionHandler) GetSectionReports() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		queryParam := r.URL.Query()
+		var sectionId = 0
+		var err error
+		if queryParam.Get("section_id") != "" {
+			sectionId, err = strconv.Atoi(queryParam.Get("section_id"))
+			if err != nil {
+				response.Error(w, customErrors.ErrorBadRequest)
+				return
+			}
+		}
+		sectionReports, err := handler.sv.GetSectionReports(sectionId)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
+		response.JSON(w, http.StatusOK, sectionReports)
 	}
 }
