@@ -59,7 +59,7 @@ func (p *purchaseOrderRepository) ValidateIfOrderStatusExist(orderStatusId int) 
 
 func (p *purchaseOrderRepository) ValidateIfOrderNumberExist(orderNumber uint) ( bool) {
 	var exist bool
-		query:= "SELECT EXISTS (SELECT 1 FROM purchase_orders po WHERE b.order_number = ?)"
+		query:= "SELECT EXISTS (SELECT 1 FROM purchase_orders po WHERE po.order_number = ?)"
 		err := p.db.QueryRow(query, orderNumber).Scan(&exist)
 		if err != nil {
 			return false

@@ -13,7 +13,6 @@ func SectionToSectionDoc(sections models.Section) models.SectionDoc {
 		MaximumCapacity:    sections.MaximumCapacity,
 		WarehouseId:        sections.WarehouseId,
 		ProductTypeId:      sections.ProductTypeId,
-		ProductBatchId:     sections.ProductBatchId,
 	}
 }
 
@@ -28,21 +27,17 @@ func SectionDocToSection(sections models.SectionDoc) models.Section {
 			MaximumCapacity:    sections.MaximumCapacity,
 			WarehouseId:        sections.WarehouseId,
 			ProductTypeId:      sections.ProductTypeId,
-			ProductBatchId:     sections.ProductBatchId,
 		},
 	}
 }
 
-func SectionToSectionValidation(section models.Section) models.SectionValidation {
-	return models.SectionValidation{
-		SectionNumber:      section.SectionNumber,
-		CurrentCapacity:    section.CurrentCapacity,
-		CurrentTemperature: section.CurrentTemperature,
-		MaximumCapacity:    section.MaximumCapacity,
-		MinimumCapacity:    section.MinimumCapacity,
-		MinimumTemperature: section.MinimumTemperature,
-		ProductTypeId:      section.ProductTypeId,
-		WarehouseId:        section.WarehouseId,
-		ProductBatchId:     section.ProductBatchId,
+func SectionAttributesToSection(attributes models.SectionAttributes, id int) models.Section {
+	return models.Section{
+		Id:                id,
+		SectionAttributes: attributes,
 	}
+}
+
+func SectionToSectionAttributes(section models.Section) models.SectionAttributes {
+	return section.SectionAttributes
 }

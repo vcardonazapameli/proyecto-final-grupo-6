@@ -6,4 +6,6 @@ type LocalityService interface {
 	Create(l *models.LocalityDoc) error
 	GetSellerCountByLocalityID(locId int) ([]models.LocalitySellerCountDoc, error)
 	GetAllSellerCountByLocalityID() ([]models.LocalitySellerCountDoc, error)
+	GetCarriesByLocality(int) ([]models.LocalityCarriesCountDoc, error)
+	GetAllCarriesByLocality() ([]models.LocalityCarriesCountDoc, error)
 }

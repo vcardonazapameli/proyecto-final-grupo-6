@@ -1,18 +1,20 @@
 package section
 
 import (
+	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewSectionDefault(rp repository.SectionRepository) SectionService {
-	return &SectionDefault{rp: rp}
+func NewSectionDefault(rp repository.SectionRepository, productTypeRepository productTypeRepository.ProductTypeRepository) SectionService {
+	return &SectionDefault{rp: rp, productTypeRespository: productTypeRepository}
 }
 
 type SectionDefault struct {
-	rp repository.SectionRepository
+	rp                     repository.SectionRepository
+	productTypeRespository productTypeRepository.ProductTypeRepository
 }
 
 func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
@@ -32,17 +34,27 @@ func (s *SectionDefault) GetByID(id int) (models.Section, error) {
 }
 
 func (s *SectionDefault) Create(section models.Section) (models.Section, error) {
+	if err := validators.ValidateNoEmptyFields(section.SectionAttributes); err != nil {
+		return models.Section{}, customErrors.ErrorUnprocessableContent
+	}
 	if err := validators.ValidateCapacity(section); err != nil {
 		return models.Section{}, err
 	}
 	if err := validators.ValidateTemperature(section); err != nil {
 		return models.Section{}, err
 	}
-	section, err := s.rp.Create(section)
+	productType, err := s.productTypeRespository.GetById(section.ProductTypeId)
 	if err != nil {
 		return models.Section{}, err
 	}
-	return section, nil
+	if productType == nil {
+		return models.Section{}, customErrors.ErrorNotFound
+	}
+	createdSection, err := s.rp.Create(section.SectionAttributes)
+	if err != nil {
+		return models.Section{}, err
+	}
+	return createdSection, nil
 }
 
 func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (models.Section, error) {
@@ -51,27 +63,50 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 		return models.Section{}, err
 	}
 	updatedSection := validators.UpdateEntity(sectionDto, &sectionToUpdate)
-	if sectionDto.SectionNumber != nil {
-		_, exists := s.rp.SearchBySectionNumber(updatedSection.SectionNumber)
-		if exists {
-			return models.Section{}, customErrors.ErrorConflict
-		}
-	}
-
 	if err := validators.ValidateCapacity(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
 	if err := validators.ValidateTemperature(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
+	productType, _ := s.productTypeRespository.GetById(updatedSection.ProductTypeId)
+	if productType == nil {
+		return models.Section{}, customErrors.ErrorNotFound
+	}
 	s.rp.Update(id, *updatedSection)
 	return *updatedSection, nil
 }
 
+func (s *SectionDefault) Recover(id int) (models.Section, error) {
+	err := s.rp.Recover(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+	recoveredSection, err := s.rp.GetByID(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+
+	return recoveredSection, nil
+}
+
 func (s *SectionDefault) Delete(id int) error {
-	err := s.rp.Delete(id)
+	section, err := s.rp.GetByID(id)
 	if err != nil {
 		return err
 	}
+	err = s.rp.Delete(section.Id)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (s *SectionDefault) GetSectionReports(sectionId int) ([]models.SectionReport, error) {
+	sectionReports, err := s.rp.GetSectionReports(sectionId)
+	if err != nil {
+		return sectionReports, customErrors.ErrorNotFound
+	}
+	return sectionReports, nil
 }

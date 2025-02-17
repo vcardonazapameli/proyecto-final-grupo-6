@@ -27,9 +27,9 @@ CREATE TABLE warehouses (
     telephone VARCHAR(255) NOT NULL,
     warehouse_code VARCHAR(255) NOT NULL UNIQUE,
     minimun_capacity INT NOT NULL,
-    minimun_temperature INT NOT NULL,
+    minimun_temperature DECIMAL(4,2) NOT NULL,
     locality_id INT,
-    FOREIGN KEY (locality_id) REFERENCES localities(id) ON DELETE SET NULL
+    FOREIGN KEY (locality_id) REFERENCES localities(id)
 );
 
 CREATE TABLE sellers (
@@ -74,6 +74,7 @@ CREATE TABLE sections (
     minimum_temperature DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     warehouse_id INT,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (product_type_id) REFERENCES products_types(id) ON DELETE SET NULL,
     FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );

@@ -1,27 +1,21 @@
 package routes
 
 import (
-	"fmt"
+	"database/sql"
 
 	"github.com/go-chi/chi/v5"
 
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
+	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
-	loader "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/loader/section"
 )
 
-func RegisterSectionRoutes(r chi.Router) {
-
-	ld := loader.NewSectionJSONFile("docs/section.json")
-	db, err := ld.Load()
-	if err != nil {
-		fmt.Print("Error: ", err.Error())
-		return
-	}
+func RegisterSectionRoutes(r chi.Router, db *sql.DB) {
 
 	rp := repository.NewSectionMap(db)
-	sv := service.NewSectionDefault(rp)
+	productTypeRepository := productTypeRepository.NewProductTypeRepository(db)
+	sv := service.NewSectionDefault(rp, productTypeRepository)
 	hd := handler.NewSectionHandler(sv)
 
 	r.Route("/sections", func(rt chi.Router) {
@@ -30,5 +24,6 @@ func RegisterSectionRoutes(r chi.Router) {
 		rt.Post("/", hd.Create())
 		rt.Patch("/{id}", hd.Update())
 		rt.Delete("/{id}", hd.Delete())
+		rt.Get("/reportProducts", hd.GetSectionReports())
 	})
 }
