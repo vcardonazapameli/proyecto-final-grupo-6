@@ -91,6 +91,10 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 		seller.Telephone = *telephone
 	}
 
-	sv.rp.Update(seller)
-	return mappers.SellerToSellerDoc(seller), nil
+	if localityId != nil {
+		seller.LocalityID = *localityId
+	}
+
+	err = sv.rp.Update(seller)
+	return mappers.SellerToSellerDoc(seller), err
 }

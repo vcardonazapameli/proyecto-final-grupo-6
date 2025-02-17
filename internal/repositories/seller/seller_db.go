@@ -127,6 +127,31 @@ func (r SellerRepositoryDB) SearchByCID(cid int) (models.Seller, bool) {
 }
 
 // Update implements SellerRepository.
-func (r SellerRepositoryDB) Update(models.Seller) {
-	panic("unimplemented")
+func (r SellerRepositoryDB) Update(s models.Seller) error {
+	_, err := r.db.Exec(
+		"UPDATE sellers SET cid = ?, company_name = ?, address = ?, telephone = ?, locality_id = ? WHERE id = ?",
+		s.Cid,
+		s.CompanyName,
+		s.Address,
+		s.Telephone,
+		s.LocalityID,
+		s.Id, // Se agrega s.Id al final para la condición WHERE
+	)
+
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) {
+			switch mysqlErr.Number {
+			case 1452: // LocalityID not found
+				return customErrors.ErrorNotFound
+			case 1062: // Duplicated CID
+				return customErrors.ErrorConflict
+			default:
+				return err
+			}
+		}
+		return err
+	}
+
+	return nil
 }
