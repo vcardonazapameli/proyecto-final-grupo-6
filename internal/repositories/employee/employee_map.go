@@ -69,7 +69,7 @@ func (r *EmployeeMap) GetById(id int) (*models.Employee, error) {
 // Create implements EmployeeRepository.
 func (r *EmployeeMap) Create(newEmployee models.Employee) (*models.Employee, error) {
 
-	result, err := r.db.Exec("INSERT INTO employees (first_name, last_name, id_card_number, warehouse_id) VALUES (?, ?, ?, ?)",
+	result, err := r.db.Exec("INSERT INTO employees (first_name, last_name, id_card_number, wareHouse_id) VALUES (?, ?, ?, ?)",
 		newEmployee.FirstName, newEmployee.LastName, newEmployee.CardNumberID, newEmployee.WarehouseID)
 
 	if err != nil {

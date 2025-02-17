@@ -6,6 +6,7 @@ import (
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
 	rpEmployee "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	rpInboundOrders "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
+	rpWarehouse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/employee"
 
 	"github.com/go-chi/chi/v5"
@@ -14,9 +15,10 @@ import (
 func RegisterEmployeeRoutes(r chi.Router, db *sql.DB) {
 
 	//dependency injection
-	rpEmployee := rpEmployee.NewEmployeeMap(db)
-	rpInboundOrders := rpInboundOrders.NewInboundOrderMap(db)
-	sv := service.NewEmployeeDefault(rpEmployee, rpInboundOrders)
+	empRepo := rpEmployee.NewEmployeeMap(db)
+	iorRepo := rpInboundOrders.NewInboundOrderMap(db)
+	whRepo := rpWarehouse.NewWarehouseRepository(db)
+	sv := service.NewEmployeeDefault(empRepo, iorRepo, whRepo)
 	hd := handler.NewEmployeeHandler(sv)
 
 	// - middlewares

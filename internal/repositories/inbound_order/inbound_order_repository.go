@@ -6,4 +6,5 @@ type InboundOrderRepository interface {
 	Create(request models.InboundOrder) (*models.InboundOrder, error)
 	GetReportByEmployeeID(id int) (*models.EmployeeWithOrders, error)
 	GetAllReport() ([]models.EmployeeWithOrders, error)
+	ExistOrderNumber(orderNumber string) (bool, error)
 }

@@ -1,58 +1,68 @@
 package inbound_order
 
 import (
-	productBatchRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/ProductBatch"
-	warehouseRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/Warehouse"
+	"log"
+
 	employeeRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
-	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
+	inboundOrderRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
+
+	// productBatchRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_batch"
+	warehouseRepo "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
 func NewInboundOrderDefault(
-	rp repository.InboundOrderRepository,
+	rp inboundOrderRepo.InboundOrderRepository,
 	empRepo employeeRepo.EmployeeRepository,
-	pbRepo productBatchRepo.ProductBatchRepository,
+	// pbRepo productBatchRepo.ProductBatchRepository,
 	whRepo warehouseRepo.WarehouseRepository) InboundOrderService {
 
-	return &InboundOrderDefault{rp: rp, empRepo: empRepo, pbRepo: pbRepo, whRepo: whRepo}
+	return &InboundOrderDefault{
+		rp:      rp,
+		empRepo: empRepo,
+		// pbRepo: pbRepo,
+		whRepo: whRepo}
 }
 
 // InboundOrderDefault is a struct that represents the default service for vehicles
 type InboundOrderDefault struct {
 	// rp is the repository that will be used by the service
-	rp      repository.InboundOrderRepository
+	rp      inboundOrderRepo.InboundOrderRepository
 	empRepo employeeRepo.EmployeeRepository
-	pbRepo  productBatchRepo.ProductBatchRepository
-	whRepo  warehouseRepo.WarehouseRepository
+	// pbRepo  productBatchRepo.ProductBatchRepository
+	whRepo warehouseRepo.WarehouseRepository
 }
 
 // Create implements InboundOrderService.
 func (i *InboundOrderDefault) Create(request models.RequestInboundOrder) (*models.InboundOrder, error) {
 
 	// Validate if OrderNumber exists
-	existingOrder, err := i.rp.FindByOrderNumber(request.OrderNumber)
-	if existingOrder != nil && err == nil {
+	existingOrder, err := i.rp.ExistOrderNumber(request.OrderNumber)
+	if existingOrder && err == nil {
+		log.Print("OrderNumber already exists")
 		return nil, customErrors.ErrorConflict
 	}
 
 	// Validate if EmployeeID exists
 	employee, err := i.empRepo.GetById(request.EmployeeID)
-	if employee != nil && err == nil {
+	if employee == nil && err != nil {
+		log.Print("EmployeeID does not exist")
 		return nil, customErrors.ErrorConflict
 	}
 
 	// Validate if ProductBatchID exists
-	productBatch, err := i.pbRepo.GetById(request.ProductBatchID)
-	if productBatch != nil && err == nil {
-		return nil, customErrors.ErrorConflict
-	}
+	// productBatch, err := i.pbRepo.GetById(request.ProductBatchID)
+	// if productBatch != nil && err == nil {
+	// 	return nil, customErrors.ErrorConflict
+	// }
 
 	// Validate if WarehouseID exists
-	warehouse, err := i.whRepo.GetById(request.WarehouseID)
-	if warehouse != nil && err == nil {
-		return nil, customErrors.ErrorNotFound
+	warehouse, _ := i.whRepo.GetById(request.WarehouseID)
+	if warehouse == nil {
+		log.Print("WarehouseID does not exist")
+		return nil, customErrors.ErrorConflict
 	}
 
 	//Map request to model

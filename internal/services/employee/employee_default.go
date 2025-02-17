@@ -5,19 +5,21 @@ import (
 
 	rpEmployee "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	rpInboundOrders "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
+	rpWarehouse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewEmployeeDefault(rp rpEmployee.EmployeeRepository, ior rpInboundOrders.InboundOrderRepository) EmployeeService {
-	return &EmployeeDefault{rp: rp, ior: ior}
+func NewEmployeeDefault(rp rpEmployee.EmployeeRepository, ior rpInboundOrders.InboundOrderRepository, wh rpWarehouse.WarehouseRepository) EmployeeService {
+	return &EmployeeDefault{rp: rp, ior: ior, wh: wh}
 }
 
 type EmployeeDefault struct {
 	rp  rpEmployee.EmployeeRepository
 	ior rpInboundOrders.InboundOrderRepository
+	wh  rpWarehouse.WarehouseRepository
 }
 
 // GetAll implements EmployeeService.
@@ -57,7 +59,7 @@ func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 // Create implements EmployeeService.
 func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.EmployeeDoc, error) {
 
-	//1. validate model (empty fields)
+	//validate model (empty fields)
 	err := validators.ValidateCreateEmployee(request)
 	if err != nil {
 		return nil, err
@@ -71,6 +73,11 @@ func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.Employ
 	}
 
 	//Validate if warehouseID exist
+	warehouse, _ := e.wh.GetById(request.WarehouseID)
+	if warehouse == nil {
+		log.Printf("Warehouse not found: %+v", warehouse)
+		return nil, customErrors.ErrorConflict
+	}
 
 	//map request to model
 	newEmployeeMap := mappers.RequestEmployeeToEmployee(request)
@@ -121,6 +128,12 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 		existingEmployee.EmployeeAttributes.LastName = *request.LastName
 	}
 	if request.WarehouseID != nil {
+		//Validate if warehouseID exist
+		warehouse, _ := e.wh.GetById(*request.WarehouseID)
+		if warehouse == nil {
+			log.Printf("Warehouse not found: %+v", warehouse)
+			return nil, customErrors.ErrorConflict
+		}
 		existingEmployee.EmployeeAttributes.WarehouseID = *request.WarehouseID
 	}
 

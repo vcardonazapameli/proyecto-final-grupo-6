@@ -17,6 +17,17 @@ type InboundOrderMap struct {
 	db *sql.DB
 }
 
+// ExistOrderNumber implements InboundOrderRepository.
+func (i *InboundOrderMap) ExistOrderNumber(orderNumber string) (bool, error) {
+	row := i.db.QueryRow("SELECT EXISTS(SELECT 1 FROM inbound_orders WHERE order_number = ?)", orderNumber)
+	var exists bool
+	if err := row.Scan(&exists); err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
 // GetAllReport implements InboundOrderRepository.
 func (i *InboundOrderMap) GetAllReport() ([]models.EmployeeWithOrders, error) {
 	rows, err := i.db.Query(`SELECT e.id, 
