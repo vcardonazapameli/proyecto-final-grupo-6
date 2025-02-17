@@ -16,7 +16,7 @@ func ValidateSellerAttrs(s models.SellerDoc) error {
 	if s.Address == "" {
 		messages = append(messages, "Company Address cannot be empty")
 	}
-	if len(s.Telephone) < 8 && len(s.Telephone) > 10 {
+	if len(s.Telephone) < 8 || len(s.Telephone) > 10 {
 		messages = append(messages, "Wrong telephone format. Must have between 8 and 10 digits")
 	}
 

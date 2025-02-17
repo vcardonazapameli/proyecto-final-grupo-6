@@ -7,7 +7,7 @@ import (
 
 func ValidateLocality(loc models.LocalityDoc) error {
 	messages := make([]string, 0)
-	if loc.Id < 0 {
+	if loc.Id <= 0 {
 		messages = append(messages, "Wrong ID format")
 	}
 	if loc.CountryName == "" {
