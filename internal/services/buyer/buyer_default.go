@@ -18,7 +18,10 @@ type BuyerDefault struct {
 
 // UpdateBuyer implements BuyerService.
 func (b *BuyerDefault) UpdateBuyer(id int, buyerRequest models.UpdateBuyerDto) (*models.BuyerDocResponse, error) {
-	buyerToUpdate, _ := b.GetById(id)
+	buyerToUpdate, err := b.GetById(id)
+	if err != nil {
+		return nil, err
+	}
 
 	updatedBuyer := validators.UpdateEntity(buyerRequest, buyerToUpdate)
 	if b.rp.ValidateCardNumberIdToUpdate(updatedBuyer.CardNumberId, id) {
@@ -78,6 +81,9 @@ func (b *BuyerDefault) GetAll() ([]models.BuyerDocResponse, error) {
 	return buyers, nil
 }
 func (p *BuyerDefault) GetPurchasesReports(cardNumberId int) ([]models.PurchaseOrderReport, error) {
+	if cardNumberId > 0 && !p.rp.ValidateCardNumberId(cardNumberId) {
+		return nil, customErrors.ErrorNotFound
+	}
 	purchaseReports, err := p.rp.GetPurchasesReports(cardNumberId)
 	if err != nil {
 		return nil, err

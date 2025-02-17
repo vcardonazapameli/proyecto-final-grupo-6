@@ -7,7 +7,6 @@ import (
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
@@ -43,13 +42,13 @@ func (h *SectionHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := chi.URLParam(r, "id")
 		if id == "" || id == "0" {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
 		idConv, err := strconv.Atoi(id)
 		if err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
@@ -68,7 +67,7 @@ func (h *SectionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var s models.SectionDoc
 		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
@@ -88,11 +87,11 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
 		var sectionDoc models.UpdateSectionDto
 		if err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
@@ -111,7 +110,7 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idConv, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
 
@@ -126,11 +125,11 @@ func (h *SectionHandler) Delete() http.HandlerFunc {
 
 func (handler *SectionHandler) GetSectionReports() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		queryParam := r.URL.Query()
+		idStr := r.URL.Query().Get("id")
 		var sectionId = 0
 		var err error
-		if queryParam.Get("section_id") != "" {
-			sectionId, err = strconv.Atoi(queryParam.Get("section_id"))
+		if idStr != "" {
+			sectionId, err = strconv.Atoi(idStr)
 			if err != nil {
 				response.Error(w, customErrors.ErrorBadRequest)
 				return

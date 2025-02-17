@@ -34,7 +34,7 @@ CREATE TABLE warehouses (
 
 CREATE TABLE sellers (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    cid VARCHAR(255) UNIQUE NOT NULL,
+    cid INT UNIQUE NOT NULL,
     company_name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     telephone VARCHAR(255) NOT NULL,

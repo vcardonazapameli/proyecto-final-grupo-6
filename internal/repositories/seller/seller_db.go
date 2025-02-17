@@ -13,7 +13,7 @@ type SellerRepositoryDB struct {
 	db *sql.DB
 }
 
-func NewSellerRepositoryDB(db *sql.DB) *SellerRepositoryDB {
+func NewSellerRepositoryDB(db *sql.DB) SellerRepository {
 	return &SellerRepositoryDB{db}
 }
 

@@ -35,7 +35,6 @@ func (h *LocalityHandler) Create() http.HandlerFunc {
 		}
 
 		response.JSON(w, 201, newLocality)
-		return
 	}
 }
 
