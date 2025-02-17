@@ -74,6 +74,7 @@ CREATE TABLE sections (
     minimum_temperature DECIMAL(19,2) NOT NULL,
     product_type_id INT,
     warehouse_id INT,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (product_type_id) REFERENCES products_types(id) ON DELETE SET NULL,
     FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE SET NULL
 );
