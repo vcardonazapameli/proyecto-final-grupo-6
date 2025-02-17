@@ -40,7 +40,7 @@ func (r *SectionMap) SectionNumberExists(sn string) bool {
 func (r *SectionMap) GetAll() (map[int]models.Section, error) {
 	rows, err := r.db.Query("SELECT id, section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id FROM sections WHERE is_deleted = FALSE")
 	if err != nil {
-		return nil, err
+		return nil, customErrors.HandleSqlError(err)
 	}
 	defer rows.Close()
 	sections := make(map[int]models.Section)
@@ -57,7 +57,7 @@ func (r *SectionMap) GetAll() (map[int]models.Section, error) {
 			&section.ProductTypeId,
 			&section.WarehouseId)
 		if err != nil {
-			return nil, err
+			return nil, customErrors.HandleSqlError(err)
 		}
 		sections[section.Id] = section
 	}
@@ -81,7 +81,7 @@ func (r *SectionMap) GetByID(id int) (models.Section, error) {
 		if err == sql.ErrNoRows {
 			return models.Section{}, customErrors.ErrorNotFound
 		}
-		return models.Section{}, err
+		return models.Section{}, customErrors.HandleSqlError(err)
 	}
 	return section, nil
 }
@@ -109,11 +109,11 @@ func (r *SectionMap) Create(section models.SectionAttributes) (models.Section, e
 	row, err := r.db.Exec("INSERT INTO sections (section_number, current_capacity, current_temperature, maximum_capacity, minimum_capacity, minimum_temperature, product_type_id, warehouse_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		section.SectionNumber, section.CurrentCapacity, section.CurrentTemperature, section.MaximumCapacity, section.MinimumCapacity, section.MinimumTemperature, section.ProductTypeId, section.WarehouseId, false)
 	if err != nil {
-		return models.Section{}, err
+		return models.Section{}, customErrors.HandleSqlError(err)
 	}
 	id, err := row.LastInsertId()
 	if err != nil {
-		return models.Section{}, err
+		return models.Section{}, customErrors.HandleSqlError(err)
 	}
 	return mappers.SectionAttributesToSection(section, int(id)), nil
 }
@@ -154,4 +154,62 @@ func (r *SectionMap) Delete(id int) error {
 		return customErrors.ErrorNotFound
 	}
 	return nil
+}
+
+func (r *SectionMap) GetSectionReports(sectionId int) ([]models.SectionReport, error) {
+	if sectionId != 0 {
+		exists := r.SectionExists(sectionId)
+		if !exists {
+			return nil, customErrors.ErrorNotFound
+		}
+	}
+	query, args := sectionReportQuery(sectionId)
+	rows, err := r.db.Query(query, args...)
+	if err != nil {
+		return nil, customErrors.HandleSqlError(err)
+	}
+	defer rows.Close()
+	var section_reports []models.SectionReport
+	for rows.Next() {
+		var report models.SectionReport
+		err := rows.Scan(
+			&report.SectionId,
+			&report.SectionNumber,
+			&report.ProductsCount,
+		)
+		if err != nil {
+			continue
+		}
+		section_reports = append(section_reports, report)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, customErrors.HandleSqlError(err)
+	}
+
+	if sectionId != 0 && len(section_reports) == 0 {
+		return nil, customErrors.ErrorNotFound
+	}
+	return section_reports, nil
+}
+func sectionReportQuery(sectionId int) (string, []any) {
+	var query string
+	var args []interface{}
+
+	if sectionId != 0 {
+		query = `
+            SELECT s.id, s.section_number, COUNT(pb.id) as products_count
+            FROM sections s
+            LEFT JOIN product_batches pb ON s.id = pb.section_id
+            WHERE s.id = ? AND s.is_deleted = FALSE
+            GROUP BY s.id, s.section_number`
+		args = append(args, sectionId)
+	} else {
+		query = `
+            SELECT s.id, s.section_number, COUNT(pb.id) as products_count
+            FROM sections s
+            LEFT JOIN product_batches pb ON s.id = pb.section_id
+            WHERE s.is_deleted = FALSE
+            GROUP BY s.id, s.section_number`
+	}
+	return query, args
 }
