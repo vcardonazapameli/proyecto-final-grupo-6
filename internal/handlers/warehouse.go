@@ -7,9 +7,10 @@ import (
 
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
 	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	mapper "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+	"github.com/bootcamp-go/web/request"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -28,13 +29,7 @@ func (h *WarehouseHandler) GetAll() http.HandlerFunc {
 			response.Error(w, err)
 			return
 		}
-
-		data := make([]models.WarehouseDoc, 0, len(warehouses))
-		for _, value := range warehouses {
-			data = append(data, mapper.WarehouseToWarehouseDoc(value))
-		}
-
-		response.JSON(w, http.StatusOK, data)
+		response.JSON(w, http.StatusOK, warehouses)
 	}
 }
 
@@ -51,28 +46,29 @@ func (h *WarehouseHandler) GetById() http.HandlerFunc {
 			response.Error(w, err)
 			return
 		}
-		warehouseResponse := mapper.WarehouseToWarehouseDoc(warehouse)
 
-		response.JSON(w, http.StatusOK, warehouseResponse)
+		response.JSON(w, http.StatusOK, warehouse)
 	}
 }
 
 func (h *WarehouseHandler) CreateWarehouse() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var warehouseData models.Warehouse
+		var warehouseData models.WarehouseDocRequest
 		err := json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
 			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
-		newWarehouse, err := h.sv.CreateWarehouse(warehouseData)
+		if err := validators.ValidateNoEmptyFields(warehouseData); err != nil {
+			response.Error(w, err)
+			return
+		}
+		warehouse, err := h.sv.CreateWarehouse(warehouseData)
 		if err != nil {
 			response.Error(w, err)
 			return
 		}
-		warehouseResponse := mapper.WarehouseToWarehouseDoc(newWarehouse)
-
-		response.JSON(w, http.StatusCreated, warehouseResponse)
+		response.JSON(w, http.StatusCreated, warehouse)
 	}
 }
 
@@ -102,7 +98,20 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 			response.Error(w, errorsCustom.ErrorBadRequest)
 			return
 		}
+		warehouseDoc := models.WarehouseUpdateDocRequest{}
+		if err := request.JSON(r, &warehouseDoc); err != nil {
+			response.Error(w, err)
+			return
+		}
+		warehouse, err := h.sv.UpdateWarehouse(id, warehouseDoc)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
+		response.JSON(w, http.StatusOK, warehouse)
+	}
 
+	/*
 		var warehouseData models.WarehouseDocUpdate
 		err = json.NewDecoder(r.Body).Decode(&warehouseData)
 		if err != nil {
@@ -118,5 +127,5 @@ func (h *WarehouseHandler) UpdateWarehouse() http.HandlerFunc {
 		warehouseResponse := mapper.WarehouseToWarehouseDoc(updatedWarehouse)
 
 		response.JSON(w, http.StatusOK, warehouseResponse)
-	}
+	*/
 }
