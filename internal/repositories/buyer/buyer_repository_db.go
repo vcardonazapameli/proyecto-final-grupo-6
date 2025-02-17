@@ -22,7 +22,7 @@ func NewBuyerRepository(db *sql.DB) BuyerRepository {
 
 // GetAll implements BuyerRepository.
 func (buyerRepository *buyerRepository) GetAll() ([]models.BuyerDocResponse, error) {
-	rows, err := buyerRepository.db.Query("SELECT id, card_number_id, first_name, last_name from buyers")
+	rows, err := buyerRepository.db.Query("SELECT id, id_card_number, first_name, last_name from buyers")
 	if err != nil {
 		return nil, customErrors.HandleSqlError(err)
 	}
@@ -51,7 +51,7 @@ func (buyerRepository *buyerRepository) GetAll() ([]models.BuyerDocResponse, err
 
 // GetById implements BuyerRepository.
 func (buyerRepository *buyerRepository) GetById(id int) (*models.BuyerDocResponse, error) {
-	row := buyerRepository.db.QueryRow("SELECT id, card_number_id, first_name, last_name from buyers WHERE id = ?", id)
+	row := buyerRepository.db.QueryRow("SELECT id, id_card_number, first_name, last_name from buyers WHERE id = ?", id)
 	var buyer models.BuyerDocResponse
 	err := row.Scan(
 		&buyer.Id,
@@ -68,7 +68,7 @@ func (buyerRepository *buyerRepository) GetById(id int) (*models.BuyerDocRespons
 
 // CreateBuyer implements BuyerRepository.
 func (buyerRepository *buyerRepository) CreateBuyer(buyer *models.BuyerDocResponse) error {
-	result, err := buyerRepository.db.Exec("INSERT INTO buyers (card_number_id, first_name, last_name) VALUES (?, ?, ?)",
+	result, err := buyerRepository.db.Exec("INSERT INTO buyers (id_card_number, first_name, last_name) VALUES (?, ?, ?)",
 		buyer.CardNumberId,
 		buyer.FirstName,
 		buyer.LastName,
@@ -101,7 +101,7 @@ func (buyerRepository *buyerRepository) DeleteBuyer(buyerId int) error{
 
 // UpdateBuyer implements BuyerRepository.
 func (buyerRepository *buyerRepository) UpdateBuyer(id int, buyer *models.BuyerDocRequest) error {
-	_, err := buyerRepository.db.Exec("UPDATE buyers SET card_number_id = ?, first_name = ?, last_name = ? WHERE id = ?", buyer.CardNumberId, buyer.FirstName, buyer.LastName, id)
+	_, err := buyerRepository.db.Exec("UPDATE buyers SET id_card_number = ?, first_name = ?, last_name = ? WHERE id = ?", buyer.CardNumberId, buyer.FirstName, buyer.LastName, id)
 	if err != nil {
 		return customErrors.HandleSqlError(err)
 	}
@@ -111,7 +111,7 @@ func (buyerRepository *buyerRepository) UpdateBuyer(id int, buyer *models.BuyerD
 // ValidateCardNumberId implements BuyerRepository.
 func (buyerRepository *buyerRepository) ValidateCardNumberId(cardNumber int) ( bool) {
 var exist bool
-	query:= "SELECT EXISTS (SELECT 1 FROM buyers b WHERE b.card_number_id = ?)"
+	query:= "SELECT EXISTS (SELECT 1 FROM buyers b WHERE b.id_card_number = ?)"
 	err := buyerRepository.db.QueryRow(query, cardNumber).Scan(&exist)
 	if err != nil {
 		return false
@@ -122,7 +122,7 @@ var exist bool
 // ValidateCardNumberIdToUpdate implements BuyerRepository.
 func (buyerRepository *buyerRepository) ValidateCardNumberIdToUpdate(cardNumber int, id int) (exists bool) {
 	var exist bool
-	query := "Select exists (select 1 FROM buyers b WHERE b.id != ? and b.card_number_id = ? );"
+	query := "Select exists (select 1 FROM buyers b WHERE b.id != ? and b.id_card_number = ? );"
 	err := buyerRepository.db.QueryRow(query, id, cardNumber).Scan(&exist)
 	if err != nil {
 		return false
@@ -174,13 +174,13 @@ func purchaseReportQuery(cardNumberId int) (string, []any) {
     var args []interface{}
     
     if cardNumberId == 0 {
-        query = "SELECT b.id, b.card_number_id, b.first_name, b.last_name, COUNT(pr.id) as purchase_orders_count FROM buyers b " +
+        query = "SELECT b.id, b.id_card_number, b.first_name, b.last_name, COUNT(pr.id) as purchase_orders_count FROM buyers b " +
                 "LEFT JOIN purchase_orders pr ON pr.buyer_id = b.id " +
                 "GROUP BY b.id;"
     } else {
-        query = "SELECT b.id, b.card_number_id, b.first_name, b.last_name, COUNT(pr.id) as purchase_orders_count FROM buyers b " +
+        query = "SELECT b.id, b.id_card_number, b.first_name, b.last_name, COUNT(pr.id) as purchase_orders_count FROM buyers b " +
                 "LEFT JOIN purchase_orders pr ON pr.buyer_id = b.id " +
-                "WHERE b.card_number_id = ? " +
+                "WHERE b.id_card_number = ? " +
                 "GROUP BY b.id;"
         args = append(args, cardNumberId)
     }

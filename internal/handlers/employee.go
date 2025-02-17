@@ -119,3 +119,26 @@ func (h *EmployeeHandler) Delete() http.HandlerFunc {
 		response.JSON(w, http.StatusNoContent, nil)
 	}
 }
+
+func (h *EmployeeHandler) GetReportInboundOrders() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		employeeIDStr := r.URL.Query().Get("id")
+		var employeeID *int
+		if employeeIDStr != "" {
+			id, err := strconv.Atoi(employeeIDStr)
+			if err != nil {
+				response.Error(w, customErrors.ErrorBadRequest)
+				return
+			}
+			employeeID = &id
+		}
+
+		report, err := h.sv.GetReportInboundOrders(employeeID)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
+
+		response.JSON(w, http.StatusOK, report)
+	}
+}

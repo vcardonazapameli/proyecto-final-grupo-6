@@ -11,7 +11,7 @@ import (
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		fmt.Errorf("error loading config: %v", err)
+		log.Fatalf("error loading config: %v", err)
 	}
 
 	log.Println("Starting server on :" + cfg.ServerAddress)
