@@ -21,7 +21,7 @@ func NewSectionMap(db *sql.DB) *SectionMap {
 
 func (r *SectionMap) SectionExists(id int) bool {
 	var exists bool
-	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM sections WHERE id = ?)", id).Scan(&exists)
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM sections WHERE id = ? AND is_deleted = FALSE)", id).Scan(&exists)
 	if err != nil {
 		return false
 	}
@@ -127,10 +127,18 @@ func (r *SectionMap) Update(id int, section models.Section) (models.Section, err
 		return models.Section{}, customErrors.ErrorNotFound
 	}
 
-	if section.SectionNumber != "" && r.SectionNumberExists(section.SectionNumber) {
+	currentSection, err := r.GetByID(id)
+	if err != nil {
+		return models.Section{}, err
+	}
+
+	if section.SectionNumber != "" &&
+		section.SectionNumber != currentSection.SectionNumber &&
+		r.SectionNumberExists(section.SectionNumber) {
 		return models.Section{}, customErrors.ErrorConflict
 	}
-	_, err := r.db.Exec("UPDATE sections SET section_number = ?, current_capacity = ?, current_temperature = ?, maximum_capacity = ?, minimum_capacity = ?, minimum_temperature = ?, product_type_id = ?, warehouse_id = ? WHERE id = ?",
+
+	_, err = r.db.Exec("UPDATE sections SET section_number = ?, current_capacity = ?, current_temperature = ?, maximum_capacity = ?, minimum_capacity = ?, minimum_temperature = ?, product_type_id = ?, warehouse_id = ? WHERE id = ?",
 		section.SectionNumber, section.CurrentCapacity, section.CurrentTemperature, section.MaximumCapacity, section.MinimumCapacity, section.MinimumTemperature, section.ProductTypeId, section.WarehouseId, id)
 	if err != nil {
 		return models.Section{}, err
