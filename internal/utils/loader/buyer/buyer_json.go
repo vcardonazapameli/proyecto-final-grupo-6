@@ -25,7 +25,7 @@ func (ldr *BuyerJsonFile)Load()(buyers map[int]models.Buyer, err error){
 	}
 	defer file.Close()
 
-	var buyersJSON []models.BuyerDoc
+	var buyersJSON []models.BuyerDocResponse
 	err = json.NewDecoder(file).Decode(&buyersJSON)
 	if err != nil {
 		return

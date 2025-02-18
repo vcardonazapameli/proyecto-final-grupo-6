@@ -26,7 +26,7 @@ func (l *WarehouseJSONFile) Load() (v map[int]models.Warehouse, err error) {
 	defer file.Close()
 
 	// decode file
-	var warehouseJSON []models.WarehouseDoc
+	var warehouseJSON []models.WarehouseDocResponse
 	err = json.NewDecoder(file).Decode(&warehouseJSON)
 	if err != nil {
 		return
@@ -43,7 +43,7 @@ func (l *WarehouseJSONFile) Load() (v map[int]models.Warehouse, err error) {
 				Telephone:           vh.Telephone,
 				Minimun_capacity:    vh.Minimun_capacity,
 				Minimun_temperature: vh.Minimun_temperature,
-				Locality_id:         vh.Locality_id,
+				Locality_id:         *vh.Locality_id,
 			},
 		}
 	}

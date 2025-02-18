@@ -43,7 +43,6 @@ func (l *SectionJSONFile) Load() (sections map[int]models.Section, err error) {
 				MinimumTemperature: section.MinimumTemperature,
 				ProductTypeId:      section.ProductTypeId,
 				WarehouseId:        section.WarehouseId,
-				ProductBatchId:     section.ProductBatchId,
 			},
 		}
 	}

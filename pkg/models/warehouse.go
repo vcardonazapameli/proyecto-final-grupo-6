@@ -14,17 +14,35 @@ type WarehouseAttributes struct {
 	Locality_id         uint64
 }
 
-type WarehouseDoc struct {
+type WarehouseDocRequest struct {
+	Warehouse_code      string  `json:"warehouse_code"`
+	Address             string  `json:"address"`
+	Telephone           string  `json:"telephone"`
+	Minimun_capacity    uint64  `json:"minimun_capacity"`
+	Minimun_temperature float64 `json:"minimun_temperature"`
+	Locality_id         *uint64 `json:"locality_id"`
+}
+
+type WarehouseDocResponse struct {
 	ID                  int     `json:"id"`
 	Warehouse_code      string  `json:"warehouse_code"`
 	Address             string  `json:"address"`
 	Telephone           string  `json:"telephone"`
 	Minimun_capacity    uint64  `json:"minimun_capacity"`
 	Minimun_temperature float64 `json:"minimun_temperature"`
-	Locality_id         uint64  `json:"locality_id"`
+	Locality_id         *uint64 `json:"locality_id"`
 }
 
-type WarehouseDocUpdate struct {
+type WarehouseUpdateDocRequest struct {
+	Warehouse_code      *string  `json:"warehouse_code"`
+	Address             *string  `json:"address"`
+	Telephone           *string  `json:"telephone"`
+	Minimun_capacity    *uint64  `json:"minimun_capacity"`
+	Minimun_temperature *float64 `json:"minimun_temperature"`
+	Locality_id         *uint64  `json:"locality_id"`
+}
+
+type WarehouseUpdateDocResponse struct {
 	ID                  *int     `json:"id"`
 	Warehouse_code      *string  `json:"warehouse_code"`
 	Address             *string  `json:"address"`

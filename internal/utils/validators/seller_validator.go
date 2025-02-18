@@ -16,7 +16,7 @@ func ValidateSellerAttrs(s models.SellerDoc) error {
 	if s.Address == "" {
 		messages = append(messages, "Company Address cannot be empty")
 	}
-	if s.Telephone < 10000000 || s.Telephone > 99999999 {
+	if len(s.Telephone) < 8 || len(s.Telephone) > 10 {
 		messages = append(messages, "Wrong telephone format. Must have between 8 and 10 digits")
 	}
 
@@ -26,7 +26,7 @@ func ValidateSellerAttrs(s models.SellerDoc) error {
 	return nil
 }
 
-func ValidateSellerAttrPointers(cid *int, companyName *string, address *string, telephone *int) error {
+func ValidateSellerAttrPointers(cid *int, companyName *string, address *string, telephone *string, localityId *int) error {
 	messages := make([]string, 0)
 	if cid != nil {
 		if *cid <= 0 {
@@ -44,8 +44,13 @@ func ValidateSellerAttrPointers(cid *int, companyName *string, address *string, 
 		}
 	}
 	if telephone != nil {
-		if *telephone < 10000000 || *telephone > 99999999 {
+		if len(*telephone) < 8 || len(*telephone) > 10 {
 			messages = append(messages, "Wrong telephone format. Must have between 8 and 10 digits")
+		}
+	}
+	if localityId != nil {
+		if *localityId <= 0 {
+			messages = append(messages, "Locality ID must not be negative nor zero")
 		}
 	}
 	if len(messages) > 0 {

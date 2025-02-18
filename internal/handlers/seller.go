@@ -37,7 +37,8 @@ type SellerRequest struct {
 	Cid         int    `json:"cid"`
 	CompanyName string `json:"company_name"`
 	Address     string `json:"address"`
-	Telephone   int    `json:"telephone"`
+	Telephone   string `json:"telephone"`
+	LocalityID  int    `json:"locality_id"`
 }
 
 func (h *SellerHandler) Create() http.HandlerFunc {
@@ -48,7 +49,7 @@ func (h *SellerHandler) Create() http.HandlerFunc {
 			return
 		}
 
-		sDoc := models.NewSellerDoc(-1, req.Cid, req.CompanyName, req.Address, req.Telephone)
+		sDoc := models.NewSellerDoc(-1, req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 		new, err := h.sv.Create(*sDoc)
 
 		// Error handling
@@ -66,7 +67,7 @@ func (h *SellerHandler) GetByID() http.HandlerFunc {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			customResponse.Error(w, err) // BadRequest
+			customResponse.Error(w, defaultErrors.ErrorBadRequest) // BadRequest
 			return
 		}
 
@@ -107,7 +108,8 @@ type UpdateSellerRequest struct {
 	Cid         *int    `json:"cid"`
 	CompanyName *string `json:"company_name"`
 	Address     *string `json:"address"`
-	Telephone   *int    `json:"telephone"`
+	Telephone   *string `json:"telephone"`
+	LocalityID  *int    `json:"locality_id"`
 }
 
 func (h *SellerHandler) Update() http.HandlerFunc {
@@ -125,7 +127,7 @@ func (h *SellerHandler) Update() http.HandlerFunc {
 			return
 		}
 
-		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone)
+		sellerDoc, err := h.sv.Update(id, req.Cid, req.CompanyName, req.Address, req.Telephone, req.LocalityID)
 
 		// Error handling
 		if err != nil {
