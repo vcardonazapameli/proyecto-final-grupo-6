@@ -3,7 +3,7 @@ package routes
 import (
 	"database/sql"
 
-	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
+	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers/inbound_order"
 	empRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	iorRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
 

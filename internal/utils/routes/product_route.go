@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
+	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers/product"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product"
 	productTyperepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	sellerRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
