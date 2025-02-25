@@ -10,7 +10,7 @@ import (
 	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers/seller"
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/seller"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )
 
