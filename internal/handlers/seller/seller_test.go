@@ -152,4 +152,48 @@ func TestHandlerSellerCreate(t *testing.T) {
 		require.Equal(t, expectedHeader, res.Header())
 		require.JSONEq(t, expectedBody, res.Body.String())
 	})
+
+	t.Run("Create Seller Error: Conflict", func(t *testing.T) {
+
+		//Arrange
+		svMock := new(service.SellerServiceMock)
+
+		svIn := models.SellerDoc{
+			Id: -1, Cid: 1000, CompanyName: "Company 1", Address: "Address 1", Telephone: "11222333", LocalityID: 1,
+		}
+
+		svMock.On("Create", svIn).Return(models.SellerDoc{}, customErrors.ErrorConflict)
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Post("/seller", hd.Create())
+
+		requestBody := map[string]any{
+			"cid":          1000,
+			"company_name": "Company 1",
+			"address":      "Address 1",
+			"telephone":    "11222333",
+			"locality_id":  1,
+		}
+
+		jsonBody, _ := json.Marshal(requestBody)
+
+		// -- Expected Values --
+		expectedBody := `{
+			"status_code": "409",
+			"message": "conflict"
+			}`
+
+		expectedCode := http.StatusConflict
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodPost, "/seller", bytes.NewReader(jsonBody)), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
 }
