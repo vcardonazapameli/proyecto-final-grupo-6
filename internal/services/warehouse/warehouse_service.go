@@ -7,5 +7,5 @@ type WarehouseService interface {
 	GetById(int) (*models.WarehouseDocResponse, error)
 	CreateWarehouse(models.WarehouseDocRequest) (*models.WarehouseDocResponse, error)
 	DeleteWarehouse(int) error
-	UpdateWarehouse(int, models.WarehouseUpdateDocRequest) (*models.WarehouseDocResponse, error)
+	UpdateWarehouse(int, models.WarehouseUpdateDocRequest) (*models.WarehouseUpdateDocResponse, error)
 }

@@ -12,7 +12,7 @@ type SellerServiceDefault struct {
 	rp repository.SellerRepository
 }
 
-func NewSellerServiceDefault(rp repository.SellerRepository) *SellerServiceDefault {
+func NewSellerServiceDefault(rp repository.SellerRepository) SellerService {
 	return &SellerServiceDefault{rp}
 }
 
@@ -33,7 +33,6 @@ func (sv *SellerServiceDefault) GetAll() (map[int]models.SellerDoc, error) {
 
 func (sv *SellerServiceDefault) Create(sDoc models.SellerDoc) (models.SellerDoc, error) {
 	// Validate Seller
-
 	if err := validators.ValidateSellerAttrs(sDoc); err != nil {
 		return models.SellerDoc{}, err
 	}
@@ -62,7 +61,7 @@ func (sv *SellerServiceDefault) Delete(id int) error {
 	return sv.rp.Delete(id)
 }
 
-func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, address *string, telephone *int, localityId *int) (models.SellerDoc, error) {
+func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, address *string, telephone *string, localityId *int) (models.SellerDoc, error) {
 	seller, err := sv.rp.GetByID(id)
 	if err != nil {
 		return models.SellerDoc{}, err
@@ -92,6 +91,10 @@ func (sv *SellerServiceDefault) Update(id int, cid *int, companyName *string, ad
 		seller.Telephone = *telephone
 	}
 
-	sv.rp.Update(seller)
-	return mappers.SellerToSellerDoc(seller), nil
+	if localityId != nil {
+		seller.LocalityID = *localityId
+	}
+
+	err = sv.rp.Update(seller)
+	return mappers.SellerToSellerDoc(seller), err
 }

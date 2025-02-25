@@ -35,7 +35,6 @@ func (h *LocalityHandler) Create() http.HandlerFunc {
 		}
 
 		response.JSON(w, 201, newLocality)
-		return
 	}
 }
 
@@ -66,6 +65,38 @@ func (h *LocalityHandler) GetSellerByLocalityID() http.HandlerFunc {
 		if err != nil {
 			response.Error(w, err)
 			return
+		}
+		response.JSON(w, 200, body)
+	}
+}
+
+func (h *LocalityHandler) GetCarriesReport() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.URL.Query().Get("id")
+		if idStr == "" {
+			body, err := h.sv.GetAllCarriesByLocality()
+			if err != nil {
+				response.Error(w, err)
+				return
+			}
+			if body == nil {
+				body = []models.LocalityCarriesCountDoc{}
+			}
+			response.JSON(w, 200, body)
+			return
+		}
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			response.Error(w, defaultErrors.ErrorBadRequest)
+			return
+		}
+		body, err := h.sv.GetCarriesByLocality(id)
+		if err != nil {
+			response.Error(w, err)
+			return
+		}
+		if body == nil {
+			body = []models.LocalityCarriesCountDoc{}
 		}
 		response.JSON(w, 200, body)
 	}

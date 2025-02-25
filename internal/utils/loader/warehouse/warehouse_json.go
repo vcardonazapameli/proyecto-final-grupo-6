@@ -43,7 +43,7 @@ func (l *WarehouseJSONFile) Load() (v map[int]models.Warehouse, err error) {
 				Telephone:           vh.Telephone,
 				Minimun_capacity:    vh.Minimun_capacity,
 				Minimun_temperature: vh.Minimun_temperature,
-				Locality_id:         vh.Locality_id,
+				Locality_id:         *vh.Locality_id,
 			},
 		}
 	}

@@ -1,43 +1,52 @@
 package employee
 
 import (
+	"database/sql"
+	"errors"
+
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func NewEmployeeMap(db map[int]models.Employee) EmployeeRepository {
-
-	// default db
-	defaultDb := make(map[int]models.Employee)
-	if db != nil {
-		defaultDb = db
-	}
-	return &EmployeeMap{db: defaultDb}
+func NewEmployeeMap(db *sql.DB) EmployeeRepository {
+	return &EmployeeMap{db: db}
 }
 
-// EmployeeMap is a struct that represents a vehicle repository
 type EmployeeMap struct {
-	// db is a map of vehicles
-	db map[int]models.Employee
+	db *sql.DB
 }
 
 // FindByCardNumberID implements EmployeeRepository.
 func (r *EmployeeMap) FindByCardNumberID(cardNumberID string) (*models.Employee, error) {
-	for _, employee := range r.db {
-		if employee.EmployeeAttributes.CardNumberID == cardNumberID {
-			return &employee, nil
+	row := r.db.QueryRow("SELECT id, first_name, last_name, id_card_number, warehouse_id FROM employees WHERE id_card_number = ?", cardNumberID)
+	var employee models.Employee
+	if err := row.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.CardNumberID, &employee.WarehouseID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, customErrors.ErrorNotFound
 		}
+		return nil, err
 	}
-	return nil, nil
+	return &employee, nil
 }
 
 // FindAll is a method that returns a map of all vehicles
 func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
-	e := make(map[int]models.Employee)
+	rows, err := r.db.Query("SELECT id, first_name, last_name, id_card_number, warehouse_id FROM  employees")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-	// copy db
-	for key, value := range r.db {
-		e[key] = value
+	e := make(map[int]models.Employee)
+	for rows.Next() {
+		var employee models.Employee
+		if err := rows.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.CardNumberID, &employee.WarehouseID); err != nil {
+			return nil, err
+		}
+		e[employee.Id] = employee
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return e, nil
@@ -45,52 +54,70 @@ func (r *EmployeeMap) GetAll() (map[int]models.Employee, error) {
 
 // FindAll is a method that returns a map of all vehicles
 func (r *EmployeeMap) GetById(id int) (*models.Employee, error) {
-	employee, exist := r.db[id]
 
-	if !exist {
-		return nil, customErrors.ErrorNotFound
+	row := r.db.QueryRow("SELECT id, first_name, last_name, id_card_number, warehouse_id FROM employees WHERE id = ?", id)
+	var employee models.Employee
+	if err := row.Scan(&employee.Id, &employee.FirstName, &employee.LastName, &employee.CardNumberID, &employee.WarehouseID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, customErrors.ErrorNotFound
+		}
+		return nil, err
 	}
-
 	return &employee, nil
 }
 
-func createNewId(employees map[int]models.Employee) int {
-	maxId := 0
-	for _, value := range employees {
-		if value.Id > maxId {
-			maxId = value.Id
-		}
-	}
-	return maxId + 1
-}
-
 // Create implements EmployeeRepository.
-func (r *EmployeeMap) Create(newEmployee models.Employee) (models.Employee, error) {
+func (r *EmployeeMap) Create(newEmployee models.Employee) (*models.Employee, error) {
 
-	newId := createNewId(r.db)
-	newEmployee.Id = newId
+	result, err := r.db.Exec("INSERT INTO employees (first_name, last_name, id_card_number, wareHouse_id) VALUES (?, ?, ?, ?)",
+		newEmployee.FirstName, newEmployee.LastName, newEmployee.CardNumberID, newEmployee.WarehouseID)
 
-	//save newEmployee
-	r.db[newId] = newEmployee
+	if err != nil {
+		return nil, err
+	}
 
-	return newEmployee, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	newEmployee.Id = int(id)
+	return &newEmployee, nil
 }
 
 // Update implements EmployeeRepository.
 func (r *EmployeeMap) Update(id int, request *models.Employee) error {
-	r.db[id] = *request
+	result, err := r.db.Exec("UPDATE employees SET first_name = ?, last_name = ?, id_card_number = ?, wareHouse_id = ? WHERE id = ?",
+		request.FirstName, request.LastName, request.CardNumberID, request.WarehouseID, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return customErrors.ErrorNotFound
+	}
 
 	return nil
 }
 
 // Create implements EmployeeRepository.
 func (r *EmployeeMap) Delete(id int) error {
-	_, exist := r.db[id]
-	if !exist {
-		return customErrors.ErrorNotFound
+	result, err := r.db.Exec("DELETE FROM employees WHERE id = ?", id)
+	if err != nil {
+		return err
 	}
 
-	delete(r.db, id)
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+
+		return customErrors.ErrorNotFound
+	}
 
 	return nil
 }

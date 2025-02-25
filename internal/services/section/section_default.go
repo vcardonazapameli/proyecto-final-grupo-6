@@ -62,6 +62,7 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 	if err != nil {
 		return models.Section{}, err
 	}
+
 	updatedSection := validators.UpdateEntity(sectionDto, &sectionToUpdate)
 	if err := validators.ValidateCapacity(*updatedSection); err != nil {
 		return models.Section{}, err
@@ -69,12 +70,17 @@ func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (mod
 	if err := validators.ValidateTemperature(*updatedSection); err != nil {
 		return models.Section{}, err
 	}
+
 	productType, _ := s.productTypeRespository.GetById(updatedSection.ProductTypeId)
 	if productType == nil {
 		return models.Section{}, customErrors.ErrorNotFound
 	}
-	s.rp.Update(id, *updatedSection)
-	return *updatedSection, nil
+	result, err := s.rp.Update(id, *updatedSection)
+	if err != nil {
+		return models.Section{}, err
+	}
+
+	return result, nil
 }
 
 func (s *SectionDefault) Recover(id int) (models.Section, error) {

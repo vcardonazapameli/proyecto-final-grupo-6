@@ -12,8 +12,6 @@ type purchaseOrderRepository struct {
 	db *sql.DB
 }
 
-
-
 func NewPurchaseOrderRepository(db *sql.DB) PurchaseOrderRepository {
 	repository := &purchaseOrderRepository{
 		db: db,
@@ -43,8 +41,6 @@ func (p *purchaseOrderRepository) CreatePurchaseOrder(purchaseOrder *models.Purc
 	return nil
 }
 
-
-
 // ValidateIfProductRecordExist implements PurchaseOrderRepository.
 func (p *purchaseOrderRepository) ValidateIfOrderStatusExist(orderStatusId int) bool {
 	var exist bool
@@ -56,13 +52,12 @@ func (p *purchaseOrderRepository) ValidateIfOrderStatusExist(orderStatusId int) 
 	return exist
 }
 
-
-func (p *purchaseOrderRepository) ValidateIfOrderNumberExist(orderNumber uint) ( bool) {
+func (p *purchaseOrderRepository) ValidateIfOrderNumberExist(orderNumber string) bool {
 	var exist bool
-		query:= "SELECT EXISTS (SELECT 1 FROM purchase_orders po WHERE b.order_number = ?)"
-		err := p.db.QueryRow(query, orderNumber).Scan(&exist)
-		if err != nil {
-			return false
-		}
-		return exist
+	query := "SELECT EXISTS (SELECT 1 FROM purchase_orders po WHERE po.order_number = ?)"
+	err := p.db.QueryRow(query, orderNumber).Scan(&exist)
+	if err != nil {
+		return false
 	}
+	return exist
+}
