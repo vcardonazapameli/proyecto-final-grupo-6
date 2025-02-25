@@ -34,6 +34,7 @@ func TestReadSellers(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, sDocs, 2)
 		assert.Equal(t, expectedDocs, sDocs)
+
 	})
 
 	t.Run("Get Seller By ID", func(t *testing.T) {
@@ -54,6 +55,22 @@ func TestReadSellers(t *testing.T) {
 		// Assert
 		assert.NoError(t, err)
 		assert.Equal(t, expectedDoc, sDoc)
+	})
+
+	t.Run("Find by non existent ID", func(t *testing.T) {
+		// Arrange
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("GetByID", 9999).Return(models.Seller{}, customErrors.ErrorNotFound)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		// Act
+		res, err := sv.GetByID(9999)
+
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
+		assert.Empty(t, res)
+
 	})
 }
 
