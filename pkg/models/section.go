@@ -45,3 +45,7 @@ type SectionReport struct {
 	SectionNumber string `json:"section_number"`
 	ProductsCount int    `json:"products_count"`
 }
+
+func NewSection(id int, sectionAttributes SectionAttributes) *Section {
+	return &Section{Id: id, SectionAttributes: sectionAttributes}
+}
