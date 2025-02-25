@@ -38,6 +38,7 @@ func TestReadSellers(t *testing.T) {
 	})
 
 	t.Run("Get Seller By ID", func(t *testing.T) {
+
 		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		mockRepo.On("GetByID", 1).Return(models.Seller{
@@ -58,6 +59,7 @@ func TestReadSellers(t *testing.T) {
 	})
 
 	t.Run("Find by non existent ID", func(t *testing.T) {
+
 		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		mockRepo.On("GetByID", 9999).Return(models.Seller{}, customErrors.ErrorNotFound)
@@ -76,8 +78,8 @@ func TestReadSellers(t *testing.T) {
 
 func TestCreateSellers(t *testing.T) {
 	t.Run("Create Seller Correctly", func(t *testing.T) {
-		// Arrange
 
+		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		newSeller := models.NewSeller(1, 1000, "Company1", "Avenida Falsa 1", "11222333", 1)
 
@@ -96,6 +98,7 @@ func TestCreateSellers(t *testing.T) {
 	})
 
 	t.Run("Create Seller With Invalid attributes", func(t *testing.T) {
+
 		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		sv := seller.NewSellerServiceDefault(mockRepo)
@@ -110,6 +113,7 @@ func TestCreateSellers(t *testing.T) {
 	})
 
 	t.Run("Create Seller With Invalid Locality ID", func(t *testing.T) {
+
 		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		mockRepo.On("Save", models.NewSeller(1, 1000, "Company1", "Avenida Falsa 1", "11222333", -1)).Return(customErrors.ErrorNotFound)
@@ -144,6 +148,8 @@ func TestCreateSellers(t *testing.T) {
 
 func TestUpdateSeller(t *testing.T) {
 	t.Run("Update Seller Successfully: no-cid given", func(t *testing.T) {
+
+		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 
 		mockRepo.On("Update", *models.NewSeller(1, 1000, "New Name", "New Address", "11222333", 1)).Return(nil)
@@ -171,6 +177,8 @@ func TestUpdateSeller(t *testing.T) {
 	})
 
 	t.Run("Update Seller Fails: trying to update with an existing CID", func(t *testing.T) {
+
+		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 
 		mockRepo.On("Update", *models.NewSeller(1, 1000, "New Name", "New Address", "11222333", 1)).Return(nil)
@@ -197,6 +205,8 @@ func TestUpdateSeller(t *testing.T) {
 	})
 
 	t.Run("Update Seller Fails: NotFound ID", func(t *testing.T) {
+
+		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 		mockRepo.On("GetByID", 9999).Return(models.Seller{}, customErrors.ErrorNotFound)
 
@@ -209,5 +219,38 @@ func TestUpdateSeller(t *testing.T) {
 		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
 		assert.Empty(t, res)
 
+	})
+}
+
+func TestDeleteSeller(t *testing.T) {
+	t.Run("Delete Ok", func(t *testing.T) {
+
+		// Arrange
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("Delete", 1).Return(nil)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		// Act
+		err := sv.Delete(1)
+
+		// Assert
+		assert.NoError(t, err)
+
+	})
+
+	t.Run("Delete Failed: Not Found ID", func(t *testing.T) {
+
+		// Arrange
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("Delete", 9999).Return(customErrors.ErrorNotFound)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		// Act
+		err := sv.Delete(9999)
+
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
 	})
 }
