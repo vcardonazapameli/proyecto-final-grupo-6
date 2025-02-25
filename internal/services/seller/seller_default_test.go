@@ -141,3 +141,73 @@ func TestCreateSellers(t *testing.T) {
 	})
 
 }
+
+func TestUpdateSeller(t *testing.T) {
+	t.Run("Update Seller Successfully: no-cid given", func(t *testing.T) {
+		mockRepo := new(repo.SellerRepositoryMock)
+
+		mockRepo.On("Update", *models.NewSeller(1, 1000, "New Name", "New Address", "11222333", 1)).Return(nil)
+
+		mockRepo.On("GetByID", 1).Return(models.Seller{
+			Id: 1, Cid: 1000, CompanyName: "Company1", Address: "San Martin 1", Telephone: "11222333", LocalityID: 1},
+			nil)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		var (
+			sName string = "New Name"
+			sAddr string = "New Address"
+		)
+
+		expectedSDoc := models.NewSellerDoc(1, 1000, "New Name", "New Address", "11222333", 1)
+
+		// Act
+		res, err := sv.Update(1, nil, &sName, &sAddr, nil, nil)
+
+		// Assert
+		assert.NoError(t, err)
+		assert.Equal(t, *expectedSDoc, res)
+
+	})
+
+	t.Run("Update Seller Fails: trying to update with an existing CID", func(t *testing.T) {
+		mockRepo := new(repo.SellerRepositoryMock)
+
+		mockRepo.On("Update", *models.NewSeller(1, 1000, "New Name", "New Address", "11222333", 1)).Return(nil)
+
+		mockRepo.On("GetByID", 1).Return(models.Seller{
+			Id: 1, Cid: 1000, CompanyName: "Company1", Address: "San Martin 1", Telephone: "11222333", LocalityID: 1},
+			nil)
+
+		mockRepo.On("SearchByCID", 2000).Return(models.Seller{
+			Id: 2, Cid: 2000, CompanyName: "Company2", Address: "San Martin 2", Telephone: "11222333", LocalityID: 1},
+			true)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		var cid int = 2000
+
+		// Act
+		res, err := sv.Update(1, &cid, nil, nil, nil, nil)
+
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorConflict)
+		assert.Empty(t, res)
+
+	})
+
+	t.Run("Update Seller Fails: NotFound ID", func(t *testing.T) {
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("GetByID", 9999).Return(models.Seller{}, customErrors.ErrorNotFound)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		// Act
+		res, err := sv.Update(9999, nil, nil, nil, nil, nil)
+
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
+		assert.Empty(t, res)
+
+	})
+}
