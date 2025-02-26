@@ -143,3 +143,28 @@ func TestUpdateSection(t *testing.T) {
 		assert.Empty(t, res)
 	})
 }
+
+func TestDeleteSection(t *testing.T) {
+	t.Run("delete_ok: delete section successfully", func(t *testing.T) {
+		// Arrange
+		mockRepo, _, sv := setupMocks()
+		mockRepo.On("GetByID", newSection.Id).Return(newSection, nil)
+		mockRepo.On("Delete", newSection.Id).Return(nil)
+		// Act
+		err := sv.Delete(newSection.Id)
+		// Assert
+		assert.NoError(t, err)
+	})
+
+	t.Run("delete_non_existent: section not found", func(t *testing.T) {
+		// Arrange
+		mockRepo, _, sv := setupMocks()
+		nonExistentID := 9999
+		err := customErrors.ErrorNotFound
+		mockRepo.On("GetByID", nonExistentID).Return(models.Section{}, err)
+		// Act
+		err = sv.Delete(nonExistentID)
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
+	})
+}
