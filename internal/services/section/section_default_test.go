@@ -118,16 +118,17 @@ func TestUpdateSection(t *testing.T) {
 	t.Run("update_existent: update section successfully", func(t *testing.T) {
 		// Arrange
 		mockRepo, mockProductTypeRepo, sv := setupMocks()
-		newSection.CurrentCapacity = currentCapacity
-		newSection.CurrentTemperature = currentTemperature
+		updatedSection := newSection
+		updatedSection.CurrentCapacity = currentCapacity
+		updatedSection.CurrentTemperature = currentTemperature
 		mockRepo.On("GetByID", newSection.Id).Return(newSection, nil)
 		mockProductTypeRepo.On("GetById", newSection.ProductTypeId).Return(&models.ProductTypeDocResponse{}, nil)
-		mockRepo.On("Update", newSection.Id, newSection).Return(newSection, nil)
+		mockRepo.On("Update", newSection.Id, updatedSection).Return(updatedSection, nil)
 		// Act
 		res, err := sv.Update(newSection.Id, updateSectionDto)
 		// Assert
 		assert.NoError(t, err)
-		assert.Equal(t, newSection, res)
+		assert.Equal(t, updatedSection, res)
 	})
 
 	t.Run("update_non_existent: section not found", func(t *testing.T) {
