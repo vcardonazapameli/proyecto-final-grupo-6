@@ -4,6 +4,7 @@ import (
 	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	repository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/section"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
+	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/validators"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
@@ -17,7 +18,7 @@ type SectionDefault struct {
 	productTypeRespository productTypeRepository.ProductTypeRepository
 }
 
-func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
+func (s *SectionDefault) GetAll() ([]models.SectionDoc, error) {
 	sections, err := s.rp.GetAll()
 	if err != nil {
 		return nil, err
@@ -25,87 +26,85 @@ func (s *SectionDefault) GetAll() (map[int]models.Section, error) {
 	return sections, nil
 }
 
-func (s *SectionDefault) GetByID(id int) (models.Section, error) {
+func (s *SectionDefault) GetByID(id int) (*models.SectionDoc, error) {
 	section, err := s.rp.GetByID(id)
 	if err != nil {
-		return models.Section{}, err
+		return nil, customErrors.ErrorNotFound
 	}
 	return section, nil
 }
 
-func (s *SectionDefault) Create(section models.Section) (models.Section, error) {
-	if err := validators.ValidateNoEmptyFields(section.SectionAttributes); err != nil {
-		return models.Section{}, customErrors.ErrorUnprocessableContent
+func (s *SectionDefault) Create(section models.SectionDocRequest) (*models.SectionDoc, error) {
+	if err := validators.ValidateNoEmptyFields(section); err != nil {
+		return nil, customErrors.ErrorUnprocessableContent
 	}
-	if err := validators.ValidateCapacity(section); err != nil {
-		return models.Section{}, err
+	sectionDoc := mappers.SectionDocRequestToSectioDocResponse(section)
+	if err := validators.ValidateCapacity(sectionDoc); err != nil {
+		return nil, customErrors.ErrorConflict
 	}
-	if err := validators.ValidateTemperature(section); err != nil {
-		return models.Section{}, err
+	if err := validators.ValidateTemperature(sectionDoc); err != nil {
+		return nil, customErrors.ErrorConflict
 	}
 	productType, err := s.productTypeRespository.GetById(section.ProductTypeId)
 	if err != nil {
-		return models.Section{}, err
+		return nil, customErrors.ErrorNotFound
 	}
 	if productType == nil {
-		return models.Section{}, customErrors.ErrorNotFound
+		return nil, customErrors.ErrorNotFound
 	}
-	createdSection, err := s.rp.Create(section.SectionAttributes)
+
+	sectionResponse := mappers.SectionDocRequestToSectioDocResponse(section)
+
+	err = s.rp.Create(&sectionResponse)
 	if err != nil {
-		return models.Section{}, err
+		return nil, err
 	}
-	return createdSection, nil
+	return &sectionResponse, nil
 }
 
-func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (models.Section, error) {
+func (s *SectionDefault) Update(id int, sectionDto models.UpdateSectionDto) (*models.SectionDoc, error) {
 	sectionToUpdate, err := s.rp.GetByID(id)
 	if err != nil {
-		return models.Section{}, err
+		return nil, err
 	}
-
-	updatedSection := validators.UpdateEntity(sectionDto, &sectionToUpdate)
+	updatedSection := validators.UpdateEntity(sectionDto, sectionToUpdate)
 	if err := validators.ValidateCapacity(*updatedSection); err != nil {
-		return models.Section{}, err
+		return nil, customErrors.ErrorConflict
 	}
 	if err := validators.ValidateTemperature(*updatedSection); err != nil {
-		return models.Section{}, err
+		return nil, customErrors.ErrorConflict
 	}
 
 	productType, _ := s.productTypeRespository.GetById(updatedSection.ProductTypeId)
 	if productType == nil {
-		return models.Section{}, customErrors.ErrorNotFound
+		return nil, customErrors.ErrorNotFound
 	}
-	result, err := s.rp.Update(id, *updatedSection)
-	if err != nil {
-		return models.Section{}, err
+	section := mappers.SectionDocResponseToSectionDocRequest(*updatedSection)
+	if err := s.rp.Update(id, &section); err != nil {
+		return nil, err
 	}
-
-	return result, nil
+	return updatedSection, nil
 }
 
-func (s *SectionDefault) Recover(id int) (models.Section, error) {
+func (s *SectionDefault) Recover(id int) (models.SectionDoc, error) {
 	err := s.rp.Recover(id)
 	if err != nil {
-		return models.Section{}, err
+		return models.SectionDoc{}, err
 	}
 	recoveredSection, err := s.rp.GetByID(id)
 	if err != nil {
-		return models.Section{}, err
+		return models.SectionDoc{}, err
 	}
 
-	return recoveredSection, nil
+	return *recoveredSection, nil
 }
 
 func (s *SectionDefault) Delete(id int) error {
 	section, err := s.rp.GetByID(id)
 	if err != nil {
-		return err
+		return customErrors.ErrorNotFound
 	}
-	err = s.rp.Delete(section.Id)
-	if err != nil {
-		return err
-	}
-
+	s.rp.Delete(section.Id)
 	return nil
 }
 
