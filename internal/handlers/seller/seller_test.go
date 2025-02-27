@@ -326,6 +326,34 @@ func TestHandler_Read(t *testing.T) {
 		require.Equal(t, expectedHeader, res.Header())
 		require.JSONEq(t, string(expectedJSON), res.Body.String())
 	})
+
+	t.Run("Read Failed: Wrong format ID", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Get("/seller/{id}", hd.GetByID())
+
+		// -- Expected Values --
+		expectedBody := `{
+			"status_code": 400,
+			"message": "bad request"
+			}`
+
+		expectedCode := http.StatusBadRequest
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodGet, "/seller/AAA", nil), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
 }
 
 func TestHandler_Update(t *testing.T) {
@@ -432,6 +460,66 @@ func TestHandler_Update(t *testing.T) {
 		require.JSONEq(t, expectedBody, res.Body.String())
 	})
 
+	t.Run("Update Failed: Wrong Format ID", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Patch("/seller/{id}", hd.Update())
+
+		// -- Expected Values --
+		expectedBody := `
+			{
+			"status_code": 400,
+			"message": "bad request"
+			}
+		`
+
+		expectedCode := http.StatusBadRequest
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodPatch, "/seller/AAA", bytes.NewReader([]byte(`{}`))), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
+
+	t.Run("Update Failed: Wrong Body Format", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Patch("/seller/{id}", hd.Update())
+
+		// -- Expected Values --
+		expectedBody := `
+			{
+			"status_code": 400,
+			"message": "bad request"
+			}
+		`
+
+		expectedCode := http.StatusBadRequest
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodPatch, "/seller/AAA", bytes.NewReader([]byte(`{"cid": "not-a-string"}`))), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
+
 }
 
 func TestHandler_Delete(t *testing.T) {
@@ -493,6 +581,36 @@ func TestHandler_Delete(t *testing.T) {
 
 		//Act
 		req, res := httptest.NewRequest(http.MethodDelete, "/seller/9999", nil), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
+
+	t.Run("Delete Fail: Wrong Format ID", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Delete("/seller/{id}", hd.Delete())
+
+		// -- Expected Values --
+		expectedBody := `
+					{
+					"status_code": 400,
+					"message": "bad request"
+					}
+				`
+
+		expectedCode := http.StatusBadRequest
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodDelete, "/seller/AAAA", nil), httptest.NewRecorder()
 		rt.ServeHTTP(res, req)
 
 		//Assert
