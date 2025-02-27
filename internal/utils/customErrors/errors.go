@@ -33,7 +33,7 @@ func HandleSqlError(err error) error{
 		case 1062: // Duplicated Order Number
 			return ErrorConflict
 		default:
-			return err
+			return ErrorInternalServerError
 		}
 	}
 	return err

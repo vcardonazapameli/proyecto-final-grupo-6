@@ -2,42 +2,27 @@ package mappers
 
 import "github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 
-func SectionToSectionDoc(sections models.Section) models.SectionDoc {
+func SectionDocRequestToSectioDocResponse(section models.SectionDocRequest) models.SectionDoc {
 	return models.SectionDoc{
-		Id:                 sections.Id,
-		SectionNumber:      sections.SectionNumber,
-		CurrentTemperature: sections.CurrentTemperature,
-		MinimumTemperature: sections.MinimumTemperature,
-		CurrentCapacity:    sections.CurrentCapacity,
-		MinimumCapacity:    sections.MinimumCapacity,
-		MaximumCapacity:    sections.MaximumCapacity,
-		WarehouseId:        sections.WarehouseId,
-		ProductTypeId:      sections.ProductTypeId,
+		SectionNumber:      section.SectionNumber,
+		CurrentTemperature: section.CurrentTemperature,
+		MinimumTemperature: section.MinimumTemperature,
+		CurrentCapacity:    section.CurrentCapacity,
+		MinimumCapacity:    section.MinimumCapacity,
+		MaximumCapacity:    section.MaximumCapacity,
+		WarehouseId:        section.WarehouseId,
+		ProductTypeId:      section.ProductTypeId,
 	}
 }
-
-func SectionDocToSection(sections models.SectionDoc) models.Section {
-	return models.Section{
-		SectionAttributes: models.SectionAttributes{
-			SectionNumber:      sections.SectionNumber,
-			CurrentTemperature: sections.CurrentTemperature,
-			MinimumTemperature: sections.MinimumTemperature,
-			CurrentCapacity:    sections.CurrentCapacity,
-			MinimumCapacity:    sections.MinimumCapacity,
-			MaximumCapacity:    sections.MaximumCapacity,
-			WarehouseId:        sections.WarehouseId,
-			ProductTypeId:      sections.ProductTypeId,
-		},
+func SectionDocResponseToSectionDocRequest(section models.SectionDoc) models.SectionDocRequest {
+	return models.SectionDocRequest{
+		SectionNumber:      section.SectionNumber,
+		CurrentTemperature: section.CurrentTemperature,
+		MinimumTemperature: section.MinimumTemperature,
+		CurrentCapacity:    section.CurrentCapacity,
+		MinimumCapacity:    section.MinimumCapacity,
+		MaximumCapacity:    section.MaximumCapacity,
+		WarehouseId:        section.WarehouseId,
+		ProductTypeId:      section.ProductTypeId,
 	}
-}
-
-func SectionAttributesToSection(attributes models.SectionAttributes, id int) models.Section {
-	return models.Section{
-		Id:                id,
-		SectionAttributes: attributes,
-	}
-}
-
-func SectionToSectionAttributes(section models.Section) models.SectionAttributes {
-	return section.SectionAttributes
 }
