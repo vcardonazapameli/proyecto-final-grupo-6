@@ -433,3 +433,71 @@ func TestHandler_Update(t *testing.T) {
 	})
 
 }
+
+func TestHandler_Delete(t *testing.T) {
+	t.Run("Delete Ok", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+
+		svMock.On("Delete", 1).Return(nil)
+
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Delete("/seller/{id}", hd.Delete())
+
+		// -- Expected Values --
+		expectedBody := `
+					{
+					"message": "Success",
+					"data": null
+					}
+				`
+
+		expectedCode := http.StatusNoContent
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodDelete, "/seller/1", nil), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
+
+	t.Run("Delete Fail: Not Found", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+
+		svMock.On("Delete", 9999).Return(customErrors.ErrorNotFound)
+
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Delete("/seller/{id}", hd.Delete())
+
+		// -- Expected Values --
+		expectedBody := `
+					{
+					"status_code": 404,
+					"message": "resource not found"
+					}
+				`
+
+		expectedCode := http.StatusNotFound
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodDelete, "/seller/9999", nil), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
+}
