@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -354,6 +355,35 @@ func TestHandler_Read(t *testing.T) {
 		require.Equal(t, expectedHeader, res.Header())
 		require.JSONEq(t, expectedBody, res.Body.String())
 	})
+
+	t.Run("Read Failed: Any Error", func(t *testing.T) {
+
+		// Arrange
+		svMock := new(service.SellerServiceMock)
+		svMock.On("GetAll").Return(map[int]models.SellerDoc{}, errors.New("Some Error"))
+		hd := handler.NewSellerHandler(svMock)
+
+		rt := chi.NewRouter()
+		rt.Get("/seller", hd.GetAll())
+
+		// -- Expected Values --
+		expectedBody := `{
+			"status_code": 500,
+			"message": "Internal Server Error"
+			}`
+
+		expectedCode := http.StatusInternalServerError
+		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
+
+		//Act
+		req, res := httptest.NewRequest(http.MethodGet, "/seller", nil), httptest.NewRecorder()
+		rt.ServeHTTP(res, req)
+
+		//Assert
+		require.Equal(t, expectedCode, res.Code)
+		require.Equal(t, expectedHeader, res.Header())
+		require.JSONEq(t, expectedBody, res.Body.String())
+	})
 }
 
 func TestHandler_Update(t *testing.T) {
@@ -511,7 +541,7 @@ func TestHandler_Update(t *testing.T) {
 		expectedHeader := http.Header{"Content-Type": []string{"application/json"}}
 
 		//Act
-		req, res := httptest.NewRequest(http.MethodPatch, "/seller/AAA", bytes.NewReader([]byte(`{"cid": "not-a-string"}`))), httptest.NewRecorder()
+		req, res := httptest.NewRequest(http.MethodPatch, "/seller/1", bytes.NewReader([]byte(`{"cid": "not-a-string"}`))), httptest.NewRecorder()
 		rt.ServeHTTP(res, req)
 
 		//Assert
