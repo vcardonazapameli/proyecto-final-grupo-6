@@ -8,9 +8,9 @@ import (
 	service "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/section"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	defaultErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/mappers"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
+	"github.com/bootcamp-go/web/request"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -26,60 +26,43 @@ func (h *SectionHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sections, err := h.sv.GetAll()
 		if err != nil {
-			response.Error(w, err)
+			response.Error(w, customErrors.ErrorNotFound)
 			return
 		}
-
-		sectionDocs := make(map[int]models.SectionDoc)
-		for id, section := range sections {
-			sectionDocs[id] = mappers.SectionToSectionDoc(section)
-		}
-		response.JSON(w, http.StatusOK, sectionDocs)
+		response.JSON(w, http.StatusOK, sections)
 
 	}
 }
 
 func (h *SectionHandler) GetByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "id")
-		if id == "" || id == "0" {
-			response.Error(w, defaultErrors.ErrorBadRequest)
-			return
-		}
-
-		idConv, err := strconv.Atoi(id)
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
-
-		s, err := h.sv.GetByID(idConv)
+		section, err := h.sv.GetByID(id)
 		if err != nil {
-			response.Error(w, err)
+			response.Error(w, customErrors.ErrorNotFound)
 			return
 		}
-
-		sectionDoc := mappers.SectionToSectionDoc(s)
-		response.JSON(w, http.StatusOK, sectionDoc)
+		response.JSON(w, http.StatusOK, section)
 	}
 }
 
 func (h *SectionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var s models.SectionDoc
-		if err := json.NewDecoder(r.Body).Decode(&s); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+		section := models.SectionDocRequest{}
+		if err := json.NewDecoder(r.Body).Decode(&section); err != nil {
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
-
-		section := mappers.SectionDocToSection(s)
 		createdSection, err := h.sv.Create(section)
 		if err != nil {
 			response.Error(w, err)
 			return
 		}
-		createdSectionDoc := mappers.SectionToSectionDoc(createdSection)
-		response.JSON(w, http.StatusCreated, createdSectionDoc)
+		response.JSON(w, http.StatusCreated, createdSection)
 	}
 }
 
@@ -91,19 +74,17 @@ func (h *SectionHandler) Update() http.HandlerFunc {
 			response.Error(w, defaultErrors.ErrorBadRequest)
 			return
 		}
-		if err := json.NewDecoder(r.Body).Decode(&sectionDoc); err != nil {
-			response.Error(w, defaultErrors.ErrorBadRequest)
+		if err := request.JSON(r, &sectionDoc); err != nil {
+			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}
-
-		updatedSection, err := h.sv.Update(idConv, sectionDoc) // section Doc puede ser:: nil | valor puntero
+		updatedSection, err := h.sv.Update(idConv, sectionDoc)
 
 		if err != nil {
 			response.Error(w, err)
 			return
 		}
-		updateSectionDoc := mappers.SectionToSectionDoc(updatedSection)
-		response.JSON(w, http.StatusOK, updateSectionDoc)
+		response.JSON(w, http.StatusOK, updatedSection)
 	}
 }
 
