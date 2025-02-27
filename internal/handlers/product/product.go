@@ -64,6 +64,7 @@ func (productHandler *ProductHandler) GetProductRecords() http.HandlerFunc {
 		products, err := productHandler.service.GetProductRecords(id, productTypeId, productCode)
 		if err != nil {
 			response.Error(w, err)
+			return
 		}
 		response.JSON(w, http.StatusOK, products)
 	}
