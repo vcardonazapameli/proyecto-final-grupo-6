@@ -22,7 +22,7 @@ type BuyerDocResponse struct {
 	FirstName		string		`json:"first_name"`
 	LastName 		string		`json:"last_name"`
 }
-
+// Struct para 
 type UpdateBuyerDto struct{
 	CardNumberId 	*int			`json:"card_number_id"`
 	FirstName		*string			`json:"first_name"`

@@ -92,6 +92,62 @@ func Test_Buyer_Read(t *testing.T){
 		mockRepo.AssertExpectations(t)
 
 	})
+	t.Run("Get_purchases_reports", func(t *testing.T) {
+		//Arrange
+		mockRepo := new(mockRepo.BuyerRepositoryMock)
+		service := NewBuyerDefault(mockRepo)
+		cardNumberId := 234532
+		expectedReports := []models.PurchaseOrderReport{
+			{
+				BuyerDocResponse: models.BuyerDocResponse {
+					Id:           2,
+					CardNumberId: 234532,
+					FirstName:    "Jacinto",
+					LastName:     "Orejuela",
+				},
+				PurchaseOrdersCount: 2,
+			},
+		}
+		
+		mockRepo.On("ValidateCardNumberId",234532).Return(true)
+		mockRepo.On("GetPurchasesReports", cardNumberId).Return(expectedReports, nil)
+		//Act
+		result, err := service.GetPurchasesReports(cardNumberId)
+		//Assert
+		assert.NoError(t, err)
+		assert.Equal(t, result, expectedReports)
+		mockRepo.AssertExpectations(t)
+	})
+	t.Run("Get_purchases_reports_non_existent", func(t *testing.T) {
+		//Arrange
+		mockRepo := new(mockRepo.BuyerRepositoryMock)
+		service := NewBuyerDefault(mockRepo)
+		cardNumberId := 234532
+		
+		mockRepo.On("ValidateCardNumberId",cardNumberId).Return(false)
+		
+		//Act
+		result, err := service.GetPurchasesReports(cardNumberId)
+		//Assert
+		assert.ErrorIs(t, err, customErrors.ErrorNotFound)
+		assert.Nil(t, result)
+		mockRepo.AssertExpectations(t)
+	})
+	t.Run("Get_purchases_reports_error_from_repo", func(t *testing.T) {
+		//Arrange
+		mockRepo := new(mockRepo.BuyerRepositoryMock)
+		service := NewBuyerDefault(mockRepo)
+		cardNumberId := 234532
+		
+		mockRepo.On("ValidateCardNumberId",cardNumberId).Return(true)
+		mockRepo.On("GetPurchasesReports",cardNumberId).Return(nil, customErrors.ErrorInternalServerError)
+		//Act
+		result, err := service.GetPurchasesReports(cardNumberId)
+		//Assert
+		assert.ErrorIs(t, err, customErrors.ErrorInternalServerError)
+		assert.Nil(t, result)
+		mockRepo.AssertExpectations(t)
+	})
 }
 
 func Test_Buyer_Create(t *testing.T){
