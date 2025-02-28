@@ -22,7 +22,10 @@ func (productTypeService *productTypeService) GetAll() ([]models.ProductTypeDocR
 }
 
 func (productTypeService *productTypeService) GetById(id int) (*models.ProductTypeDocResponse, error) {
-	productType, _ := productTypeService.repository.GetById(id)
+	productType, err := productTypeService.repository.GetById(id)
+	if err != nil {
+		return nil, errorCustom.ErrorNotFound
+	}
 	if productType == nil {
 		return nil, errorCustom.ErrorNotFound
 	}
