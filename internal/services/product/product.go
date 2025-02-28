@@ -21,7 +21,10 @@ type productService struct {
 }
 
 func (productService *productService) GetAll() ([]models.ProductDocResponse, error) {
-	products, _ := productService.repository.GetAll()
+	products, err := productService.repository.GetAll()
+	if err != nil {
+		return nil, err
+	}
 	return products, nil
 }
 
@@ -46,7 +49,10 @@ func (productService *productService) Delete(id int) error {
 	if product == nil {
 		return errorCustom.ErrorNotFound
 	}
-	productService.repository.Delete(product.Id)
+	err := productService.repository.Delete(product.Id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -94,8 +100,6 @@ func (productService *productService) Update(id int, productDocRequest models.Pr
 	if errorValidateFields := validators.ValidateFieldsProduct(productDoc); errorValidateFields != nil {
 		return nil, errorValidateFields
 	}
-	if err := productService.repository.Update(id, productUpdate); err != nil {
-		return nil, nil
-	}
+	productService.repository.Update(id, productUpdate)
 	return productUpdate, nil
 }
