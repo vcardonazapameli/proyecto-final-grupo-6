@@ -16,6 +16,17 @@ type SectionAttributes struct {
 	WarehouseId        int
 }
 
+type SectionDocRequest struct {
+	SectionNumber      string  `json:"section_number"`
+	CurrentCapacity    int     `json:"current_capacity"`
+	CurrentTemperature float64 `json:"current_temperature"`
+	MaximumCapacity    int     `json:"maximum_capacity"`
+	MinimumCapacity    int     `json:"minimum_capacity"`
+	MinimumTemperature float64 `json:"minimum_temperature"`
+	ProductTypeId      int     `json:"product_type_id"`
+	WarehouseId        int     `json:"warehouse_id"`
+}
+
 type SectionDoc struct {
 	Id                 int     `json:"id"`
 	SectionNumber      string  `json:"section_number"`
@@ -44,4 +55,8 @@ type SectionReport struct {
 	SectionId     int    `json:"section_id"`
 	SectionNumber string `json:"section_number"`
 	ProductsCount int    `json:"products_count"`
+}
+
+func NewSection(id int, sectionAttributes SectionAttributes) *Section {
+	return &Section{Id: id, SectionAttributes: sectionAttributes}
 }
