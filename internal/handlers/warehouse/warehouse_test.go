@@ -9,7 +9,6 @@ import (
 
 	handlers "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers/warehouse"
 	services "github.com/arieleon_meli/proyecto-final-grupo-6/internal/services/warehouse"
-	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	errorsCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/go-chi/chi/v5"
@@ -75,7 +74,7 @@ func TestWarehouseCreate(t *testing.T) {
 	t.Run("case create_fail", func(t *testing.T) {
 		// Arrange
 		sv := new(services.WarehouseServiceMock)
-		sv.On("CreateWarehouse", mock.Anything).Return(&models.WarehouseDocResponse{}, customErrors.ErrorBadRequest)
+		sv.On("CreateWarehouse", mock.Anything).Return(&models.WarehouseDocResponse{}, errorsCustom.ErrorBadRequest)
 
 		hd := handlers.NewWarehouseHandler(sv)
 		rt := chi.NewRouter()
@@ -481,7 +480,7 @@ func TestWarehouseDelete(t *testing.T) {
 	t.Run("case delete_non_existent", func(t *testing.T) {
 		//Arrange
 		sv := new(services.WarehouseServiceMock)
-		sv.On("DeleteWarehouse", 1).Return(customErrors.ErrorNotFound)
+		sv.On("DeleteWarehouse", 1).Return(errorsCustom.ErrorNotFound)
 		hd := handlers.NewWarehouseHandler(sv)
 		rt := chi.NewRouter()
 		rt.Delete("/warehouse/{id}", hd.DeleteWarehouse())

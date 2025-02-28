@@ -7,7 +7,6 @@ import (
 	productTypeRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/product_type"
 	sellerRepository "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/seller"
 	customErrors "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
-	errorCustom "github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -155,7 +154,7 @@ func Test_Product_Create(t *testing.T) {
 		// Assert
 		require.Nil(t, product)
 		require.Error(t, err)
-		require.Equal(t, errorCustom.ErrorConflict, err)
+		require.Equal(t, customErrors.ErrorConflict, err)
 		productRepository.AssertExpectations(t)
 	})
 
@@ -189,7 +188,7 @@ func Test_Product_Create(t *testing.T) {
 		// Assert
 		require.Nil(t, product)
 		require.Error(t, err)
-		require.Equal(t, errorCustom.ErrorConflict, err)
+		require.Equal(t, customErrors.ErrorConflict, err)
 		productRepository.AssertExpectations(t)
 		productTypeRepository.AssertExpectations(t)
 	})

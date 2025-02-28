@@ -92,7 +92,7 @@ func Test_Buyer_Read(t *testing.T){
 		mockRepo.AssertExpectations(t)
 
 	})
-	t.Run("Get_purchases_reports", func(t *testing.T) {
+	t.Run("get_purchases_reports", func(t *testing.T) {
 		//Arrange
 		mockRepo := new(mockRepo.BuyerRepositoryMock)
 		service := NewBuyerDefault(mockRepo)
@@ -118,7 +118,7 @@ func Test_Buyer_Read(t *testing.T){
 		assert.Equal(t, result, expectedReports)
 		mockRepo.AssertExpectations(t)
 	})
-	t.Run("Get_purchases_reports_non_existent", func(t *testing.T) {
+	t.Run("get_purchases_reports_non_existent", func(t *testing.T) {
 		//Arrange
 		mockRepo := new(mockRepo.BuyerRepositoryMock)
 		service := NewBuyerDefault(mockRepo)
@@ -133,7 +133,7 @@ func Test_Buyer_Read(t *testing.T){
 		assert.Nil(t, result)
 		mockRepo.AssertExpectations(t)
 	})
-	t.Run("Get_purchases_reports_error_from_repo", func(t *testing.T) {
+	t.Run("get_purchases_reports_error_from_repo", func(t *testing.T) {
 		//Arrange
 		mockRepo := new(mockRepo.BuyerRepositoryMock)
 		service := NewBuyerDefault(mockRepo)
