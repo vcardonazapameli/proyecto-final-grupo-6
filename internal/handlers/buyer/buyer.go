@@ -9,8 +9,6 @@ import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/customErrors"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/internal/utils/response"
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
-	"github.com/bootcamp-go/web/request"
-
 	"github.com/go-chi/chi/v5"
 )
 
@@ -28,7 +26,7 @@ func (handler *BuyerHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		buyers, err := handler.sv.GetAll()
 		if err != nil {
-			response.Error(w, customErrors.ErrorNotFound)
+			response.Error(w, err)
 			return
 		}
 
@@ -95,7 +93,7 @@ func (handler *BuyerHandler) UpdateBuyer() http.HandlerFunc {
 			return
 		}
 		
-		if err := request.JSON(r,&buyerDoc); err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&buyerDoc); err != nil {
 			response.Error(w, customErrors.ErrorBadRequest)
 			return
 		}

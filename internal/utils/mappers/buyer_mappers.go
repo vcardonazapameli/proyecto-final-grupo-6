@@ -12,13 +12,7 @@ func BuyerDocToBuyer(buyerDoc models.BuyerDocResponse) models.Buyer {
 		},
 	}
 }
-func BuyerDocToBuyerAttributes(buyerDoc models.CreateBuyerDto) models.BuyerAttributes {
-	return models.BuyerAttributes{
-		CardNumberId: buyerDoc.CardNumberId,
-		FirstName:    buyerDoc.FirstName,
-		LastName:     buyerDoc.LastName,
-	}
-}
+
 func BuyerDocRequestToBuyerDocResponse(buyer models.BuyerDocRequest) models.BuyerDocResponse {
 	return models.BuyerDocResponse{
 		CardNumberId: buyer.CardNumberId,

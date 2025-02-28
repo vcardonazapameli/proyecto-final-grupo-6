@@ -11,6 +11,10 @@
 *.userosscache
 *.sln.docstates
 
+# Coverage Files
+coverage.html
+coverage.out
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

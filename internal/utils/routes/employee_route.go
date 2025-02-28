@@ -3,7 +3,7 @@ package routes
 import (
 	"database/sql"
 
-	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers"
+	handler "github.com/arieleon_meli/proyecto-final-grupo-6/internal/handlers/employee"
 	rpEmployee "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/employee"
 	rpInboundOrders "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/inbound_order"
 	rpWarehouse "github.com/arieleon_meli/proyecto-final-grupo-6/internal/repositories/warehouse"

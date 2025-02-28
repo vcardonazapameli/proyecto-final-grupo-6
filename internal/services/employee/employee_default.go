@@ -47,10 +47,6 @@ func (e *EmployeeDefault) GetById(id int) (*models.EmployeeDoc, error) {
 		return nil, err
 	}
 
-	if data == nil {
-		return nil, customErrors.ErrorNotFound
-	}
-
 	dataMap := mappers.EmployeeToEmployeeDoc(*data)
 
 	return &dataMap, nil
@@ -62,7 +58,8 @@ func (e *EmployeeDefault) Create(request models.RequestEmployee) (*models.Employ
 	//validate model (empty fields)
 	err := validators.ValidateCreateEmployee(request)
 	if err != nil {
-		return nil, err
+		log.Print(err.Error())
+		return nil, customErrors.ErrorUnprocessableContent
 	}
 
 	//validate if cardNumberID already exist
@@ -105,7 +102,7 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 	//Validate request fields
 	err = validators.ValidateUpdateEmployee(request)
 	if err != nil {
-		return nil, err
+		return nil, customErrors.ErrorUnprocessableContent
 	}
 
 	// Validate if cardNumberid already exist y Actualizar los campos que no son nil
@@ -116,9 +113,6 @@ func (e *EmployeeDefault) Update(id int, request models.UpdateEmployee) (*models
 			return nil, customErrors.ErrorConflict
 		}
 
-		existingEmployee.EmployeeAttributes.CardNumberID = *request.CardNumberID
-	}
-	if request.CardNumberID != nil {
 		existingEmployee.EmployeeAttributes.CardNumberID = *request.CardNumberID
 	}
 	if request.FirstName != nil {
@@ -168,12 +162,8 @@ func (e *EmployeeDefault) GetReportInboundOrders(employeeID *int) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		if employeeExists == nil {
-			log.Print("Employee not found")
-			return nil, customErrors.ErrorNotFound
-		}
 
-		employee, err := e.ior.GetReportByEmployeeID(*employeeID)
+		employee, err := e.ior.GetReportByEmployeeID(employeeExists.Id)
 		if err != nil {
 			return nil, err
 		}

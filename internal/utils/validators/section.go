@@ -5,7 +5,7 @@ import (
 	"github.com/arieleon_meli/proyecto-final-grupo-6/pkg/models"
 )
 
-func ValidateCapacity(section models.Section) error {
+func ValidateCapacity(section models.SectionDoc) error {
 	var messages []string
 
 	if section.MaximumCapacity <= section.MinimumCapacity {
@@ -24,7 +24,7 @@ func ValidateCapacity(section models.Section) error {
 	return nil
 }
 
-func ValidateTemperature(section models.Section) error {
+func ValidateTemperature(section models.SectionDoc) error {
 	if section.CurrentTemperature < section.MinimumTemperature {
 		return defaultErrors.ValidationError{Messages: []string{"current temperature cannot be below minimum temperature"}}
 	}

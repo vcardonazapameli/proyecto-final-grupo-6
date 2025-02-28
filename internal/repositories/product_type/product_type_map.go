@@ -1,4 +1,4 @@
-package product
+package product_type
 
 import (
 	"database/sql"
