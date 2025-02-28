@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadSellers(t *testing.T) {
+func TestServiceSeller_Read(t *testing.T) {
 	t.Run("Get All Sellers", func(t *testing.T) {
 
 		// Arrange
@@ -74,9 +74,25 @@ func TestReadSellers(t *testing.T) {
 		assert.Empty(t, res)
 
 	})
+
+	t.Run("Get All Fails: Internal Error", func(t *testing.T) {
+
+		// Arrange
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("GetAll").Return(map[int]models.Seller{}, customErrors.ErrorInternalServerError)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		// Act
+		sDocs, err := sv.GetAll()
+
+		// Assert
+		assert.ErrorIs(t, err, customErrors.ErrorInternalServerError)
+		assert.Len(t, sDocs, 0)
+	})
 }
 
-func TestCreateSellers(t *testing.T) {
+func TestServiceSeller_Create(t *testing.T) {
 	t.Run("Create Seller Correctly", func(t *testing.T) {
 
 		// Arrange
@@ -146,14 +162,14 @@ func TestCreateSellers(t *testing.T) {
 
 }
 
-func TestUpdateSeller(t *testing.T) {
+func TestServiceSeller_Update(t *testing.T) {
 	t.Run("Update Seller Successfully: no-cid given", func(t *testing.T) {
 
 		// Arrange
 		mockRepo := new(repo.SellerRepositoryMock)
 
-		mockRepo.On("Update", *models.NewSeller(1, 1000, "New Name", "New Address", "11222333", 1)).Return(nil)
-
+		mockRepo.On("Update", *models.NewSeller(1, 2000, "New Name", "New Address", "11333444", 2)).Return(nil)
+		mockRepo.On("SearchByCID", 2000).Return(models.Seller{}, false)
 		mockRepo.On("GetByID", 1).Return(models.Seller{
 			Id: 1, Cid: 1000, CompanyName: "Company1", Address: "San Martin 1", Telephone: "11222333", LocalityID: 1},
 			nil)
@@ -161,14 +177,17 @@ func TestUpdateSeller(t *testing.T) {
 		sv := seller.NewSellerServiceDefault(mockRepo)
 
 		var (
-			sName string = "New Name"
-			sAddr string = "New Address"
+			newCID        int    = 2000
+			newName       string = "New Name"
+			newAddr       string = "New Address"
+			newPhone      string = "11333444"
+			newLocalityId int    = 2
 		)
 
-		expectedSDoc := models.NewSellerDoc(1, 1000, "New Name", "New Address", "11222333", 1)
+		expectedSDoc := models.NewSellerDoc(1, 2000, "New Name", "New Address", "11333444", 2)
 
 		// Act
-		res, err := sv.Update(1, nil, &sName, &sAddr, nil, nil)
+		res, err := sv.Update(1, &newCID, &newName, &newAddr, &newPhone, &newLocalityId)
 
 		// Assert
 		assert.NoError(t, err)
@@ -220,9 +239,29 @@ func TestUpdateSeller(t *testing.T) {
 		assert.Empty(t, res)
 
 	})
+
+	t.Run("Update Seller Fails: Validation Error", func(t *testing.T) {
+
+		// Arrange
+		mockRepo := new(repo.SellerRepositoryMock)
+		mockRepo.On("GetByID", 1).Return(models.Seller{
+			Id: 1, Cid: 1000, CompanyName: "Company1", Address: "San Martin 1", Telephone: "11222333", LocalityID: 1},
+			nil)
+
+		sv := seller.NewSellerServiceDefault(mockRepo)
+
+		var wrongFormatCID int = -1
+		// Act
+		res, err := sv.Update(1, &wrongFormatCID, nil, nil, nil, nil)
+
+		// Assert
+		assert.ErrorAs(t, err, &customErrors.ValidationError{})
+		assert.Empty(t, res)
+
+	})
 }
 
-func TestDeleteSeller(t *testing.T) {
+func TestServiceSeller_Delete(t *testing.T) {
 	t.Run("Delete Ok", func(t *testing.T) {
 
 		// Arrange
